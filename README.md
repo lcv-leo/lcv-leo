@@ -3,10 +3,10 @@
 </div>
 
 <h1 align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=700&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV+Ideas+%26+Software" alt="Typing SVG" />
 </h1>
 
-<h3 align="center">Founder & Developer @ LCV Ideas & Software | TypeScript • React • Cloudflare Workers • Rust/Tauri • MCP</h3>
+<h3 align="center">Founder & Developer @ LCV Ideas & Software<br>TypeScript • React • Cloudflare Workers • Rust/Tauri • MCP</h3>
 
 <p align="center">
   <em>A passionate developer from Brazil</em><br>
