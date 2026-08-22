@@ -1,0 +1,40 @@
+# Gera a animação da cobra do grid de contribuições consumida pelo README
+# do profile (branch output). Actions pinadas por SHA completo, como em
+# todos os repositórios da organização.
+name: Generate snake animation
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # diário, 03:00 em Brasília
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+concurrency:
+  group: snake
+  cancel-in-progress: true
+
+jobs:
+  snake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # push do SVG gerado para o branch output
+    steps:
+      - uses: Platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3
+        with:
+          github_user_name: lcv-leo
+          outputs: |
+            dist/github-contribution-grid-snake.svg
+            dist/github-contribution-grid-snake-dark.svg?palette=github-dark
+
+      - name: Push para o branch output
+        uses: crazy-max/ghaction-github-pages@df5cc2bfa78282ded844b354faee141f06b41865 # v4.2.0
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
