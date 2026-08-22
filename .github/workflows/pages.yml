@@ -1,3 +1,4 @@
+# This workflow is managed by gh actions-lock.
 # Publica site/ no GitHub Pages (domínio custom lcv-leo.lcv.dev).
 # Actions pinadas por SHA completo, como em todos os repositórios da organização.
 name: Deploy Pages
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   deploy:
+    name: Deploy GitHub Pages
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

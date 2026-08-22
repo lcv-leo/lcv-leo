@@ -6,3 +6,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    # A política geral usa sete dias, mas GitHub Actions é a exceção explícita:
+    # os pins precisam receber correções upstream assim que publicadas.
+    cooldown:
+      default-days: 7
+      exclude:
+        - "*"

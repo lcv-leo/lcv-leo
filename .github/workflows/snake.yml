@@ -1,3 +1,4 @@
+# This workflow is managed by gh actions-lock.
 # Gera a animação da cobra do grid de contribuições consumida pelo README
 # do profile (branch output). Actions pinadas por SHA completo, como em
 # todos os repositórios da organização.
@@ -19,12 +20,13 @@ concurrency:
 
 jobs:
   snake:
+    name: Generate snake SVGs
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write # push do SVG gerado para o branch output
     steps:
-      - uses: Platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3
+      - uses: Platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3.5.0
         with:
           github_user_name: lcv-leo
           outputs: |
