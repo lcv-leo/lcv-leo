@@ -4,78 +4,401 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Leonardo Cardozo Vargas — LCV Ideas &amp; Software</title>
-  <meta name="description" content="Founder &amp; Developer at LCV Ideas &amp; Software. TypeScript, React, Cloudflare Workers, Rust/Tauri, MCP servers.">
-  <style>
-    :root {
-      --bg: #f7f9fc;
-      --card: #ffffff;
-      --text: #1a2233;
-      --muted: #5b6b7d;
-      --accent: #3b82f6;
-      --border: #e3e8f0;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0d1117;
-        --card: #161b22;
-        --text: #e6edf3;
-        --muted: #8b949e;
-        --accent: #58a6ff;
-        --border: #30363d;
-      }
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-    }
-    main {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      max-width: 640px;
-      width: 100%;
-      padding: 2.5rem 2rem;
-      text-align: center;
-    }
-    .logo { max-width: 340px; width: 100%; height: auto; border-radius: 8px; }
-    h1 { font-size: 1.6rem; margin-top: 1.4rem; }
-    .tagline { color: var(--muted); margin-top: .5rem; line-height: 1.5; }
-    .links { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; }
-    .links a {
-      display: inline-block;
-      padding: .55rem 1.1rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--text);
-      text-decoration: none;
-      font-size: .95rem;
-    }
-    .links a:hover { border-color: var(--accent); color: var(--accent); }
-    footer { margin-top: 2rem; color: var(--muted); font-size: .85rem; }
-  </style>
+  <meta name="description" content="Founder &amp; Developer at LCV Ideas &amp; Software. TypeScript, React, Cloudflare Workers, Rust/Tauri, MCP servers — shipping real products with test-driven, fail-closed engineering.">
+  <meta property="og:title" content="Leonardo Cardozo Vargas — LCV Ideas &amp; Software">
+  <meta property="og:description" content="Full-Stack &amp; Edge Developer. TypeScript • React • Cloudflare • Rust/Tauri • MCP servers. Fail closed, test first, ship through the queue.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lcv-leo.lcv.dev">
+  <meta property="og:image" content="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg">
+  <link rel="icon" href="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <img class="logo" src="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg" alt="LCV Ideas &amp; Software">
-    <h1>Leonardo Cardozo Vargas</h1>
-    <p class="tagline">Founder &amp; Developer @ LCV Ideas &amp; Software<br>
-      TypeScript • React • Cloudflare Workers • Rust/Tauri • MCP Servers</p>
-    <nav class="links">
-      <a href="https://github.com/lcv-leo">GitHub</a>
-      <a href="https://github.com/LCV-Ideas-Software">Organization</a>
-      <a href="https://www.lcv.dev">www.lcv.dev</a>
-      <a href="https://github.com/sponsors/lcv-leo">Sponsor</a>
-      <a href="https://lcv-ideas-software.slack.com/team/U0B376DA1K9">Slack</a>
-      <a href="mailto:lcv@lcv.dev">Email</a>
+
+<a class="skip-link" href="#about">Skip to content</a>
+
+<header class="nav" id="top">
+  <div class="nav__inner">
+    <a class="nav__brand" href="#top">
+      <span class="nav__prompt">~/</span>lcv-leo
+    </a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#stack">Stack</a>
+      <a href="#philosophy">Philosophy</a>
+      <a href="#focus">Focus</a>
+      <a href="#analytics">Analytics</a>
+      <a href="#connect">Connect</a>
     </nav>
-    <footer>Fail closed, test first, ship through the queue.</footer>
-  </main>
+    <a class="nav__cta" href="https://github.com/lcv-leo" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__pulse" aria-hidden="true"></span>Founder &amp; Developer @ LCV Ideas &amp; Software</p>
+        <h1 class="hero__title">Leonardo<br>Cardozo <span class="hero__title-accent">Vargas</span></h1>
+        <p class="hero__roles mono" aria-label="Roles">
+          <span id="role-type">Full-Stack &amp; Edge Developer</span><span class="caret" aria-hidden="true"></span>
+        </p>
+        <p class="hero__lede">
+          A passionate developer from Brazil — building full-stack web, edge and desktop
+          applications from idea to deployment. Shipping real products with test-driven,
+          fail-closed engineering.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#focus">See what I'm shipping</a>
+          <a class="btn btn--ghost" href="mailto:lcv@lcv.dev">lcv@lcv.dev</a>
+        </div>
+        <dl class="hero__stats">
+          <div class="stat"><dt>AI models per review</dt><dd data-count="6">0</dd></div>
+          <div class="stat"><dt>Products live</dt><dd data-count="5">0</dd></div>
+          <div class="stat"><dt>Packages on npm</dt><dd data-count="2">0</dd></div>
+          <div class="stat"><dt>GitHub followers</dt><dd id="stat-followers" data-count="4">0</dd></div>
+          <div class="stat"><dt>Public repos</dt><dd id="stat-repos" data-count="1">0</dd></div>
+          <div class="stat"><dt>Stars earned</dt><dd id="stat-stars" data-count="0">0</dd></div>
+        </dl>
+        <p class="hero__live mono"><span class="eyebrow__pulse" aria-hidden="true"></span>live from the GitHub API on every visit</p>
+      </div>
+
+      <div class="editor reveal" id="about" aria-label="about.yaml — profile as code">
+        <div class="editor__bar">
+          <span class="editor__dot editor__dot--r" aria-hidden="true"></span>
+          <span class="editor__dot editor__dot--y" aria-hidden="true"></span>
+          <span class="editor__dot editor__dot--g" aria-hidden="true"></span>
+          <span class="editor__file mono">about.yaml</span>
+          <button class="editor__skip mono" id="editor-skip" type="button" title="Render the whole file now">skip ⏭</button>
+        </div>
+        <div class="editor__body">
+          <ol class="editor__gutter mono" id="editor-gutter" aria-hidden="true"></ol>
+          <pre class="editor__code mono" id="editor-code" aria-live="off"></pre>
+        </div>
+        <div class="editor__status mono" aria-hidden="true">
+          <span class="editor__mode">NORMAL</span>
+          <span>~/lcv-leo/about.yaml</span>
+          <span class="editor__meta"><span id="editor-progress">0%</span> · yaml · utf-8</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SNAKE ============ -->
+  <section class="snake" aria-label="Contribution snake animation">
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/output/github-contribution-grid-snake-dark.svg"
+         alt="Snake eating my GitHub contribution graph" loading="lazy">
+  </section>
+
+  <!-- ============ WHAT I DO ============ -->
+  <section class="section" id="work">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ ls ~/work</p>
+      <h2>What I Do</h2>
+    </div>
+    <div class="cards">
+      <article class="card reveal" style="--accent: var(--tn-blue)">
+        <h3>cross-review <span class="chip chip--green">Live on npm</span></h3>
+        <p>An MCP server that runs adversarial code review across <strong>6 AI models</strong>
+        (GPT, Claude, Gemini, DeepSeek, Grok, Perplexity) with unanimous-convergence gates,
+        evidence custody and cost accounting.</p>
+      </article>
+      <article class="card reveal" style="--accent: var(--tn-purple)">
+        <h3>ultrabrain-mcp <span class="chip chip--green">Live on npm</span></h3>
+        <p>A structured deep-reasoning MCP server with branching, review and export —
+        thinking as an auditable artifact.</p>
+      </article>
+      <article class="card reveal" style="--accent: var(--tn-cyan)">
+        <h3>Reflexos da Alma <span class="chip chip--green">Live</span></h3>
+        <p>A public blog PWA on Cloudflare — React 19, Workers, D1, Vertex AI chat and
+        summaries, TipTap content pipeline.</p>
+      </article>
+      <article class="card reveal" style="--accent: var(--tn-green)">
+        <h3>Oráculo Financeiro <span class="chip chip--green">Live</span></h3>
+        <p>An inflation-indexed fixed-income dashboard — React, Workers, D1 and AI analysis
+        over real market indexes.</p>
+      </article>
+      <article class="card reveal" style="--accent: var(--tn-orange)">
+        <h3>Maestro <span class="chip chip--blue">Shipping</span></h3>
+        <p>A desktop writing &amp; orchestration studio in <strong>Tauri/Rust</strong> with
+        deterministic engines — citations, link integrity, web evidence.</p>
+      </article>
+      <article class="card reveal" style="--accent: var(--tn-yellow)">
+        <h3>Payments in production <span class="chip chip--blue">Mercado Pago → Stripe</span></h3>
+        <p>Checkout Transparente + Orders API with 3DS and HMAC-signed webhooks, operated
+        daily; Stripe migration planned.</p>
+      </article>
+      <article class="card card--wide reveal" style="--accent: var(--tn-red)">
+        <h3>A fleet that deploys itself</h3>
+        <p>Operating repositories with <strong>merge queues, SHA-pinned actions, actions.lock,
+        CodeQL, Zizmor and OpenSSF Scorecard</strong> — deploys only through CI. Practicing TDD with
+        fail-closed design: RED before GREEN, gates that refuse to guess. Open to collaborate
+        on <strong>Edge, MCP &amp; Full-Stack projects</strong>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ TECH STACK ============ -->
+  <section class="section" id="stack">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ cat stack.lock</p>
+      <h2>Tech Stack &amp; Expertise</h2>
+    </div>
+
+    <div class="stackgrid">
+      <div class="stackrow reveal" style="--accent: var(--tn-blue)">
+        <h3 class="stackrow__label mono">languages</h3>
+        <ul class="icons">
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="" loading="lazy"><span>TypeScript</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="" loading="lazy"><span>JavaScript</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/rust/rust-original.svg" alt="" loading="lazy"><span>Rust</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="" loading="lazy"><span>Python</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/sqlite/sqlite-original.svg" alt="" loading="lazy"><span>SQL / SQLite</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg" alt="" loading="lazy"><span>HTML5</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg" alt="" loading="lazy"><span>CSS3</span></li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-cyan)">
+        <h3 class="stackrow__label mono">frontend</h3>
+        <ul class="icons">
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="" loading="lazy"><span>React 19</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vitejs/vitejs-original.svg" alt="" loading="lazy"><span>Vite</span></li>
+          <li class="icons__chip">TipTap</li>
+          <li class="icons__chip">PWA / Workbox</li>
+          <li class="icons__chip">DOMPurify</li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-orange)">
+        <h3 class="stackrow__label mono">edge &amp; backend</h3>
+        <ul class="icons">
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/cloudflareworkers/cloudflareworkers-original.svg" alt="" loading="lazy"><span>CF Workers</span></li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/cloudflare/cloudflare-original.svg" alt="" loading="lazy"><span>CF Pages</span></li>
+          <li class="icons__chip">Hono</li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="" loading="lazy"><span>Node.js</span></li>
+          <li class="icons__chip">D1 (SQLite)</li>
+          <li><img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/tauri/tauri-original.svg" alt="" loading="lazy"><span>Tauri</span></li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-purple)">
+        <h3 class="stackrow__label mono">ai &amp; mcp</h3>
+        <ul class="chips">
+          <li style="--dot:#c0caf5">Model Context Protocol</li>
+          <li style="--dot:#4285F4">Vertex AI (Gemini)</li>
+          <li style="--dot:#D97757">Claude</li>
+          <li style="--dot:#a78bfa">GPT</li>
+          <li style="--dot:#c0caf5">Grok</li>
+          <li style="--dot:#4D6BFE">DeepSeek</li>
+          <li style="--dot:#1FB8CD">Perplexity</li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-green)">
+        <h3 class="stackrow__label mono">payments &amp; integrations</h3>
+        <ul class="chips">
+          <li style="--dot:#00B1EA">Mercado Pago</li>
+          <li style="--dot:#635BFF">Stripe (planned)</li>
+          <li style="--dot:#c0caf5">Resend</li>
+          <li style="--dot:#E01E5A">Slack Integrations</li>
+          <li style="--dot:#5E6AD2">Linear</li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-red)">
+        <h3 class="stackrow__label mono">quality &amp; security</h3>
+        <ul class="chips">
+          <li style="--dot:#6E9F18">Vitest</li>
+          <li style="--dot:#3E67B1">Zod</li>
+          <li style="--dot:#60A5FA">Biome</li>
+          <li style="--dot:#4B32C3">ESLint</li>
+          <li style="--dot:#F7B93E">Prettier</li>
+          <li style="--dot:#2088FF">CodeQL</li>
+          <li style="--dot:#FF6B6B">Zizmor</li>
+          <li style="--dot:#2E7D32">OpenSSF Scorecard</li>
+        </ul>
+      </div>
+
+      <div class="stackrow reveal" style="--accent: var(--tn-yellow)">
+        <h3 class="stackrow__label mono">deployment &amp; devops</h3>
+        <ul class="chips">
+          <li style="--dot:#2088FF">GitHub Actions</li>
+          <li style="--dot:#c0caf5">Merge Queues</li>
+          <li style="--dot:#F38020">Wrangler</li>
+          <li style="--dot:#31C4F3">Dependabot</li>
+          <li style="--dot:#F05032">SHA-pinned Actions</li>
+          <li style="--dot:#CB3837">npm Publishing</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PHILOSOPHY ============ -->
+  <section class="section" id="philosophy">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ cat philosophy.txt</p>
+      <h2>Dev Philosophy</h2>
+    </div>
+    <div class="terminal reveal mono" role="list">
+      <p role="listitem"><span class="terminal__n">1</span>Fail closed: a gate that cannot verify must <em>refuse</em>, never guess</p>
+      <p role="listitem"><span class="terminal__n">2</span>RED before GREEN — the failing test is half the proof</p>
+      <p role="listitem"><span class="terminal__n">3</span>Every external action pinned to a full commit SHA, every dependency in a lockfile</p>
+      <p role="listitem"><span class="terminal__n">4</span>Nothing reaches production outside the merge queue — no manual deploys, ever</p>
+      <p role="listitem"><span class="terminal__n">5</span>Six AI models argue over my code before it ships — unanimity or it doesn't merge</p>
+      <p role="listitem"><span class="terminal__n">6</span>Evidence over narrative: logs, SHAs and run IDs, or it didn't happen</p>
+      <p role="listitem"><span class="terminal__n">7</span>From idea to deployed edge worker is my favorite journey</p>
+    </div>
+  </section>
+
+  <!-- ============ CURRENT FOCUS ============ -->
+  <section class="section" id="focus">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ git status --focus</p>
+      <h2>Current Focus</h2>
+    </div>
+    <div class="focus">
+      <div class="focus__projects">
+        <article class="project reveal">
+          <header><h3>cross-review</h3><span class="chip chip--green">Live on npm</span></header>
+          <p class="project__stack mono">TypeScript + MCP + 6 AI providers</p>
+          <p>Adversarial multi-model code review with unanimous-convergence gates, evidence custody, budget preflight.</p>
+        </article>
+        <article class="project reveal">
+          <header><h3>ultrabrain-mcp</h3><span class="chip chip--green">Live on npm</span></header>
+          <p class="project__stack mono">TypeScript + MCP stdio server</p>
+          <p>Structured deep-reasoning sessions with branching, review and export.</p>
+        </article>
+        <article class="project reveal">
+          <header><h3>Reflexos da Alma</h3><span class="chip chip--green">Live</span></header>
+          <p class="project__stack mono">React 19 + CF Workers + D1 + Vertex AI</p>
+          <p>Public blog PWA with AI chat, comments moderation, TipTap content pipeline.</p>
+        </article>
+        <article class="project reveal">
+          <header><h3>Oráculo Financeiro</h3><span class="chip chip--green">Live</span></header>
+          <p class="project__stack mono">React + Workers + D1 + Vertex AI</p>
+          <p>Inflation-indexed fixed-income dashboard with AI analysis.</p>
+        </article>
+        <article class="project reveal">
+          <header><h3>Maestro</h3><span class="chip chip--blue">Shipping</span></header>
+          <p class="project__stack mono">Tauri (Rust) + TypeScript</p>
+          <p>Desktop writing &amp; orchestration studio — ABNT citations, link integrity, web evidence engines.</p>
+        </article>
+        <article class="project reveal">
+          <header><h3>Sponsor Motor</h3><span class="chip chip--blue">Live → Stripe planned</span></header>
+          <p class="project__stack mono">CF Worker + Hono + Mercado Pago</p>
+          <p>Donation payments with 3DS, signed webhooks and operator CLI.</p>
+        </article>
+      </div>
+
+      <aside class="focus__skills reveal">
+        <h3 class="mono">skills shipped in production</h3>
+        <ul class="chips chips--tight">
+          <li style="--dot:#3178C6">TypeScript end-to-end</li>
+          <li style="--dot:#61DAFB">React 19 + Vite</li>
+          <li style="--dot:#F38020">CF Workers + Pages</li>
+          <li style="--dot:#E36002">Hono on the edge</li>
+          <li style="--dot:#F38020">D1 + migrations</li>
+          <li style="--dot:#c0caf5">MCP servers (stdio)</li>
+          <li style="--dot:#4285F4">Vertex AI SA OAuth</li>
+          <li style="--dot:#00B1EA">Mercado Pago 3DS</li>
+          <li style="--dot:#9ece6a">HMAC-signed webhooks</li>
+          <li style="--dot:#24C8DB">Tauri desktop</li>
+          <li style="--dot:#6E9F18">Vitest TDD</li>
+          <li style="--dot:#3E67B1">Zod validation</li>
+          <li style="--dot:#c0caf5">Merge queue ALLGREEN</li>
+          <li style="--dot:#F05032">actions.lock + SHA pins</li>
+          <li style="--dot:#CB3837">npm publishing</li>
+          <li style="--dot:#5A0FC8">PWA offline-first</li>
+        </ul>
+        <h3 class="mono focus__next">up next</h3>
+        <ul class="chips chips--tight">
+          <li style="--dot:#635BFF">Stripe migration</li>
+          <li style="--dot:#4285F4">Gemini explicit caching</li>
+          <li style="--dot:#3DDC84">Android (Play Store)</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ ANALYTICS ============ -->
+  <section class="section" id="analytics">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ gh api /graphs --live</p>
+      <h2>GitHub Analytics</h2>
+      <p class="section__note">Rendered live from my real activity — same tokyonight theme as everything else here.</p>
+    </div>
+    <div class="analytics">
+      <img class="reveal" src="https://streak-stats.demolab.com/?user=lcv-leo&amp;theme=tokyonight&amp;hide_border=true&amp;background=1a1b26"
+           alt="GitHub streak stats" loading="lazy">
+      <img class="reveal analytics--wide" src="https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&amp;theme=tokyo-night&amp;hide_border=true&amp;area=true&amp;custom_title=Leonardo%27s%20Contribution%20Graph"
+           alt="Contribution activity graph" loading="lazy">
+      <div class="ghcard reveal analytics--wide" aria-label="GitHub profile details">
+        <h3 class="ghcard__title">lcv-leo <span class="ghcard__fullname">(Leonardo Cardozo Vargas)</span></h3>
+        <ul class="ghcard__items mono">
+          <li><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg><span id="ghcard-followers">4</span>&nbsp;Followers on GitHub</li>
+          <li><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"/></svg><span id="ghcard-repos">1</span>&nbsp;Public Repos</li>
+          <li><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Zm7-3.25v2.992l2.028 1.352a.75.75 0 0 1-.832 1.248l-2.5-1.666A.75.75 0 0 1 6.75 8V4.75a.75.75 0 0 1 1.5 0Z"/></svg><span id="ghcard-joined">Joined GitHub March 2026</span></li>
+          <li><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-8.5C0 2.784.784 2 1.75 2ZM1.5 12.251c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V5.809L8.38 9.397a.75.75 0 0 1-.76 0L1.5 5.809Zm13-8.181v-.32a.25.25 0 0 0-.25-.25H1.75a.25.25 0 0 0-.25.25v.32L8 7.88Z"/></svg>lcv@lcv.dev</li>
+        </ul>
+      </div>
+      <div class="analytics__row">
+        <img class="reveal" src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=lcv-leo&amp;theme=tokyonight" alt="Repositories per language" loading="lazy">
+        <img class="reveal" src="https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=lcv-leo&amp;theme=tokyonight" alt="Most committed language" loading="lazy">
+        <img class="reveal" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=lcv-leo&amp;theme=tokyonight" alt="GitHub stats" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONNECT ============ -->
+  <section class="section section--connect" id="connect">
+    <div class="section__head reveal">
+      <p class="eyebrow mono">$ open --with anything</p>
+      <h2>Connect &amp; Collaborate</h2>
+      <p class="section__note">Open to collaborate on Edge, MCP &amp; Full-Stack projects.</p>
+    </div>
+    <div class="connect reveal">
+      <a class="connect__item" href="https://github.com/lcv-leo" target="_blank" rel="noopener" style="--accent: var(--tn-fg)">
+        <span class="connect__label mono">github</span><span>@lcv-leo</span>
+      </a>
+      <a class="connect__item" href="mailto:lcv@lcv.dev" style="--accent: var(--tn-red)">
+        <span class="connect__label mono">email</span><span>lcv@lcv.dev</span>
+      </a>
+      <a class="connect__item" href="https://lcv-ideas-software.slack.com/team/U0B376DA1K9" target="_blank" rel="noopener" style="--accent: var(--tn-purple)">
+        <span class="connect__label mono">slack</span><span>DM me directly</span>
+      </a>
+      <a class="connect__item" href="https://www.lcv.dev" target="_blank" rel="noopener" style="--accent: var(--tn-blue)">
+        <span class="connect__label mono">web</span><span>www.lcv.dev</span>
+      </a>
+      <a class="connect__item" href="https://github.com/LCV-Ideas-Software" target="_blank" rel="noopener" style="--accent: var(--tn-cyan)">
+        <span class="connect__label mono">org</span><span>LCV Ideas &amp; Software</span>
+      </a>
+      <a class="connect__item" href="https://github.com/sponsors/lcv-leo" target="_blank" rel="noopener" style="--accent: var(--tn-green)">
+        <span class="connect__label mono">sponsor</span><span>GitHub Sponsors</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <blockquote class="footer__quote">
+    “First, solve the problem. Then, write the code.”
+    <cite>— John Johnson</cite>
+  </blockquote>
+  <p class="footer__hint">Feel free to explore my repositories and star them if you find something interesting.</p>
+  <p class="footer__made mono">made with dedication by <a href="https://github.com/lcv-leo">Leonardo Cardozo Vargas</a> · <span id="year">2026</span></p>
+</footer>
+
+<script src="app.js" defer></script>
 </body>
 </html>
