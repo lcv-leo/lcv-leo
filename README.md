@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=LCV%20Ideas%20%26%20Software&fontSize=42&fontAlignY=35&animation=twinkling" width="100%"/>
+  <img src="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg" alt="LCV Ideas &amp; Software" width="560"/>
 </div>
 
 <h1 align="center">
@@ -34,7 +34,7 @@
 name: Leonardo Cardozo Vargas
 role: Founder, Full-Stack & Edge Developer
 location: Brazil
-organization: LCV Ideas & Software — https://lcv.dev
+organization: LCV Ideas & Software — https://www.lcv.dev
 stack:
   languages: [TypeScript, JavaScript, Rust, Python, SQL, HTML, CSS]
   frontend:  [React 19, Vite, TipTap, PWA/Workbox, DOMPurify]
@@ -68,7 +68,7 @@ motto: "Fail closed, test first, ship through the queue."
 - Practicing **TDD with fail-closed design** — RED before GREEN, gates that refuse to guess
 - Open to collaborate on **Edge, MCP & Full-Stack Projects**
 - Reach me at **lcv@lcv.dev**
-- Visit **[lcv.dev](https://lcv.dev)**
+- Visit **[www.lcv.dev](https://www.lcv.dev)**
 
 <br clear="both">
 
@@ -375,8 +375,8 @@ From idea to deployed edge worker is my favorite journey
   <a href="mailto:lcv@lcv.dev">
     <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
   </a>
-  <a href="https://lcv.dev" target="_blank">
-    <img src="https://img.shields.io/badge/lcv.dev-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website" />
+  <a href="https://www.lcv.dev" target="_blank">
+    <img src="https://img.shields.io/badge/www.lcv.dev-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website" />
   </a>
   <a href="https://github.com/LCV-Ideas-Software">
     <img src="https://img.shields.io/badge/LCV_Ideas_%26_Software-0A66C2?style=for-the-badge&logo=github&logoColor=white" alt="Organization" />
