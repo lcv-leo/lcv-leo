@@ -31,12 +31,17 @@ jobs:
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
 
-      # Push nativo (sem action de terceiro): dist/ vira o único commit do
+      # Push nativo (sem action de terceiro): os SVGs viram o único commit do
       # branch output, forçado a cada geração — mesmo comportamento do
       # keep_history: false da action que este passo substituiu.
+      # Os arquivos são copiados para fora de dist/ porque o Platane/snk é uma
+      # Docker action e cria o diretório como root — git init dentro dele
+      # falha com Permission denied para o usuário runner.
       - name: Push para o branch output
         run: |
-          cd dist
+          mkdir -p "$RUNNER_TEMP/output-branch"
+          cp dist/*.svg "$RUNNER_TEMP/output-branch/"
+          cd "$RUNNER_TEMP/output-branch"
           git init -q -b output
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
