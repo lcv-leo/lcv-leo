@@ -1,3 +1,5 @@
+# This workflow is managed by gh actions-lock.
+
 name: Linear Release
 
 on:
@@ -32,14 +34,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Create Linear release
-        env:
-          LINEAR_ACCESS_KEY: ${{ secrets.LINEAR_ACCESS_KEY }}
-          CLI_URL: https://github.com/linear/linear-release/releases/download/v0.16.0/linear-release-linux-x64
-          CLI_SHA256: 963ae1cb3b5302372a4d988b89bf16a91dfae51f504e9493c14a9f89441a89be
-        run: |
-          bin="$RUNNER_TEMP/linear-release"
-          curl -fsSL "$CLI_URL" -o "$bin"
-          echo "$CLI_SHA256  $bin" | sha256sum -c -
-          chmod +x "$bin"
-          "$bin" sync
+      - name: Create Linear release with the official action
+        uses: linear/linear-release-action@0a25abab892a91062ebf42260dbb2ce6277aa205 # v0.16.0
+        with:
+          access_key: ${{ secrets.LINEAR_ACCESS_KEY }}
+          cli_version: v0.16.0
+          command: sync
