@@ -68,6 +68,7 @@ motto: "Fail closed, test first, ship through the queue."
 - Practicing **TDD with fail-closed design** — RED before GREEN, gates that refuse to guess
 - Open to collaborate on **Edge, MCP & Full-Stack Projects**
 - Reach me at **lcv@lcv.dev**
+- Message me directly on **[Slack](https://lcv-ideas-software.slack.com/team/U0B376DA1K9)**
 - Visit **[www.lcv.dev](https://www.lcv.dev)**
 
 <br clear="both">
@@ -374,6 +375,9 @@ From idea to deployed edge worker is my favorite journey
   </a>
   <a href="mailto:lcv@lcv.dev">
     <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://lcv-ideas-software.slack.com/team/U0B376DA1K9" target="_blank">
+    <img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white" alt="Slack" />
   </a>
   <a href="https://www.lcv.dev" target="_blank">
     <img src="https://img.shields.io/badge/www.lcv.dev-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website" />
