@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leonardo Cardozo Vargas — LCV Ideas &amp; Software</title>
+  <meta name="description" content="Founder &amp; Developer at LCV Ideas &amp; Software. TypeScript, React, Cloudflare Workers, Rust/Tauri, MCP servers.">
+  <style>
+    :root {
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #1a2233;
+      --muted: #5b6b7d;
+      --accent: #3b82f6;
+      --border: #e3e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --card: #161b22;
+        --text: #e6edf3;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+        --border: #30363d;
+      }
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    main {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    .logo { max-width: 340px; width: 100%; height: auto; border-radius: 8px; }
+    h1 { font-size: 1.6rem; margin-top: 1.4rem; }
+    .tagline { color: var(--muted); margin-top: .5rem; line-height: 1.5; }
+    .links { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; }
+    .links a {
+      display: inline-block;
+      padding: .55rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: .95rem;
+    }
+    .links a:hover { border-color: var(--accent); color: var(--accent); }
+    footer { margin-top: 2rem; color: var(--muted); font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg" alt="LCV Ideas &amp; Software">
+    <h1>Leonardo Cardozo Vargas</h1>
+    <p class="tagline">Founder &amp; Developer @ LCV Ideas &amp; Software<br>
+      TypeScript • React • Cloudflare Workers • Rust/Tauri • MCP Servers</p>
+    <nav class="links">
+      <a href="https://github.com/lcv-leo">GitHub</a>
+      <a href="https://github.com/LCV-Ideas-Software">Organization</a>
+      <a href="https://www.lcv.dev">www.lcv.dev</a>
+      <a href="https://github.com/sponsors/lcv-leo">Sponsor</a>
+      <a href="mailto:lcv@lcv.dev">Email</a>
+    </nav>
+    <footer>Fail closed, test first, ship through the queue.</footer>
+  </main>
+</body>
+</html>
