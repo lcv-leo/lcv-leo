@@ -341,7 +341,7 @@ From idea to deployed edge worker is my favorite journey
 
 <br/><br/>
 
-<img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/output/github-contribution-grid-snake-dark.svg" alt="snake animation" width="98%" />
+<img src="https://lcv-leo.lcv.dev/github-contribution-grid-snake-dark.svg" alt="snake animation" width="98%" />
 
 </div>
 
