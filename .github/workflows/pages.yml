@@ -1,14 +1,18 @@
 # This workflow is managed by gh actions-lock.
-# Publica site/ no GitHub Pages (domínio custom lcv-leo.lcv.dev).
+# Gera a animação do grid e publica site/ no GitHub Pages
+# (domínio custom lcv-leo.lcv.dev), sem branch de artefatos.
 # Actions pinadas por SHA completo, como em todos os repositórios da organização.
 name: Deploy Pages
 
 on:
+  schedule:
+    - cron: "17 6 * * *" # diário, 03:17 em Brasília; evita o pico da hora cheia
   push:
     branches:
       - main
     paths:
       - "site/**"
+      - "README.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -34,6 +38,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Generate contribution snake SVGs
+        uses: platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3.5.0
+        with:
+          github_user_name: lcv-leo
+          outputs: |
+            site/github-contribution-grid-snake.svg
+            site/github-contribution-grid-snake-dark.svg?palette=github-dark
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
         with:

@@ -1,4 +1,4 @@
-# Único ecossistema deste repositório: GitHub Actions (snake.yml, codeql.yml).
+# Único ecossistema deste repositório: GitHub Actions (pages.yml, codeql.yml).
 # As actions são pinadas por SHA; o Dependabot atualiza o pin e o comentário de versão.
 version: 2
 updates:
