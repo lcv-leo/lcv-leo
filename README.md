@@ -67,7 +67,7 @@ motto: "Fail closed, test first, ship through the queue."
 - Operating a fleet of repos with **merge queues, SHA-pinned actions, actions.lock, CodeQL, Zizmor and Scorecard** — deploys only through CI
 - Practicing **TDD with fail-closed design** — RED before GREEN, gates that refuse to guess
 - Open to collaborate on **Edge, MCP & Full-Stack Projects**
-- Reach me at **lcv@lcv.dev**
+- Reach me at **contato@lcv.dev**
 - Message me directly on **[Slack](https://lcv-ideas-software.slack.com/team/U0B376DA1K9)**
 - Visit **[www.lcv.dev](https://www.lcv.dev)**
 
@@ -373,7 +373,7 @@ From idea to deployed edge worker is my favorite journey
   <a href="https://github.com/lcv-leo">
     <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
   </a>
-  <a href="mailto:lcv@lcv.dev">
+  <a href="mailto:contato@lcv.dev">
     <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
   </a>
   <a href="https://lcv-ideas-software.slack.com/team/U0B376DA1K9" target="_blank">
