@@ -13,7 +13,7 @@ This code applies to issues, pull requests, discussions, review comments, docume
 
 ## Reporting
 
-Report conduct concerns privately to LCV Ideas & Software at lcv@lcv.dev. This is the same private channel used for security reports; do not open public issues for private conduct or security matters.
+Report conduct concerns privately to LCV Ideas & Software at lcv@lcv.dev. Security reports use the separate channel documented in [SECURITY.md](SECURITY.md). Do not open public issues for private conduct or security matters.
 
 ## Enforcement
 

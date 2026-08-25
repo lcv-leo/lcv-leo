@@ -15,8 +15,21 @@ workflows:
         - 'actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128'
         - 'actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9'
         - 'platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b'
+    '.github/workflows/scorecard.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'actions/upload-artifact@v7.0.1'
+        - 'github/codeql-action@v4.37.8'
+        - 'ossf/scorecard-action@v2.4.4'
+    '.github/workflows/zizmor.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'zizmorcore/zizmor-action@v0.6.2'
 dependencies:
     'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1':
+        ref: 'v7.0.1'
+        commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
+        owner_id: 44036562
+        repo_id: 197814629
+    'actions/checkout@v7.0.1':
         ref: 'v7.0.1'
         commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
         owner_id: 44036562
@@ -36,6 +49,11 @@ dependencies:
         commit: 'sha1-bbbca2ddaa5d8feaa63e36b76fdaad77386f024f'
         owner_id: 44036562
         repo_id: 192625955
+    'actions/upload-artifact@v7.0.1':
+        ref: 'v7.0.1'
+        commit: 'sha1-043fb46d1a93c77aae656e7c1c64a875d1fc6a0a'
+        owner_id: 44036562
+        repo_id: 192625955
     'actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9':
         ref: 'v5.0.0'
         commit: 'sha1-fc324d3547104276b827a68afc52ff2a11cc49c9'
@@ -43,7 +61,17 @@ dependencies:
         repo_id: 496012378
         uses:
             - 'actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f'
+    'github/codeql-action@7188fc363630916deb702c7fdcf4e481b751f97a':
+        ref: 'v4.37.1'
+        commit: 'sha1-7188fc363630916deb702c7fdcf4e481b751f97a'
+        owner_id: 9919
+        repo_id: 259445878
     'github/codeql-action@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28':
+        ref: 'v4.37.8'
+        commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
+        owner_id: 9919
+        repo_id: 259445878
+    'github/codeql-action@v4.37.8':
         ref: 'v4.37.8'
         commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
         owner_id: 9919
@@ -53,8 +81,20 @@ dependencies:
         commit: 'sha1-0a25abab892a91062ebf42260dbb2ce6277aa205'
         owner_id: 46686594
         repo_id: 1150447766
+    'ossf/scorecard-action@v2.4.4':
+        ref: 'v2.4.4'
+        commit: 'sha1-2d1146689b8cda280b9bc96326124645441f03bc'
+        owner_id: 67707773
+        repo_id: 421101922
     'platane/snk@d8f6715049803e982ee5ff501b6b9b7d5deeb09b':
         ref: 'v3.5.0'
         commit: 'sha1-d8f6715049803e982ee5ff501b6b9b7d5deeb09b'
         owner_id: 1659820
         repo_id: 279995113
+    'zizmorcore/zizmor-action@v0.6.2':
+        ref: 'v0.6.2'
+        commit: 'sha1-3dc1ecc9bcb9e94e9b2c709687979e1298497054'
+        owner_id: 210636713
+        repo_id: 985558803
+        uses:
+            - 'github/codeql-action@7188fc363630916deb702c7fdcf4e481b751f97a'
