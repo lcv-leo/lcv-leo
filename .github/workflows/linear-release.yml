@@ -13,7 +13,7 @@ permissions: {}
 
 concurrency:
   group: linear-release-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.conclusion }}
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   linear_release:
