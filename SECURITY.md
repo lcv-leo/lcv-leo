@@ -58,6 +58,6 @@ The contribution-snake generator is retained for the profile feature at the exac
 
 ## Automation policy
 
-Dependabot checks every supported ecosystem daily and relies on GitHub's post-merge branch deletion. GitHub Actions updates are evaluated immediately, so that a release can be adopted as soon as its provenance, security, and compatibility are validated; every other ecosystem applies a seven-day cooldown to ordinary version updates for stability. Dependabot security updates are exempt from that delay. Required security and quality checks are never bypassed.
+Dependabot checks every supported ecosystem daily and relies on GitHub's post-merge branch deletion. Official Actions under `actions/*` and `github/*` are evaluated immediately, so that a release can be adopted as soon as its provenance, security, and compatibility are validated; third-party GitHub Actions apply a seven-day cooldown to ordinary version updates for stability. Dependabot security updates are exempt from that delay. Required security and quality checks are never bypassed.
 
 This personal repository does not use the organization's custom Dependabot auto-merge controller or a merge queue. Pull requests are admitted and merged under the repository's own effective ruleset. Repository-local workflows may secure and publish this repository's own profile surfaces; organization or enterprise settings do not implicitly govern this personal account.
