@@ -18,6 +18,7 @@
   <img src="https://komarev.com/ghpvc/?username=lcv-leo&label=Profile%20Views&color=3B82F6&style=flat-square" alt="Profile views" />
   <img src="https://img.shields.io/github/followers/lcv-leo?label=Followers&style=flat-square&color=3B82F6" alt="followers" />
   <img src="https://img.shields.io/github/stars/lcv-leo?label=Stars&style=flat-square&color=3B82F6" alt="stars" />
+  <a href="https://www.bestpractices.dev/projects/14239"><img src="https://www.bestpractices.dev/projects/14239/badge" alt="OpenSSF Best Practices" /></a>
 </p>
 
 <br>
