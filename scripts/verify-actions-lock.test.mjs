@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  formatDiagnosticCommand,
   validateLockfileText,
   validateRepository,
   validateWorkflowText,
@@ -73,6 +74,12 @@ test("rejects a dependency whose metadata commit does not match its key", () => 
   assert.match(result.diagnostics[0].message, /commit must be/);
 });
 
+test("rejects unsupported 64-character action object identifiers", () => {
+  const sha256 = "a".repeat(64);
+  const result = validateLockfileText(validLockfile({ pin: `actions/checkout@${sha256}` }));
+  assert.equal(result.diagnostics.some((item) => item.message.includes("full commit SHA")), true);
+});
+
 test("rejects missing and invalid dependency metadata", () => {
   const lockfile = validLockfile()
     .replace("        ref: 'v7.0.1'\n", "")
@@ -107,6 +114,17 @@ test("does not treat shell text inside a block scalar as workflow uses", () => {
 test("rejects an invalid self-repository reference", () => {
   const result = validateWorkflowText("jobs:\n  test:\n    uses: $/action@main\n", ".github/workflows/ci.yml");
   assert.match(result.diagnostics[0].message, /must not contain @ref/);
+});
+
+test("escapes untrusted file names in GitHub workflow commands", () => {
+  assert.equal(
+    formatDiagnosticCommand({
+      file: ".github/workflows/evil%,:\n.yml",
+      line: 7,
+      message: "bad%\r\nvalue",
+    }),
+    "::error file=.github/workflows/evil%25%2C%3A%0A.yml,line=7::bad%25%0D%0Avalue",
+  );
 });
 
 test("repository validation requires exact agreement between workflows and lockfile", async (t) => {

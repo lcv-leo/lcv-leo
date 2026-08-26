@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 const LOCKFILE_PATH = ".github/workflows/actions.lock";
 const WORKFLOWS_DIRECTORY = ".github/workflows";
 const SUPPORTED_LOCKFILE_VERSION = "v0.0.2";
-const FULL_COMMIT_SHA = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/i;
+const FULL_COMMIT_SHA = /^[0-9a-f]{40}$/i;
 const REMOTE_USES = /^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)(?:\/[^@\s]+)*@([^\s@]+)$/;
 
 function diagnostic(file, line, message) {
@@ -266,7 +266,7 @@ export function validateLockfileText(text, file = LOCKFILE_PATH) {
     if (!dependency.commit) {
       // The missing field was already reported with the complete required set.
     } else {
-      const expected = dependency.sha.length === 40 ? `sha1-${dependency.sha}` : `sha256-${dependency.sha}`;
+      const expected = `sha1-${dependency.sha}`;
       if (dependency.commit.value.toLowerCase() !== expected) {
         diagnostics.push(
           diagnostic(
@@ -421,11 +421,28 @@ export async function validateRepository(repositoryRoot = process.cwd()) {
   return { diagnostics };
 }
 
+function escapeWorkflowCommandProperty(value) {
+  return String(value)
+    .replaceAll("%", "%25")
+    .replaceAll("\r", "%0D")
+    .replaceAll("\n", "%0A")
+    .replaceAll(":", "%3A")
+    .replaceAll(",", "%2C");
+}
+
+function escapeWorkflowCommandData(value) {
+  return String(value).replaceAll("%", "%25").replaceAll("\r", "%0D").replaceAll("\n", "%0A");
+}
+
+export function formatDiagnosticCommand(item) {
+  const file = escapeWorkflowCommandProperty(item.file);
+  const line = escapeWorkflowCommandProperty(item.line);
+  const message = escapeWorkflowCommandData(item.message);
+  return `::error file=${file},line=${line}::${message}`;
+}
+
 function printDiagnostics(diagnostics) {
-  for (const item of diagnostics) {
-    const message = item.message.replaceAll("%", "%25").replaceAll("\r", "%0D").replaceAll("\n", "%0A");
-    process.stderr.write(`::error file=${item.file},line=${item.line}::${message}\n`);
-  }
+  for (const item of diagnostics) process.stderr.write(`${formatDiagnosticCommand(item)}\n`);
 }
 
 async function main() {
