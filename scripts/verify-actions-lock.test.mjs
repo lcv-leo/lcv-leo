@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -116,6 +116,38 @@ test("does not treat shell text inside a block scalar as workflow uses", () => {
     ".github/workflows/ci.yml",
   );
   assert.deepEqual(result, { diagnostics: [], remotePins: [] });
+});
+
+test("does not treat ordinary env or input keys named uses as action invocations", () => {
+  const result = validateWorkflowText(
+    `env:
+  uses: production
+jobs:
+  test:
+    env:
+      uses: staging
+    steps:
+      - name: Exercise an ordinary input
+        uses: actions/checkout@${CHECKOUT_SHA}
+        with:
+          uses: nested-input
+      - name: Exercise a step environment
+        env:
+          uses: nested-environment
+        run: printf 'safe\\n'
+`,
+    ".github/workflows/ci.yml",
+  );
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(result.remotePins.map((pin) => pin.raw), [`actions/checkout@${CHECKOUT_SHA}`]);
+});
+
+test("the unprivileged trigger covers pull requests retargeted to main", async () => {
+  const trigger = await readFile(
+    new URL("../.github/workflows/actions-lock-trigger.yml", import.meta.url),
+    "utf8",
+  );
+  assert.match(trigger, /^\s*- edited\s*$/m);
 });
 
 test("rejects an invalid self-repository reference", () => {

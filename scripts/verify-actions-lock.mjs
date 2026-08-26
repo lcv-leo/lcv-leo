@@ -334,24 +334,45 @@ export function validateLockfileText(text, file = LOCKFILE_PATH) {
   return { diagnostics, workflows, dependencies, version };
 }
 
-function extractUsesScalar(raw, file, line, diagnostics) {
-  const match = raw.match(/^\s*(?:-\s*)?uses\s*:\s*(.+)$/);
+function extractUsesScalar(raw, file, line, diagnostics, { sequenceItem = false } = {}) {
+  const match = raw.match(sequenceItem ? /^\s*-\s*uses\s*:\s*(.+)$/ : /^\s*uses\s*:\s*(.+)$/);
   if (!match) return null;
   return parseScalar(match[1], file, line, diagnostics);
 }
 
-export function validateWorkflowText(text, file) {
-  const diagnostics = [];
-  const remotePins = [];
+function collectWorkflowUses(text, file, diagnostics) {
   const lines = text.replaceAll("\r\n", "\n").split("\n");
+  const uses = [];
   let blockScalarParentIndent = null;
+  let jobsIndent = null;
+  let currentJobIndent = null;
+  let jobPropertyIndent = null;
+  let stepsIndent = null;
+  let currentStepIndent = null;
+  let stepPropertyIndent = null;
+
+  const resetJob = () => {
+    currentJobIndent = null;
+    jobPropertyIndent = null;
+    stepsIndent = null;
+    currentStepIndent = null;
+    stepPropertyIndent = null;
+  };
+
+  const record = (raw, lineNumber, sequenceItem = false) => {
+    const value = extractUsesScalar(raw, file, lineNumber, diagnostics, { sequenceItem });
+    if (value !== null) uses.push({ line: lineNumber, value });
+  };
 
   for (let index = 0; index < lines.length; index += 1) {
     const lineNumber = index + 1;
     const raw = lines[index];
+    if (!raw.trim() || raw.trimStart().startsWith("#")) continue;
     const indent = raw.length - raw.trimStart().length;
+    const trimmed = raw.trim();
+
     if (blockScalarParentIndent !== null) {
-      if (!raw.trim() || indent > blockScalarParentIndent) continue;
+      if (indent > blockScalarParentIndent) continue;
       blockScalarParentIndent = null;
     }
     if (/^\s*(?:-\s*)?[A-Za-z0-9_-]+\s*:\s*[>|][+-]?\s*(?:#.*)?$/.test(raw)) {
@@ -359,8 +380,71 @@ export function validateWorkflowText(text, file) {
       continue;
     }
 
-    const value = extractUsesScalar(raw, file, lineNumber, diagnostics);
-    if (value === null) continue;
+    if (indent === 0) {
+      resetJob();
+      jobsIndent = /^jobs\s*:\s*(?:#.*)?$/.test(trimmed) ? indent : null;
+      continue;
+    }
+    if (jobsIndent === null || indent <= jobsIndent) continue;
+
+    if (
+      currentJobIndent === null ||
+      (indent === currentJobIndent && /^[^\s-][^:]*:\s*(?:#.*)?$/.test(trimmed))
+    ) {
+      currentJobIndent = indent;
+      jobPropertyIndent = null;
+      stepsIndent = null;
+      currentStepIndent = null;
+      stepPropertyIndent = null;
+      continue;
+    }
+    if (indent < currentJobIndent) {
+      resetJob();
+      continue;
+    }
+
+    if (stepsIndent !== null) {
+      const leavesSteps = indent < stepsIndent || (indent === stepsIndent && !trimmed.startsWith("-"));
+      if (leavesSteps) {
+        stepsIndent = null;
+        currentStepIndent = null;
+        stepPropertyIndent = null;
+      } else {
+        if (trimmed.startsWith("-")) {
+          currentStepIndent = indent;
+          stepPropertyIndent = null;
+          record(raw, lineNumber, true);
+          continue;
+        }
+        if (currentStepIndent !== null && indent > currentStepIndent) {
+          if (stepPropertyIndent === null) stepPropertyIndent = indent;
+          if (indent === stepPropertyIndent) record(raw, lineNumber);
+        }
+        continue;
+      }
+    }
+
+    if (jobPropertyIndent === null && !trimmed.startsWith("-")) jobPropertyIndent = indent;
+    if (indent === jobPropertyIndent) {
+      currentStepIndent = null;
+      stepPropertyIndent = null;
+      if (/^steps\s*:\s*(?:#.*)?$/.test(trimmed)) {
+        stepsIndent = indent;
+        continue;
+      }
+      record(raw, lineNumber);
+      continue;
+    }
+
+  }
+
+  return uses;
+}
+
+export function validateWorkflowText(text, file) {
+  const diagnostics = [];
+  const remotePins = [];
+  for (const { line: lineNumber, value } of collectWorkflowUses(text, file, diagnostics)) {
 
     if (value.startsWith("docker://")) continue;
     if (value.startsWith("./")) continue;
