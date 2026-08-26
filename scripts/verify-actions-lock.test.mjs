@@ -95,6 +95,13 @@ test("rejects a symbolic remote uses reference even when the lockfile is canonic
   assert.match(result.diagnostics[0].message, /symbolic ref/);
 });
 
+test("rejects an adversarial malformed action path without ambiguous parsing", () => {
+  const malformed = `${"-/-/".repeat(10_000)}main`;
+  const result = validateWorkflowText(`jobs:\n  test:\n    uses: ${malformed}\n`, ".github/workflows/ci.yml");
+  assert.equal(result.diagnostics.length, 1);
+  assert.match(result.diagnostics[0].message, /invalid action pin/);
+});
+
 test("accepts local, self-repository and container references without lock entries", () => {
   const result = validateWorkflowText(
     "jobs:\n  test:\n    steps:\n      - uses: ./action\n      - uses: $/action\n      - uses: docker://alpine:3.23\n",

@@ -8,7 +8,8 @@ const LOCKFILE_PATH = ".github/workflows/actions.lock";
 const WORKFLOWS_DIRECTORY = ".github/workflows";
 const SUPPORTED_LOCKFILE_VERSION = "v0.0.2";
 const FULL_COMMIT_SHA = /^[0-9a-f]{40}$/i;
-const REMOTE_USES = /^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)(?:\/[^@\s]+)*@([^\s@]+)$/;
+const ACTION_REPOSITORY_COMPONENT = /^[A-Za-z0-9_.-]+$/;
+const ACTION_SUBPATH_COMPONENT = /^[^@\s/]+$/;
 
 function diagnostic(file, line, message) {
   return { file, line, message };
@@ -48,13 +49,25 @@ function parseScalar(raw, file, line, diagnostics) {
 }
 
 function parsePin(raw, file, line, diagnostics) {
-  const match = raw.match(REMOTE_USES);
-  if (!match) {
+  const separator = raw.lastIndexOf("@");
+  const actionPath = separator > 0 ? raw.slice(0, separator) : "";
+  const reference = separator > 0 ? raw.slice(separator + 1) : "";
+  const components = actionPath.split("/");
+  const validPath =
+    raw.indexOf("@") === separator &&
+    components.length >= 2 &&
+    ACTION_REPOSITORY_COMPONENT.test(components[0]) &&
+    ACTION_REPOSITORY_COMPONENT.test(components[1]) &&
+    components.slice(2).every((component) => ACTION_SUBPATH_COMPONENT.test(component)) &&
+    reference.length > 0 &&
+    !/\s/.test(reference);
+
+  if (!validPath) {
     diagnostics.push(diagnostic(file, line, `invalid action pin ${JSON.stringify(raw)}`));
     return null;
   }
 
-  const sha = match[3];
+  const sha = reference;
   if (!FULL_COMMIT_SHA.test(sha)) {
     diagnostics.push(
       diagnostic(
@@ -67,7 +80,7 @@ function parsePin(raw, file, line, diagnostics) {
   }
 
   return {
-    canonical: `${match[1].toLowerCase()}/${match[2].toLowerCase()}@${sha.toLowerCase()}`,
+    canonical: `${components[0].toLowerCase()}/${components[1].toLowerCase()}@${sha.toLowerCase()}`,
     sha: sha.toLowerCase(),
   };
 }
