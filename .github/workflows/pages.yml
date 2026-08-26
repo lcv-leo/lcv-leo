@@ -5,6 +5,15 @@
 name: Deploy Pages
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/generate-contribution-snake.mjs"
+      - "scripts/generate-contribution-snake.test.mjs"
+      - "scripts/linear-release-trust.test.mjs"
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/linear-release.yml"
   schedule:
     - cron: "17 6 * * *" # diário, 03:17 em Brasília; evita o pico da hora cheia
   push:
@@ -13,7 +22,11 @@ on:
     paths:
       - "site/**"
       - "README.md"
+      - "scripts/generate-contribution-snake.mjs"
+      - "scripts/generate-contribution-snake.test.mjs"
+      - "scripts/linear-release-trust.test.mjs"
       - ".github/workflows/pages.yml"
+      - ".github/workflows/linear-release.yml"
   workflow_dispatch:
 
 permissions: {}
@@ -23,8 +36,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  test-snake:
+    name: Test Pages and release contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read # Check out untrusted PR content without granting write access or exposing a secret.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run generator tests
+        run: >-
+          node --test
+          scripts/generate-contribution-snake.test.mjs
+          scripts/linear-release-trust.test.mjs
+
   build:
+    if: github.event_name != 'pull_request'
     name: Build GitHub Pages artifact
+    needs: test-snake
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -36,12 +68,10 @@ jobs:
           persist-credentials: false
 
       - name: Generate contribution snake SVGs
-        uses: platane/snk/svg-only@d8f6715049803e982ee5ff501b6b9b7d5deeb09b # v3.5.0
-        with:
-          github_user_name: lcv-leo
-          outputs: |
-            site/github-contribution-grid-snake.svg
-            site/github-contribution-grid-snake-dark.svg?palette=github-dark
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USER: lcv-leo
+        run: node scripts/generate-contribution-snake.mjs
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
 
@@ -50,6 +80,7 @@ jobs:
           path: site
 
   deploy:
+    if: github.event_name != 'pull_request'
     name: Deploy GitHub Pages
     needs: build
     runs-on: ubuntu-latest
