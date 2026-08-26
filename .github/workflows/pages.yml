@@ -11,7 +11,9 @@ on:
     paths:
       - "scripts/generate-contribution-snake.mjs"
       - "scripts/generate-contribution-snake.test.mjs"
+      - "scripts/linear-release-trust.test.mjs"
       - ".github/workflows/pages.yml"
+      - ".github/workflows/linear-release.yml"
   schedule:
     - cron: "17 6 * * *" # diário, 03:17 em Brasília; evita o pico da hora cheia
   push:
@@ -22,7 +24,9 @@ on:
       - "README.md"
       - "scripts/generate-contribution-snake.mjs"
       - "scripts/generate-contribution-snake.test.mjs"
+      - "scripts/linear-release-trust.test.mjs"
       - ".github/workflows/pages.yml"
+      - ".github/workflows/linear-release.yml"
   workflow_dispatch:
 
 permissions: {}
@@ -33,7 +37,7 @@ concurrency:
 
 jobs:
   test-snake:
-    name: Test contribution snake generator
+    name: Test Pages and release contracts
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -44,7 +48,10 @@ jobs:
           persist-credentials: false
 
       - name: Run generator tests
-        run: node --test scripts/generate-contribution-snake.test.mjs
+        run: >-
+          node --test
+          scripts/generate-contribution-snake.test.mjs
+          scripts/linear-release-trust.test.mjs
 
   build:
     if: github.event_name != 'pull_request'
