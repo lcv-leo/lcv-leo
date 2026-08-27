@@ -1,10 +1,12 @@
-# This workflow intentionally uses no actions. It treats the pull-request
-# snapshot strictly as untrusted data and executes only the semantic validator
-# bundled by the pinned LCV Ideas & Software actions-lock policy commit.
+# This workflow is managed by gh actions-lock.
+# This workflow uses only GitHub's official App-token action. It treats the
+# pull-request snapshot strictly as untrusted data and executes only the
+# semantic validator bundled by the pinned LCV Ideas & Software actions-lock
+# policy commit.
 #
 # Threat boundary: this prevents untrusted pull-request content and accidental
-# invalid lockfiles from approving themselves. The legacy GitHub Actions status
-# remains during the dedicated-App canary and is not the final trust boundary.
+# invalid lockfiles from approving themselves. The required status is published
+# exclusively by a least-privilege GitHub App dedicated to this validator.
 
 name: Actions lock trusted validator
 
@@ -26,15 +28,24 @@ jobs:
     name: Publish trusted actions.lock status
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: actions-lock-validation
     permissions:
       contents: read # Resolve and download the exact pull-request snapshot.
-      statuses: write # Publish the required status on that exact head SHA.
     steps:
+      - name: Create dedicated status token
+        id: status-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.ACTIONS_LOCK_VALIDATOR_CLIENT_ID }}
+          private-key: ${{ secrets.ACTIONS_LOCK_VALIDATOR_PRIVATE_KEY }}
+          permission-statuses: write
+
       - name: Validate untrusted snapshot and publish status
         shell: bash
         env:
           BASE_REPOSITORY: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
+          GH_STATUS_TOKEN: ${{ steps.status-token.outputs.token }}
           HEAD_REPOSITORY: ${{ github.event.workflow_run.head_repository.full_name }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
           STATUS_CONTEXT: Validate actions.lock
@@ -88,7 +99,7 @@ jobs:
             local state="$1"
             local description="$2"
 
-            gh api \
+            GH_TOKEN="${GH_STATUS_TOKEN}" gh api \
               --method POST \
               -H 'Accept: application/vnd.github+json' \
               -H 'X-GitHub-Api-Version: 2022-11-28' \

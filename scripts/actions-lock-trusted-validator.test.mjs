@@ -33,14 +33,38 @@ test("the trusted validator consumes the pinned central semantic bundle", async 
   assert.doesNotMatch(workflow, /scripts\/verify-actions-lock\.mjs/u);
 });
 
-test("the legacy status publisher remains active during the dedicated-App canary", async () => {
+test("the status publisher uses the official action and a dedicated least-privilege App", async () => {
   const workflow = await readFile(workflowUrl, "utf8");
 
+  assert.match(workflow, /environment: actions-lock-validation/u);
+  assert.match(
+    workflow,
+    /actions\/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3\.2\.0/u,
+  );
+  assert.match(
+    workflow,
+    /client-id: \$\{\{ vars\.ACTIONS_LOCK_VALIDATOR_CLIENT_ID \}\}/u,
+  );
+  assert.match(
+    workflow,
+    /private-key: \$\{\{ secrets\.ACTIONS_LOCK_VALIDATOR_PRIVATE_KEY \}\}/u,
+  );
+  assert.match(workflow, /permission-statuses: write/u);
+  assert.match(
+    workflow,
+    /GH_STATUS_TOKEN: \$\{\{ steps\.status-token\.outputs\.token \}\}/u,
+  );
+  assert.match(workflow, /GH_TOKEN="\$\{GH_STATUS_TOKEN\}" gh api/u);
   assert.match(workflow, /STATUS_CONTEXT: Validate actions\.lock/u);
-  assert.match(workflow, /statuses: write/u);
   assert.match(workflow, /post_status 'pending'/u);
   assert.match(workflow, /post_status 'success'/u);
   assert.match(workflow, /post_status 'failure'/u);
+  assert.doesNotMatch(
+    workflow,
+    /permissions:\s*\n\s+contents: read[^]*?\n\s+statuses: write/u,
+  );
+  assert.doesNotMatch(workflow, /\bapp-id:/u);
+  assert.doesNotMatch(workflow, /\bopenssl\b|\bjwt\b/iu);
 });
 
 test("the unprivileged trigger covers pull requests retargeted to main", async () => {
