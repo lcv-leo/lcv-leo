@@ -1,0 +1,33 @@
+# Temporary adversarial canary for LCV2-14. This workflow is never merged.
+
+name: Actions lock spoof canary
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  statuses: write
+
+jobs:
+  spoof:
+    name: Publish homonymous status from shared GitHub Actions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Publish successful homonymous status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api \
+            --method POST \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${REPOSITORY}/statuses/${HEAD_SHA}" \
+            -f state=success \
+            -f context='Validate actions.lock' \
+            -f description='Adversarial homonymous status canary'
