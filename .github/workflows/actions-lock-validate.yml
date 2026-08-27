@@ -1,11 +1,10 @@
 # This workflow intentionally uses no actions. It treats the pull-request
-# snapshot strictly as untrusted data and executes only code read from the
-# trusted default-branch commit that triggered this workflow.
+# snapshot strictly as untrusted data and executes only the semantic validator
+# bundled by the pinned LCV Ideas & Software actions-lock policy commit.
 #
 # Threat boundary: this prevents untrusted pull-request content and accidental
-# invalid lockfiles from approving themselves. It does not defend against an
-# actor already authorized to modify trusted default-branch workflows, because
-# every such workflow can publish statuses as the GitHub Actions App.
+# invalid lockfiles from approving themselves. The legacy GitHub Actions status
+# remains during the dedicated-App canary and is not the final trust boundary.
 
 name: Actions lock trusted validator
 
@@ -28,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: read # Read the trusted validator and resolve the exact PR head.
+      contents: read # Resolve and download the exact pull-request snapshot.
       statuses: write # Publish the required status on that exact head SHA.
     steps:
       - name: Validate untrusted snapshot and publish status
@@ -41,14 +40,47 @@ jobs:
           STATUS_CONTEXT: Validate actions.lock
           STATUS_TARGET_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TRIGGER_EVENT: ${{ github.event.workflow_run.event }}
-          TRUSTED_BASE_SHA: ${{ github.sha }}
         run: |
           set -Eeuo pipefail
 
           readonly lock_version='v0.1.6'
           readonly lock_asset_url='https://github.com/github/gh-actions-lock/releases/download/v0.1.6/linux-amd64'
           readonly lock_asset_sha256='4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3'
-          readonly validator_path='scripts/verify-actions-lock.mjs'
+          readonly policy_repository='LCV-Ideas-Software/actions-lock-policy'
+          readonly policy_sha='bdde91d4d2b47275e244e4a9b23cbf97269d23da'
+          readonly policy_bundle='dist/verify-actions-lock.cjs'
+
+          fail() {
+            printf '%s\n' "::error::$1" >&2
+            exit 1
+          }
+
+          extract_single_root() {
+            local archive_path="$1"
+            local destination="$2"
+            local label="$3"
+            local -a roots=()
+
+            mkdir -p "${destination}"
+            if ! tar \
+              --extract \
+              --gzip \
+              --file "${archive_path}" \
+              --directory "${destination}" \
+              --no-same-owner \
+              --no-same-permissions; then
+              fail "The ${label} archive could not be extracted."
+            fi
+
+            mapfile -t roots < <(
+              find "${destination}" -mindepth 1 -maxdepth 1 -print
+            )
+            if (( ${#roots[@]} != 1 )) || [[ ! -d "${roots[0]}" ]]; then
+              fail "The ${label} archive did not contain exactly one repository root."
+            fi
+
+            printf '%s\n' "${roots[0]}"
+          }
 
           status_started='false'
 
@@ -98,11 +130,6 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "${TRUSTED_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
-            printf '%s\n' '::error::The workflow_run context did not provide a valid trusted default-branch SHA.'
-            exit 1
-          fi
-
           if [[ ! "${HEAD_REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
             printf '%s\n' '::error::The triggering workflow did not provide a valid head repository name.'
             exit 1
@@ -128,35 +155,47 @@ jobs:
           status_started='true'
 
           readonly work_root="${RUNNER_TEMP}/actions-lock-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          readonly archive_path="${work_root}/head.tar.gz"
+          readonly policy_archive="${work_root}/policy.tar.gz"
+          readonly policy_parent="${work_root}/policy"
+          readonly snapshot_archive="${work_root}/head.tar.gz"
           readonly snapshot_parent="${work_root}/snapshot"
-          readonly trusted_validator="${work_root}/verify-actions-lock.mjs"
           readonly lock_binary="${work_root}/gh-actions-lock"
+          readonly lock_report="${work_root}/gh-actions-lock-report.json"
 
-          mkdir -p "${snapshot_parent}"
+          mkdir -p "${work_root}"
+
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "repos/${policy_repository}/tarball/${policy_sha}" \
+            >"${policy_archive}"
 
           gh api \
             -H 'Accept: application/vnd.github+json' \
             -H 'X-GitHub-Api-Version: 2022-11-28' \
             "repos/${HEAD_REPOSITORY}/tarball/${HEAD_SHA}" \
-            >"${archive_path}"
+            >"${snapshot_archive}"
 
-          tar \
-            --extract \
-            --gzip \
-            --file "${archive_path}" \
-            --directory "${snapshot_parent}" \
-            --no-same-owner \
-            --no-same-permissions
+          policy_root="$(
+            extract_single_root "${policy_archive}" "${policy_parent}" 'trusted policy'
+          )" || fail 'The trusted policy archive could not be extracted safely.'
+          readonly policy_root
+          readonly trusted_validator="${policy_root}/${policy_bundle}"
 
-          mapfile -t snapshot_entries < <(
-            find "${snapshot_parent}" -mindepth 1 -maxdepth 1 -print
-          )
-          if (( ${#snapshot_entries[@]} != 1 )) || [[ ! -d "${snapshot_entries[0]}" ]]; then
-            printf '%s\n' '::error::The GitHub-generated source archive did not contain exactly one repository root.'
-            exit 1
+          snapshot_root="$(
+            extract_single_root "${snapshot_archive}" "${snapshot_parent}" 'untrusted snapshot'
+          )" || fail 'The untrusted snapshot archive could not be extracted safely.'
+          readonly snapshot_root
+
+          policy_symlink="$(
+            find -P "${policy_root}" -type l -print -quit
+          )" || fail 'The trusted policy archive could not be inspected.'
+          if [[ -n "${policy_symlink}" ]]; then
+            fail 'Symbolic links are not allowed in the trusted policy archive.'
           fi
-          readonly snapshot_root="${snapshot_entries[0]}"
+          if [[ ! -f "${trusted_validator}" ]] || [[ -L "${trusted_validator}" ]]; then
+            fail 'The trusted policy snapshot has no regular semantic validator bundle.'
+          fi
 
           snapshot_symlink="$(
             find -P "${snapshot_root}" -type l -print -quit
@@ -166,17 +205,16 @@ jobs:
             exit 1
           fi
 
-          gh api \
-            -H 'Accept: application/vnd.github.raw+json' \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            "repos/${BASE_REPOSITORY}/contents/${validator_path}?ref=${TRUSTED_BASE_SHA}" \
-            >"${trusted_validator}"
-          test -s "${trusted_validator}"
+          if [[ -e "${snapshot_root}/.git" || -L "${snapshot_root}/.git" ]]; then
+            fail 'The untrusted snapshot unexpectedly contains a .git path.'
+          fi
+          mkdir --mode=0700 "${snapshot_root}/.git"
 
           curl \
             --fail \
             --location \
             --proto '=https' \
+            --proto-redir '=https' \
             --show-error \
             --silent \
             --tlsv1.2 \
@@ -186,14 +224,23 @@ jobs:
           printf '%s  %s\n' "${lock_asset_sha256}" "${lock_binary}" | sha256sum --check --strict
           chmod 0500 "${lock_binary}"
 
-          printf 'Running github/gh-actions-lock %s against %s.\n' "${lock_version}" "${HEAD_SHA}"
+          : >"${lock_report}"
+          set +e
           (
-            cd "${snapshot_root}"
+            cd "${snapshot_root}" || exit 97
             "${lock_binary}" \
               --verify-local \
               --no-fix \
               --no-migrate-local-actions \
-              --json=valid,findings
+              --json=valid,findings \
+              >"${lock_report}"
           )
+          lock_exit_code="$?"
+          readonly lock_exit_code
+          set -e
 
-          node "${trusted_validator}" "${snapshot_root}"
+          printf 'Ran github/gh-actions-lock %s against %s.\n' "${lock_version}" "${HEAD_SHA}"
+          node "${trusted_validator}" \
+            --repository-root "${snapshot_root}" \
+            --gh-actions-lock-report "${lock_report}" \
+            --gh-actions-lock-exit-code "${lock_exit_code}"
