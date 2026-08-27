@@ -1,0 +1,24 @@
+# Temporary semantic-negative canary for LCV2-14. This workflow is never merged.
+
+name: Actions lock semantic negative canary
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read # Required only by the checkout step in this canary.
+
+jobs:
+  canary:
+    name: Exercise missing workflow mapping
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+        with:
+          persist-credentials: false
