@@ -1,3 +1,4 @@
+# This workflow is managed by gh actions-lock.
 # This workflow intentionally uses no actions and has no token permissions.
 
 name: Actions lock validation trigger
