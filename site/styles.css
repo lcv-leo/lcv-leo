@@ -473,6 +473,9 @@ img { max-width: 100%; }
 .footer__made { color: var(--tn-comment); font-size: .78rem; margin-top: 2rem; }
 .footer__made a { color: var(--tn-fg-soft); text-decoration: none; border-bottom: 1px solid var(--tn-border); }
 .footer__made a:hover { color: var(--tn-cyan); border-color: var(--tn-cyan); }
+.footer__legal { color: var(--tn-comment); font-size: .75rem; line-height: 1.7; margin: .85rem auto 0; max-width: 46rem; }
+.footer__legal a { color: var(--tn-fg-soft); text-underline-offset: .2em; }
+.footer__legal a:hover { color: var(--tn-cyan); }
 
 /* ============ REVEAL ============ */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
