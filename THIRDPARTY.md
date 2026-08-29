@@ -18,7 +18,7 @@ All Actions are pinned to immutable commit SHAs in the workflows and in
 | --- | --- | --- | --- | --- |
 | [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token/tree/bcd2ba49218906704ab6c1aa796996da409d3eb1) | v3.2.0 | `bcd2ba49218906704ab6c1aa796996da409d3eb1` | MIT | Create the least-privilege trusted-validator status token |
 | [`actions/checkout`](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1) | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` | MIT | Read trusted repository snapshots |
-| [`github/codeql-action`](https://github.com/github/codeql-action/tree/db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28) | v4.37.8 | `db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28` | MIT | CodeQL analysis and SARIF upload |
+| [`github/codeql-action`](https://github.com/github/codeql-action/tree/cdf488f595d80d6e07e03d4674febd5ab45fa938) | v4.37.9 | `cdf488f595d80d6e07e03d4674febd5ab45fa938` | MIT | CodeQL analysis and SARIF upload |
 | [`linear/linear-release-action`](https://github.com/linear/linear-release-action/tree/0a25abab892a91062ebf42260dbb2ce6277aa205) | v0.16.0 | `0a25abab892a91062ebf42260dbb2ce6277aa205` | MIT | Synchronize successful Pages deployments with Linear |
 | [`actions/configure-pages`](https://github.com/actions/configure-pages/tree/45bfe0192ca1faeb007ade9deae92b16b8254a0d) | v6.0.0 | `45bfe0192ca1faeb007ade9deae92b16b8254a0d` | MIT | Configure GitHub Pages |
 | [`actions/deploy-pages`](https://github.com/actions/deploy-pages/tree/cd2ce8fcbc39b97be8ca5fce6e763baed58fa128) | v5.0.0 | `cd2ce8fcbc39b97be8ca5fce6e763baed58fa128` | MIT | Deploy the Pages artifact |
