@@ -74,8 +74,6 @@ motto: "Fail closed, test first, ship through the queue."
 
 <br clear="both">
 
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
-
 ## Tech Stack & Expertise
 
 <div align="center">
@@ -214,8 +212,6 @@ motto: "Fail closed, test first, ship through the queue."
 
 </div>
 
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
-
 ## Dev Philosophy
 
 <div align="center">
@@ -235,8 +231,6 @@ From idea to deployed edge worker is my favorite journey
 <div align="center">
   <img src="https://user-images.githubusercontent.com/74038190/212747903-32a9b7b7-71f0-4c3a-a2a8-4e4e4f41d8cd.gif" width="500" />
 </div>
-
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
 ## Current Focus
 
@@ -326,8 +320,6 @@ From idea to deployed edge worker is my favorite journey
 </tr>
 </table>
 
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
-
 ## GitHub Analytics
 
 <div align="center">
@@ -346,8 +338,6 @@ From idea to deployed edge worker is my favorite journey
 
 </div>
 
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
-
 ## Statistics
 
 <div align="center">
@@ -365,8 +355,6 @@ From idea to deployed edge worker is my favorite journey
 <img src="https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif" width="400" />
 
 </div>
-
-<img src="https://user-images.githubusercontent.com/73097560/115834477-dbab4500-a447-11eb-908a-139a6edaec5c.gif">
 
 ## Connect & Collaborate
 
@@ -410,4 +398,12 @@ From idea to deployed edge worker is my favorite journey
 
 <p align="center">
   <i>Made with dedication by <a href="https://github.com/lcv-leo">Leonardo Cardozo Vargas</a></i>
+</p>
+
+<p align="center">
+  <small>
+    Public repository; original content is proprietary and all rights are reserved.
+    See <a href="LICENSE">LICENSE</a>, <a href="NOTICE">NOTICE</a>, and
+    <a href="THIRDPARTY.md">third-party notices</a>.
+  </small>
 </p>
