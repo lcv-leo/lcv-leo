@@ -8,7 +8,6 @@ workflows:
     '.github/workflows/codeql.yml':
         - 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
         - 'github/codeql-action@cdf488f595d80d6e07e03d4674febd5ab45fa938'
-        - 'github/codeql-action@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
     '.github/workflows/linear-release.yml':
         - 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
         - 'linear/linear-release-action@0a25abab892a91062ebf42260dbb2ce6277aa205'
