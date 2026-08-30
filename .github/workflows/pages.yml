@@ -16,9 +16,11 @@ on:
     paths:
       - "site/**"
       - "README.md"
+      - "THIRDPARTY.md"
       - "scripts/generate-contribution-snake.mjs"
       - "scripts/generate-contribution-snake.test.mjs"
       - "scripts/linear-release-trust.test.mjs"
+      - "scripts/provenance-drift.test.mjs"
       - ".github/workflows/pages.yml"
       - ".github/workflows/linear-release.yml"
   workflow_dispatch:
@@ -35,13 +37,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: read # Check out untrusted PR content without granting write access or exposing a secret.
+      contents: read # Check out untrusted PR content without granting write access or persisting credentials.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Run repository tests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: >-
           node --test
           scripts/generate-contribution-snake.test.mjs
