@@ -8,6 +8,12 @@ on:
   pull_request:
     branches:
       - main
+    types:
+      - edited
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
   schedule:
     - cron: "17 6 * * *" # diário, 03:17 em Brasília; evita o pico da hora cheia
   push:
@@ -58,7 +64,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Install official Playwright Chromium headless shell
-        run: npx --no-install playwright install --with-deps --only-shell chromium
+        run: ./node_modules/.bin/playwright install --with-deps --only-shell chromium
 
       - name: Install official GitHub Actions lock validator
         shell: bash
@@ -108,7 +114,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           node --test scripts/provenance-drift.test.mjs
-          npx --no-install playwright test
+          ./node_modules/.bin/playwright test
 
       - name: Run provenance tests on a trusted ref
         if: github.event_name != 'pull_request'
@@ -116,7 +122,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           node --test scripts/provenance-drift.test.mjs
-          npx --no-install playwright test
+          ./node_modules/.bin/playwright test
 
   build:
     if: github.event_name != 'pull_request'

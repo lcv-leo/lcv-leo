@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -16,6 +17,10 @@ const [
   pageWorkflow,
   scorecardWorkflow,
   zizmorWorkflow,
+  packageManifestSource,
+  packageLockSource,
+  playwrightBrowsersSource,
+  brandLogo,
 ] = await Promise.all([
   readFile(new URL("../THIRDPARTY.md", import.meta.url), "utf8"),
   readFile(new URL("../.github/workflows/actions.lock", import.meta.url), "utf8"),
@@ -24,11 +29,91 @@ const [
   readFile(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8"),
   readFile(new URL("../.github/workflows/scorecard.yml", import.meta.url), "utf8"),
   readFile(new URL("../.github/workflows/zizmor.yml", import.meta.url), "utf8"),
+  readFile(new URL("../package.json", import.meta.url), "utf8"),
+  readFile(new URL("../package-lock.json", import.meta.url), "utf8"),
+  readFile(new URL("../node_modules/playwright-core/browsers.json", import.meta.url), "utf8"),
+  readFile(new URL("../site/assets/lcv-ideas-software-logo.svg", import.meta.url)),
 ]);
 
 function sorted(values) {
   return [...values].sort((left, right) => left.localeCompare(right, "en"));
 }
+
+const BROWSER_PACKAGE_METADATA = new Map([
+  [
+    "@playwright/test",
+    {
+      directSection: "devDependencies",
+      license: "Apache-2.0",
+      order: 0,
+      purpose: "Execute browser-level provenance and CSP contract tests",
+      relation: "Direct development dependency",
+      sourcePath: "packages/playwright-test",
+    },
+  ],
+  [
+    "playwright",
+    {
+      edge: "dependencies",
+      license: "Apache-2.0",
+      order: 1,
+      parent: "@playwright/test",
+      purpose: "Browser automation and test runner integration",
+      relation: "Transitive dependency of `@playwright/test`",
+      sourcePath: "packages/playwright",
+    },
+  ],
+  [
+    "playwright-core",
+    {
+      edge: "dependencies",
+      license: "Apache-2.0",
+      order: 2,
+      parent: "playwright",
+      purpose: "Browser protocol and executable management",
+      relation: "Transitive dependency of `playwright`",
+      sourcePath: "packages/playwright-core",
+    },
+  ],
+  [
+    "fsevents",
+    {
+      edge: "optionalDependencies",
+      license: "MIT",
+      order: 3,
+      parent: "playwright",
+      purpose: "Optional macOS filesystem event support",
+      relation: "Optional transitive dependency of `playwright`; Darwin only",
+    },
+  ],
+]);
+
+const PLAYWRIGHT_RELEASE_AUDITS = new Map([
+  [
+    "1.62.1",
+    {
+      browserArchiveSha256:
+        "3cfc2bd00d1bafcf8a68dc74c9c92bb7150ddc8d26ade948a776316e1cec4f14",
+      browserLicenseSections: 281,
+      browserLicenseSha256:
+        "334f3e2d8a58954bc7152a8150bdd3e7f35e0d9bcf30dd323d4edcb7df5f36d5",
+      browserRevision: "1234",
+      browserVersion: "151.0.7922.34",
+      ffmpegArchiveSha256:
+        "ebc74fc5b94830176a3c2914ae96bd8bc7f6a91f4f33890230f84a172ee61ccc",
+      ffmpegRevision: "1011",
+      publishAttempt: 1,
+      publishRun: "30562184036",
+      sourceCommit: "26a9e470a7b3c7822084b09fb7f13902c5f37b51",
+    },
+  ],
+]);
+
+const BRAND_LOGO_SOURCE_COMMIT = "1b6eed828fd72c8ddc382ab271825015e4f14d10";
+const BRAND_LOGO_SHA256 =
+  "70631f32e8b4c01d794a3af5016484dd09d51beb0c26abf3a80a9355db179f27";
+const BRAND_LOGO_SOURCE_URL =
+  `https://github.com/LCV-Ideas-Software/.github/blob/${BRAND_LOGO_SOURCE_COMMIT}/profile/assets/lcv-ideas-software-logo.svg`;
 
 // These regular expressions parse isolated machine syntax, never prose.
 function actionIdentityParts(identity, sourceName) {
@@ -225,6 +310,302 @@ function extractSection(content, heading, nextHeading) {
   return content.slice(start, end);
 }
 
+function parseJsonObject(source, sourceName) {
+  const parsed = JSON.parse(source);
+  assert.ok(
+    parsed && typeof parsed === "object" && !Array.isArray(parsed),
+    `${sourceName} must contain one JSON object`,
+  );
+  return parsed;
+}
+
+function extractTableRows(content, header, columnCount, sourceName) {
+  const lines = content.split("\n").map((line) => line.trimEnd());
+  const headerIndex = lines.indexOf(header);
+  assert.ok(headerIndex !== -1, `${sourceName} table header is missing`);
+  assert.equal(
+    lines[headerIndex + 1],
+    `|${" --- |".repeat(columnCount)}`,
+    `${sourceName} table separator drifted`,
+  );
+  const rows = [];
+  for (const line of lines.slice(headerIndex + 2)) {
+    if (line === "") break;
+    assert.ok(line.startsWith("|") && line.endsWith("|"), `${sourceName} row drifted`);
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((cell) => cell.trim());
+    assert.equal(cells.length, columnCount, `${sourceName} column count drifted`);
+    rows.push(cells);
+  }
+  assert.ok(rows.length > 0, `${sourceName} table must not be empty`);
+  return rows;
+}
+
+function packageNameFromLockLocation(location) {
+  const marker = "node_modules/";
+  const markerIndex = location.lastIndexOf(marker);
+  assert.ok(markerIndex !== -1, `Unsupported package-lock location: ${location}`);
+  const suffix = location.slice(markerIndex + marker.length);
+  const match = /^(?:@[^/]+\/[^/]+|[^/]+)$/u.exec(suffix);
+  assert.ok(match, `Unsupported package-lock location: ${location}`);
+  return suffix;
+}
+
+function browserPackageRow(packageName, packageNode) {
+  const metadata = BROWSER_PACKAGE_METADATA.get(packageName);
+  assert.ok(metadata, `Missing browser package metadata: ${packageName}`);
+  const sourceUrl = metadata.sourcePath
+    ? `https://github.com/microsoft/playwright/tree/v${packageNode.version}/${metadata.sourcePath}`
+    : `https://github.com/fsevents/fsevents/tree/v${packageNode.version}`;
+  const licenseUrl = metadata.sourcePath
+    ? `https://github.com/microsoft/playwright/blob/v${packageNode.version}/LICENSE`
+    : `https://github.com/fsevents/fsevents/blob/v${packageNode.version}/LICENSE`;
+  return [
+    `[\`${packageName}\`](${sourceUrl})`,
+    packageNode.version,
+    metadata.relation,
+    `\`${packageNode.integrity}\``,
+    `[${metadata.license}](${licenseUrl})`,
+    metadata.purpose,
+  ];
+}
+
+function assertBrowserToolInventory(
+  manifestSource,
+  lockSource,
+  browsersSource,
+  thirdPartySource,
+) {
+  const manifest = parseJsonObject(manifestSource, "package.json");
+  const lock = parseJsonObject(lockSource, "package-lock.json");
+  assert.equal(lock.lockfileVersion, 3, "package-lock.json must use lockfileVersion 3");
+  assert.equal(lock.name, manifest.name, "package manifest and lockfile names drifted");
+  assert.ok(lock.packages && typeof lock.packages === "object" && !Array.isArray(lock.packages));
+  const lockRoot = lock.packages[""];
+  assert.ok(lockRoot && typeof lockRoot === "object", "package-lock.json root package is missing");
+  assert.equal(lockRoot.name, manifest.name, "package-lock.json root name drifted");
+
+  const dependencySections = [
+    "dependencies",
+    "devDependencies",
+    "optionalDependencies",
+    "peerDependencies",
+  ];
+  for (const section of dependencySections) {
+    assert.deepEqual(
+      lockRoot[section] ?? {},
+      manifest[section] ?? {},
+      `${section} drifted between package.json and package-lock.json`,
+    );
+  }
+
+  const packages = new Map();
+  for (const [location, packageNode] of Object.entries(lock.packages)) {
+    if (location === "") continue;
+    assert.ok(
+      packageNode && typeof packageNode === "object" && !Array.isArray(packageNode),
+      `Invalid package-lock node: ${location}`,
+    );
+    const packageName = packageNameFromLockLocation(location);
+    assert.equal(packages.has(packageName), false, `Duplicate package in lockfile: ${packageName}`);
+    assert.ok(
+      BROWSER_PACKAGE_METADATA.has(packageName),
+      `Uninventoried lockfile package: ${packageName}`,
+    );
+    for (const field of ["version", "resolved", "integrity", "license"]) {
+      assert.equal(
+        typeof packageNode[field],
+        "string",
+        `package-lock ${packageName} has no ${field}`,
+      );
+      assert.ok(packageNode[field].length > 0, `package-lock ${packageName} has empty ${field}`);
+    }
+    assert.equal(packageNode.dev, true, `${packageName} must remain a development dependency`);
+    const resolved = new URL(packageNode.resolved);
+    assert.equal(
+      resolved.origin,
+      "https://registry.npmjs.org",
+      `${packageName} must resolve from the official npm registry`,
+    );
+    assert.match(packageNode.integrity, /^sha512-[A-Za-z0-9+/]+={0,2}$/u);
+    packages.set(packageName, { location, node: packageNode });
+  }
+  assert.deepEqual(
+    sorted(packages.keys()),
+    sorted(BROWSER_PACKAGE_METADATA.keys()),
+    "CI-only browser inventory must equal the complete package-lock dependency set",
+  );
+
+  for (const [packageName, metadata] of BROWSER_PACKAGE_METADATA) {
+    const record = packages.get(packageName);
+    assert.ok(record, `Missing locked browser package: ${packageName}`);
+    assert.equal(record.node.license, metadata.license, `${packageName} license metadata drifted`);
+    for (const section of dependencySections) {
+      const declaredDirectly = Object.hasOwn(manifest[section] ?? {}, packageName);
+      assert.equal(
+        declaredDirectly,
+        metadata.directSection === section,
+        `${packageName} direct dependency relation drifted in ${section}`,
+      );
+    }
+    if (metadata.directSection) {
+      assert.equal(
+        manifest[metadata.directSection]?.[packageName],
+        record.node.version,
+        `${packageName} must be exactly pinned as a direct dependency`,
+      );
+    } else {
+      const parent = packages.get(metadata.parent);
+      assert.ok(parent, `Missing ${packageName} parent package: ${metadata.parent}`);
+      assert.equal(
+        parent.node[metadata.edge]?.[packageName],
+        record.node.version,
+        `${packageName} dependency edge drifted`,
+      );
+    }
+  }
+  const fsevents = packages.get("fsevents").node;
+  assert.equal(fsevents.optional, true, "fsevents must remain optional");
+  assert.deepEqual(fsevents.os, ["darwin"], "fsevents must remain Darwin-only");
+
+  const browserSection = extractSection(
+    thirdPartySource,
+    "## CI-only browser validation tooling",
+    "## Fonts, icons, and hosted media",
+  );
+  const packageRows = extractTableRows(
+    browserSection,
+    "| Component | Version | Relation | npm integrity | License | Purpose |",
+    6,
+    "CI-only npm package inventory",
+  );
+  const expectedPackageRows = [...BROWSER_PACKAGE_METADATA.entries()]
+    .sort(([, left], [, right]) => left.order - right.order)
+    .map(([packageName]) => browserPackageRow(packageName, packages.get(packageName).node));
+  assert.deepEqual(
+    packageRows,
+    expectedPackageRows,
+    "THIRDPARTY CI-only package rows must equal package-lock.json",
+  );
+
+  const playwrightVersion = packages.get("playwright-core").node.version;
+  for (const packageName of ["@playwright/test", "playwright"]) {
+    assert.equal(
+      packages.get(packageName).node.version,
+      playwrightVersion,
+      `${packageName} and playwright-core versions drifted`,
+    );
+  }
+  const audit = PLAYWRIGHT_RELEASE_AUDITS.get(playwrightVersion);
+  assert.ok(
+    audit,
+    `Playwright ${playwrightVersion} needs a reviewed provenance and browser artifact audit`,
+  );
+  const expectedProvenance = [
+    `The three Playwright ${playwrightVersion} npm packages publish SLSA provenance from the`,
+    `official [\`microsoft/playwright\` v${playwrightVersion} source](https://github.com/microsoft/playwright/tree/v${playwrightVersion}),`,
+    `signed commit \`${audit.sourceCommit}\`, and publish workflow run`,
+    `\`${audit.publishRun}\`, attempt ${audit.publishAttempt}. Their distributed archives include the Apache-2.0`,
+    "license; `playwright` and `playwright-core` also include the upstream Playwright",
+    "NOTICE. The npm integrities above are enforced by the committed lockfile.",
+  ].join("\n");
+  assert.equal(
+    browserSection.split(expectedProvenance).length - 1,
+    1,
+    "Playwright npm provenance drifted",
+  );
+
+  const browsers = parseJsonObject(browsersSource, "playwright-core/browsers.json");
+  assert.ok(Array.isArray(browsers.browsers), "Playwright browser descriptor list is missing");
+  const descriptor = (name) => {
+    const matches = browsers.browsers.filter((browser) => browser.name === name);
+    assert.equal(matches.length, 1, `Playwright descriptor must contain one ${name}`);
+    return matches[0];
+  };
+  const headlessShell = descriptor("chromium-headless-shell");
+  const ffmpeg = descriptor("ffmpeg");
+  assert.equal(headlessShell.revision, audit.browserRevision, "headless shell revision drifted");
+  assert.equal(headlessShell.browserVersion, audit.browserVersion, "headless shell version drifted");
+  assert.equal(headlessShell.installByDefault, true, "headless shell install contract drifted");
+  assert.equal(ffmpeg.revision, audit.ffmpegRevision, "Playwright FFmpeg revision drifted");
+  assert.equal(ffmpeg.installByDefault, true, "Playwright FFmpeg install contract drifted");
+
+  const artifactRows = extractTableRows(
+    browserSection,
+    "| Component | Version | Origin and observed integrity | License or terms | Purpose |",
+    5,
+    "CI-only browser artifact inventory",
+  );
+  const expectedArtifactRows = [
+    [
+      "Chrome Headless Shell",
+      `${audit.browserVersion}, Playwright revision ${audit.browserRevision}`,
+      `[Official Playwright descriptor](https://github.com/microsoft/playwright/blob/v${playwrightVersion}/packages/playwright-core/browsers.json); [versioned Chrome for Testing archive](https://cdn.playwright.dev/builds/cft/${audit.browserVersion}/linux64/chrome-headless-shell-linux64.zip); archive SHA-256 observed on 30/08/2026: \`${audit.browserArchiveSha256}\``,
+      `The archive supplies Chromium's \`LICENSE.headless_shell\` (observed SHA-256 \`${audit.browserLicenseSha256}\`) with ${audit.browserLicenseSections} bundled third-party license sections; the executable is not represented as a single SPDX license`,
+      "Execute Chromium headless for semantic DOM, request, and CSP validation",
+    ],
+    [
+      "Playwright FFmpeg",
+      `Build ${audit.ffmpegRevision}`,
+      `[Versioned official Playwright archive](https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/${audit.ffmpegRevision}/ffmpeg-linux.zip); archive SHA-256 observed on 30/08/2026: \`${audit.ffmpegArchiveSha256}\``,
+      "The archive supplies `COPYING.LGPLv2.1`; exact redistribution terms for the prebuilt binary remain **INCONCLUSIVE** without its complete build configuration and incorporated-component inventory",
+      "Playwright-supplied CI media helper",
+    ],
+  ];
+  assert.deepEqual(
+    artifactRows,
+    expectedArtifactRows,
+    "THIRDPARTY browser artifacts must equal the installed Playwright descriptor and audit",
+  );
+  const expectedCaveat = [
+    "The browser and FFmpeg hashes are dated audit evidence, not integrity values",
+    `enforced by \`package-lock.json\`. Playwright ${playwrightVersion} selects their versioned`,
+    "revisions and validates download size, but its installer does not enforce these",
+    "recorded SHA-256 values. Neither executable is redistributed in the GitHub",
+    "Pages artifact; reassess the complete bundled notices and FFmpeg build terms",
+    "before any future redistribution.",
+  ].join("\n");
+  assert.equal(
+    browserSection.split(expectedCaveat).length - 1,
+    1,
+    "Browser artifact integrity caveat drifted",
+  );
+}
+
+function assertBrandLogoProvenance(thirdPartySource, logoBytes) {
+  const mediaSection = extractSection(
+    thirdPartySource,
+    "## Fonts, icons, and hosted media",
+    "### Decorative profile GIFs",
+  );
+  const expectedBlock = [
+    "The repository-local",
+    "[`site/assets/lcv-ideas-software-logo.svg`](site/assets/lcv-ideas-software-logo.svg)",
+    "is first-party proprietary content, not a third-party component. It was copied",
+    `from the approved [organization-governance source](${BRAND_LOGO_SOURCE_URL})`,
+    `at commit \`${BRAND_LOGO_SOURCE_COMMIT}\`; its SHA-256 is`,
+    `\`${BRAND_LOGO_SHA256}\`.`,
+    "Runtime rendering no longer depends on another LCV repository.",
+  ].join("\n");
+  const blockStart = mediaSection.indexOf("The repository-local\n");
+  const blockEnd = mediaSection.indexOf("\n\nThe MIT license applies", blockStart);
+  assert.ok(blockStart !== -1 && blockEnd > blockStart, "Logo provenance block is missing");
+  const documentedBlock = mediaSection.slice(blockStart, blockEnd);
+  assert.equal(documentedBlock, expectedBlock, "Repository-local logo provenance drifted");
+  const documentedDigests = [
+    ...documentedBlock.matchAll(/`([0-9a-f]{64})`/gu),
+  ].map((match) => match[1]);
+  assert.deepEqual(documentedDigests, [BRAND_LOGO_SHA256]);
+  const actualDigest = createHash("sha256").update(logoBytes).digest("hex");
+  assert.equal(
+    actualDigest,
+    documentedDigests[0],
+    "site/assets/lcv-ideas-software-logo.svg drifted from its documented digest",
+  );
+}
+
 function extractActionRows(content, heading, nextHeading) {
   const section = extractSection(content, heading, nextHeading);
   const lines = section
@@ -320,6 +701,32 @@ function assertActionInventoryReconciled(actionsLockSource, thirdPartySource) {
   }
 }
 
+function assertPullRequestActivityTypes(workflowSource) {
+  const lines = workflowSource.replaceAll("\r\n", "\n").split("\n");
+  const start = lines.indexOf("  pull_request:");
+  assert.notEqual(start, -1, "Pages workflow needs one pull_request trigger");
+  const duplicate = lines.indexOf("  pull_request:", start + 1);
+  assert.equal(duplicate, -1, "Pages workflow must not duplicate pull_request triggers");
+  let end = lines.length;
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (/^ {2}[a-z_]+:$/u.test(lines[index])) {
+      end = index;
+      break;
+    }
+  }
+  assert.deepEqual(lines.slice(start, end), [
+    "  pull_request:",
+    "    branches:",
+    "      - main",
+    "    types:",
+    "      - edited",
+    "      - opened",
+    "      - ready_for_review",
+    "      - reopened",
+    "      - synchronize",
+  ]);
+}
+
 function assertPageTestTokenBoundary(workflowSource) {
   const normalizedWorkflow = workflowSource.replaceAll("\r\n", "\n");
   const testJobStart = normalizedWorkflow.indexOf("  test-snake:");
@@ -354,7 +761,7 @@ function assertPageTestTokenBoundary(workflowSource) {
     ].join("\n"),
     [
       "      - name: Install official Playwright Chromium headless shell",
-      "        run: npx --no-install playwright install --with-deps --only-shell chromium",
+      "        run: ./node_modules/.bin/playwright install --with-deps --only-shell chromium",
     ].join("\n"),
     [
       "      - name: Install official GitHub Actions lock validator",
@@ -409,7 +816,7 @@ function assertPageTestTokenBoundary(workflowSource) {
       "        if: github.event_name == 'pull_request'",
       "        run: |",
       "          node --test scripts/provenance-drift.test.mjs",
-      "          npx --no-install playwright test",
+      "          ./node_modules/.bin/playwright test",
     ].join("\n"),
     [
       "      - name: Run provenance tests on a trusted ref",
@@ -418,13 +825,24 @@ function assertPageTestTokenBoundary(workflowSource) {
       "          GITHUB_TOKEN: ${{ github.token }}",
       "        run: |",
       "          node --test scripts/provenance-drift.test.mjs",
-      "          npx --no-install playwright test",
+      "          ./node_modules/.bin/playwright test",
     ].join("\n"),
   ]);
   assert.equal(testJob.split("${{ github.token }}").length - 1, 2);
   assert.equal(testJob.split("GITHUB_TOKEN:").length - 1, 1);
   assert.equal(testJob.split("GH_TOKEN:").length - 1, 1);
 }
+
+test("pull-request retargeting reruns the repository-local gate", () => {
+  assertPullRequestActivityTypes(pageWorkflow);
+  for (const mutant of [
+    pageWorkflow.replace("      - edited\n", ""),
+    pageWorkflow.replace("      - ready_for_review\n", "      # - ready_for_review\n"),
+  ]) {
+    assert.notEqual(mutant, pageWorkflow);
+    assert.throws(() => assertPullRequestActivityTypes(mutant));
+  }
+});
 
 test("pull-request tests never receive GITHUB_TOKEN", () => {
   assertPageTestTokenBoundary(pageWorkflow);
@@ -438,8 +856,8 @@ test("pull-request tests never receive GITHUB_TOKEN", () => {
   const mutants = [
     pageWorkflow.replace("GITHUB_TOKEN: ${{ github.token }}", "GH_TOKEN: ${{ github.token }}"),
     pageWorkflow.replace(
-      "          npx --no-install playwright test",
-      '          echo "${{ github.token }}"\n          npx --no-install playwright test',
+      "          ./node_modules/.bin/playwright test",
+      '          echo "${{ github.token }}"\n          ./node_modules/.bin/playwright test',
     ),
     pageWorkflow.replace(
       "    timeout-minutes: 15",
@@ -447,7 +865,7 @@ test("pull-request tests never receive GITHUB_TOKEN", () => {
     ),
     pageWorkflow.replace(
       "      - name: Run provenance tests on a trusted ref",
-      "      - name: Run a second pull-request test\n        if: github.event_name == 'pull_request'\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n        run: npx --no-install playwright test\n\n      - name: Run provenance tests on a trusted ref",
+      "      - name: Run a second pull-request test\n        if: github.event_name == 'pull_request'\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n        run: ./node_modules/.bin/playwright test\n\n      - name: Run provenance tests on a trusted ref",
     ),
     pageWorkflow.replace(
       "      - name: Run local repository tests without credentials",
@@ -561,6 +979,61 @@ function extractTrustedValidationToolRows(content) {
   return rows;
 }
 
+function inlineActionStepInputs(
+  workflowSource,
+  actionIdentity,
+  expectedVersionComment,
+  sourceName,
+) {
+  const lines = workflowSource.replaceAll("\r\n", "\n").split("\n");
+  const selectedSteps = [];
+  for (const [index, line] of lines.entries()) {
+    assert.doesNotMatch(line, /\t/u, `${sourceName} must use spaces for indentation`);
+    if (line.trimStart().startsWith("#")) continue;
+    const match = /^ {6}- uses:\s+(\S+)\s+#\s+(\S+)\s*$/u.exec(line);
+    if (match?.[1] === actionIdentity) {
+      assert.equal(
+        match[2],
+        expectedVersionComment,
+        `${sourceName} Action version comment drifted`,
+      );
+      selectedSteps.push({ index, inputIndexes: new Map(), inputs: new Map() });
+    }
+  }
+
+  for (const step of selectedSteps) {
+    let stepEnd = lines.length;
+    for (let index = step.index + 1; index < lines.length; index += 1) {
+      if (/^ {6}- /u.test(lines[index])) {
+        stepEnd = index;
+        break;
+      }
+    }
+    const withLines = [];
+    for (let index = step.index + 1; index < stepEnd; index += 1) {
+      if (lines[index] === "        with:") withLines.push(index);
+    }
+    assert.equal(withLines.length, 1, `${sourceName} Action step needs one with mapping`);
+    for (let index = withLines[0] + 1; index < stepEnd; index += 1) {
+      const line = lines[index];
+      if (line.trim() === "" || line.trimStart().startsWith("#")) continue;
+      const indent = line.length - line.trimStart().length;
+      if (indent <= 8) break;
+      assert.equal(indent, 10, `${sourceName} has a non-canonical with mapping`);
+      const match = /^ {10}([a-z_][a-z0-9_-]*):\s+(.+?)\s*$/iu.exec(line);
+      assert.ok(match, `${sourceName} has a non-scalar Action input`);
+      assert.equal(
+        step.inputs.has(match[1]),
+        false,
+        `${sourceName} has a duplicate ${match[1]} input`,
+      );
+      step.inputs.set(match[1], match[2]);
+      step.inputIndexes.set(match[1], index);
+    }
+  }
+  return { lines, selectedSteps };
+}
+
 function actionStepInputs(
   workflowSource,
   actionIdentity,
@@ -640,23 +1113,46 @@ function actionStepInputs(
 
 function assertRuntimeToolInventory(thirdPartySource, workflowOverrides = {}) {
   const currentLinearWorkflow = workflowOverrides.linearWorkflow ?? linearWorkflow;
+  const currentPageWorkflow = workflowOverrides.pageWorkflow ?? pageWorkflow;
   const currentZizmorWorkflow = workflowOverrides.zizmorWorkflow ?? zizmorWorkflow;
-  assert.equal(
-    pageWorkflow.split(
-      "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
-    ).length - 1,
-    2,
+  const setupNode = inlineActionStepInputs(
+    currentPageWorkflow,
+    "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+    "v7.0.0",
+    "Pages workflow",
   );
-  assert.equal(pageWorkflow.split('node-version: "24.20.0"').length - 1, 2);
-  assert.ok(pageWorkflow.includes("github/gh-actions-lock/releases/download/v0.1.6/linux-amd64"));
+  assert.equal(setupNode.selectedSteps.length, 2, "Pages workflow needs two setup-node steps");
+  for (const step of setupNode.selectedSteps) {
+    assert.deepEqual([...step.inputs], [
+      ["node-version", '"24.20.0"'],
+      ["package-manager-cache", "false"],
+    ]);
+  }
+  for (const inputName of ["node-version", "package-manager-cache"]) {
+    const activeInputIndexes = [];
+    const inputPattern = new RegExp(String.raw`^\s*${inputName}:\s+`, "u");
+    for (const [index, line] of setupNode.lines.entries()) {
+      if (!line.trimStart().startsWith("#") && inputPattern.test(line)) {
+        activeInputIndexes.push(index);
+      }
+    }
+    assert.deepEqual(
+      activeInputIndexes,
+      setupNode.selectedSteps.map((step) => step.inputIndexes.get(inputName)),
+      `Pages workflow ${inputName} inputs must belong to setup-node steps`,
+    );
+  }
   assert.ok(
-    pageWorkflow.includes(
+    currentPageWorkflow.includes("github/gh-actions-lock/releases/download/v0.1.6/linux-amd64"),
+  );
+  assert.ok(
+    currentPageWorkflow.includes(
       "ACTIONS_LOCK_SHA256: 4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3",
     ),
   );
-  assert.ok(pageWorkflow.includes("gh-actions-lock\n          --verify-local\n          --no-fix"));
+  assert.ok(currentPageWorkflow.includes("gh-actions-lock\n          --verify-local\n          --no-fix"));
   assert.ok(
-    pageWorkflow.includes(
+    currentPageWorkflow.includes(
       "Reverify actions.lock against GitHub on a trusted ref\n        if: github.event_name != 'pull_request'\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: >-\n          gh-actions-lock\n          --verify",
     ),
   );
@@ -703,11 +1199,146 @@ function assertRuntimeToolInventory(thirdPartySource, workflowOverrides = {}) {
   );
 }
 
+test("CI-only browser packages and artifacts stay reconciled", () => {
+  assertBrowserToolInventory(
+    packageManifestSource,
+    packageLockSource,
+    playwrightBrowsersSource,
+    thirdParty,
+  );
+});
+
+test("CI-only browser inventory rejects lockfile and artifact drift", () => {
+  const manifestDrift = parseJsonObject(packageManifestSource, "package.json mutant");
+  manifestDrift.devDependencies["@playwright/test"] = "1.62.2";
+
+  const versionDrift = parseJsonObject(packageLockSource, "package-lock.json mutant");
+  versionDrift.packages["node_modules/@playwright/test"].version = "1.62.2";
+
+  const integrityDrift = parseJsonObject(packageLockSource, "package-lock.json mutant");
+  integrityDrift.packages["node_modules/playwright-core"].integrity =
+    `sha512-${"A".repeat(86)}==`;
+
+  const extraPackage = parseJsonObject(packageLockSource, "package-lock.json mutant");
+  extraPackage.packages["node_modules/uninventoried-package"] = {
+    dev: true,
+    integrity: `sha512-${"A".repeat(86)}==`,
+    license: "MIT",
+    resolved: "https://registry.npmjs.org/uninventoried-package/-/uninventoried-package-1.0.0.tgz",
+    version: "1.0.0",
+  };
+
+  const descriptorDrift = parseJsonObject(
+    playwrightBrowsersSource,
+    "playwright-core/browsers.json mutant",
+  );
+  descriptorDrift.browsers.find(
+    (browser) => browser.name === "chromium-headless-shell",
+  ).revision = "9999";
+
+  const canonicalLock = parseJsonObject(packageLockSource, "package-lock.json");
+  const canonicalPlaywrightVersion =
+    canonicalLock.packages["node_modules/playwright-core"].version;
+  const canonicalAudit = PLAYWRIGHT_RELEASE_AUDITS.get(canonicalPlaywrightVersion);
+  assert.ok(canonicalAudit);
+  const staleThirdParty = thirdParty.replace(
+    canonicalAudit.sourceCommit,
+    "0".repeat(40),
+  );
+  assert.notEqual(staleThirdParty, thirdParty);
+
+  for (const [name, manifest, lock, browsers, inventory] of [
+    [
+      "manifest version",
+      JSON.stringify(manifestDrift),
+      packageLockSource,
+      playwrightBrowsersSource,
+      thirdParty,
+    ],
+    [
+      "package version",
+      packageManifestSource,
+      JSON.stringify(versionDrift),
+      playwrightBrowsersSource,
+      thirdParty,
+    ],
+    [
+      "package integrity",
+      packageManifestSource,
+      JSON.stringify(integrityDrift),
+      playwrightBrowsersSource,
+      thirdParty,
+    ],
+    [
+      "complete package set",
+      packageManifestSource,
+      JSON.stringify(extraPackage),
+      playwrightBrowsersSource,
+      thirdParty,
+    ],
+    [
+      "browser descriptor",
+      packageManifestSource,
+      packageLockSource,
+      JSON.stringify(descriptorDrift),
+      thirdParty,
+    ],
+    [
+      "published provenance",
+      packageManifestSource,
+      packageLockSource,
+      playwrightBrowsersSource,
+      staleThirdParty,
+    ],
+  ]) {
+    assert.throws(
+      () =>
+        assertBrowserToolInventory(
+          manifest,
+          lock,
+          browsers,
+          inventory,
+        ),
+      undefined,
+      `${name} drift must be rejected`,
+    );
+  }
+});
+
+test("repository-local brand logo matches its approved documented digest", () => {
+  assertBrandLogoProvenance(thirdParty, brandLogo);
+});
+
+test("brand logo provenance rejects byte and documented-digest drift", () => {
+  const mutatedLogo = Buffer.from(brandLogo);
+  mutatedLogo[0] ^= 1;
+  assert.throws(() => assertBrandLogoProvenance(thirdParty, mutatedLogo));
+
+  const driftedDocumentation = thirdParty.replace(BRAND_LOGO_SHA256, "0".repeat(64));
+  assert.notEqual(driftedDocumentation, thirdParty);
+  assert.throws(() => assertBrandLogoProvenance(driftedDocumentation, brandLogo));
+});
+
 test("runtime tool versions and immutable origins stay inventoried", () => {
   assertRuntimeToolInventory(thirdParty);
 });
 
 test("runtime tool inputs reject stale comments and detached duplicates", () => {
+  const buildJobStart = pageWorkflow.indexOf("\n  build:");
+  assert.notEqual(buildJobStart, -1);
+  const driftedBuildWorkflow =
+    pageWorkflow.slice(0, buildJobStart) +
+    pageWorkflow
+      .slice(buildJobStart)
+      .replace(
+        '          node-version: "24.20.0"',
+        '          node-version: "25.0.0"\n          # node-version: "24.20.0"',
+      );
+  assert.notEqual(driftedBuildWorkflow, pageWorkflow);
+  assert.throws(() =>
+    assertRuntimeToolInventory(thirdParty, { pageWorkflow: driftedBuildWorkflow }),
+  );
+
   const driftedLinearWorkflow = linearWorkflow.replace(
     "          cli_version: v0.17.1",
     "          cli_version: v0.18.0\n          # cli_version: v0.17.1",

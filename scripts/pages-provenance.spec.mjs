@@ -25,6 +25,7 @@ const [readmeSource, pageSource, scriptSource, stylesheetSource] = await Promise
 
 const FIXED_TIME = "2026-08-30T13:15:00.000Z";
 const CACHE_BUSTER = "2026083013";
+const DEFERRED_RESOURCE_WINDOW_MS = 2_147_483_647;
 const APP_URL = new URL("app.js", PAGE_DOCUMENT_URL).href;
 const LOCAL_STYLESHEET_URL = new URL("styles.css", PAGE_DOCUMENT_URL).href;
 const PROFILE_API_URL = "https://api.github.com/users/lcv-leo";
@@ -76,6 +77,28 @@ function count(values, expected) {
 
 function sorted(values) {
   return [...values].sort((left, right) => left.localeCompare(right, "en"));
+}
+
+async function exerciseDeferredResourcePaths(page) {
+  await page.evaluate(() => {
+    document.addEventListener("click", (event) => event.preventDefault(), {
+      capture: true,
+    });
+    document.addEventListener("submit", (event) => event.preventDefault(), {
+      capture: true,
+    });
+  });
+
+  for (let cycle = 0; cycle < 2; cycle += 1) {
+    await page.clock.fastForward(DEFERRED_RESOURCE_WINDOW_MS);
+    await page.locator("body").click({ position: { x: 1, y: 1 } });
+    await page.keyboard.press("A");
+    const pageHeight = await page.evaluate(() =>
+      Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
+    );
+    await page.mouse.wheel(0, pageHeight);
+  }
+  await page.clock.fastForward(DEFERRED_RESOURCE_WINDOW_MS);
 }
 
 async function renderReadmeWithGitHub(content) {
@@ -184,7 +207,7 @@ async function assertParserCspSemantics(browser, html) {
       const policy = policies[0];
       const resources = [
         ...document.querySelectorAll(
-          "audio[src], embed[src], iframe[src], img[src], input[type=image][src], link[href], object[data], script[src], source[src], source[srcset], style, track[src], video[src]",
+          "audio[src], embed[src], iframe, img[src], input[type=image][src], link[href], object[data], script[src], source[src], source[srcset], style, track[src], video[src]",
         ),
       ];
       return {
@@ -256,7 +279,7 @@ async function assertPagesSemantics(
       });
     });
   });
-  await page.clock.setFixedTime(FIXED_TIME);
+  await page.clock.install({ time: FIXED_TIME });
 
   await context.route("**/*", async (route) => {
     const url = route.request().url();
@@ -324,7 +347,7 @@ async function assertPagesSemantics(
       const policy = policyElements[0];
       const resourceElements = [
         ...document.querySelectorAll(
-          "audio[src], embed[src], iframe[src], img[src], input[type=image][src], link[href], object[data], script[src], source[src], source[srcset], style, track[src], video[src]",
+          "audio[src], embed[src], iframe, img[src], input[type=image][src], link[href], object[data], script[src], source[src], source[srcset], style, track[src], video[src]",
         ),
       ];
       const scripts = [...document.scripts].map((element) => ({
@@ -341,7 +364,7 @@ async function assertPagesSemantics(
 
       return {
         forbiddenResourceElementCount: document.querySelectorAll(
-          "audio[src], embed[src], iframe[src], input[type=image][src], object[data], source, style, track[src], video[src]",
+          "audio[src], embed[src], iframe, input[type=image][src], object[data], source, style, track[src], video[src]",
         ).length,
         htmlNamespace:
           document.documentElement.namespaceURI === "http://www.w3.org/1999/xhtml",
@@ -445,6 +468,8 @@ async function assertPagesSemantics(
         year: "2026",
       });
 
+    await exerciseDeferredResourcePaths(page);
+
     for (const expected of [
       PAGE_DOCUMENT_URL,
       APP_URL,
@@ -455,8 +480,11 @@ async function assertPagesSemantics(
     ]) {
       expect(count(requests, expected), `${expected} request count`).toBe(1);
     }
+    expect(
+      unknownRequests,
+      `Untracked requests: ${unknownRequests.join(", ")}`,
+    ).toEqual([]);
     expect(requests.every((url) => allowedRequests.has(url))).toBe(true);
-    expect(unknownRequests).toEqual([]);
     expect(requestFailures).toEqual([]);
     expect(pageErrors).toEqual([]);
 
@@ -812,6 +840,13 @@ test("browser semantics reject inert policy, inert script, and quoted-tag-bounda
         '<img src="https://example.com/untracked.png" alt="">\n</main>',
       ),
     ],
+    [
+      "srcdoc subdocument",
+      pageSource.replace(
+        "</main>",
+        `<iframe srcdoc="&lt;img src='${BRAND_LOGO_URL}'&gt;"></iframe>\n</main>`,
+      ),
+    ],
   ]);
 
   for (const [name, html] of pageMutants) {
@@ -839,20 +874,57 @@ test("browser network inventory rejects dynamic query and CSS resource drift", a
     '"use strict";',
     `"use strict";\n  const untrackedImage = new Image();\n  untrackedImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1";`,
   );
+  const delayedRequestScript = scriptSource.replace(
+    '"use strict";',
+    `"use strict";\n  setTimeout(() => {\n    const delayedImage = new Image();\n    delayedImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=delayed";\n  }, 2147483646);`,
+  );
+  const eventRequestScript = scriptSource.replace(
+    '"use strict";',
+    `"use strict";\n  document.addEventListener("click", () => {\n    const eventImage = new Image();\n    eventImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=event";\n  }, { once: true });`,
+  );
+  const deferredEventUrl =
+    `${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-event`;
+  const deferredEventRequestScript = scriptSource.replace(
+    '"use strict";',
+    `"use strict";\n  setTimeout(() => {\n    document.addEventListener("click", (event) => {\n      if (!event.isTrusted) return;\n      const deferredEventImage = new Image();\n      deferredEventImage.src = "${deferredEventUrl}";\n    }, { once: true });\n  }, 1000);`,
+  );
+  const deferredKeyboardUrl =
+    `${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-keyboard`;
+  const deferredKeyboardRequestScript = scriptSource.replace(
+    '"use strict";',
+    `"use strict";\n  setTimeout(() => {\n    document.addEventListener("keydown", (event) => {\n      if (!event.isTrusted) return;\n      const deferredKeyboardImage = new Image();\n      deferredKeyboardImage.src = "${deferredKeyboardUrl}";\n    }, { once: true });\n  }, 1000);`,
+  );
   const stylesheetDrift =
     `${stylesheetSource}\nbody { background-image: url("${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1"); }`;
 
-  for (const [name, mutation] of [
+  for (const [name, mutation, expectedUnknownRequest] of [
     ["analytics query", { script: queryDriftScript }],
     ["detached image request", { script: hiddenRequestScript }],
+    ["delayed image request", { script: delayedRequestScript }],
+    ["event-driven image request", { script: eventRequestScript }],
+    [
+      "deferred trusted-interaction request",
+      { script: deferredEventRequestScript },
+      deferredEventUrl,
+    ],
+    [
+      "deferred trusted-keyboard request",
+      { script: deferredKeyboardRequestScript },
+      deferredKeyboardUrl,
+    ],
     ["stylesheet request", { stylesheet: stylesheetDrift }],
   ]) {
-    let rejected = false;
+    let failure;
     try {
       await assertPagesSemantics(browser, mutation);
-    } catch {
-      rejected = true;
+    } catch (error) {
+      failure = error;
     }
-    expect(rejected, `${name} drift must be rejected`).toBe(true);
+    expect(failure, `${name} drift must be rejected`).toBeDefined();
+    if (expectedUnknownRequest) {
+      expect(String(failure), `${name} must fail on its exact URL`).toContain(
+        expectedUnknownRequest,
+      );
+    }
   }
 });
