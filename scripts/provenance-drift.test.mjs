@@ -152,7 +152,7 @@ function parseWorkflowVersions(workflowSources) {
     for (const line of workflowSource.split("\n")) {
       if (line.trimStart().startsWith("#")) continue;
       const match =
-        /^\s*(?:-\s*)?uses:\s+([^/@\s]+\/[^/@\s]+)(?:\/[^@\s]+)*@([0-9a-f]{40})\s+#\s+(\S+)\s*$/u.exec(
+        /^\s*(?:-\s*)?uses:\s+([^/@\s]+\/[^/@\s]+)(?:\/[^/@\s]+)*@([0-9a-f]{40})\s+#\s+(\S+)\s*$/u.exec(
           line,
         );
       if (!match) continue;
