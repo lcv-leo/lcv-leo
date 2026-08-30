@@ -8,12 +8,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - "scripts/generate-contribution-snake.mjs"
-      - "scripts/generate-contribution-snake.test.mjs"
-      - "scripts/linear-release-trust.test.mjs"
-      - ".github/workflows/pages.yml"
-      - ".github/workflows/linear-release.yml"
   schedule:
     - cron: "17 6 * * *" # diário, 03:17 em Brasília; evita o pico da hora cheia
   push:
@@ -47,11 +41,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run generator tests
+      - name: Run repository tests
         run: >-
           node --test
           scripts/generate-contribution-snake.test.mjs
           scripts/linear-release-trust.test.mjs
+          scripts/provenance-drift.test.mjs
 
   build:
     if: github.event_name != 'pull_request'
