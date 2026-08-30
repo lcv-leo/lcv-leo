@@ -351,22 +351,38 @@ function assertPageCssSurfaces(content, pageStylesSource) {
 }
 
 function activeHtml(content, sourceName) {
-  const comments = [...content.matchAll(/<!--[\s\S]*?-->/gu)];
-  assert.equal(
-    [...content.matchAll(/<!--/gu)].length,
-    comments.length,
-    `${sourceName} has an unterminated HTML comment`,
-  );
-  assert.equal(
-    [...content.matchAll(/-->/gu)].length,
-    comments.length,
-    `${sourceName} has a stray HTML comment terminator`,
-  );
-  return content.replaceAll(/<!--[\s\S]*?-->/gu, "");
+  for (const marker of ["<!--", "-->", "--!>"]) {
+    assert.equal(
+      content.includes(marker),
+      false,
+      `${sourceName} must not contain HTML comment syntax`,
+    );
+  }
+  return content;
 }
 
 function assertPageSecurityPolicy(content) {
   const activeContent = activeHtml(content, "Pages");
+  const headStart = activeContent.indexOf("<head>");
+  const headEnd = activeContent.indexOf("</head>");
+  const bodyStart = activeContent.indexOf("<body>");
+  assert.notEqual(headStart, -1, "Pages needs its canonical <head>");
+  assert.notEqual(headEnd, -1, "Pages needs its canonical </head>");
+  assert.notEqual(bodyStart, -1, "Pages needs its canonical <body>");
+  assert.equal(
+    activeContent.lastIndexOf("<head>"),
+    headStart,
+    "Pages must contain exactly one <head>",
+  );
+  assert.equal(
+    activeContent.lastIndexOf("</head>"),
+    headEnd,
+    "Pages must contain exactly one </head>",
+  );
+  assert.ok(
+    headStart < headEnd && headEnd < bodyStart,
+    "Pages head must close before the body begins",
+  );
   const metaTags = [...activeContent.matchAll(/<meta\b[^>]*>/giu)];
   const policyTags = metaTags.filter(
     (match) =>
@@ -374,6 +390,10 @@ function assertPageSecurityPolicy(content) {
       "content-security-policy",
   );
   assert.equal(policyTags.length, 1, "Pages needs exactly one enforced CSP meta tag");
+  assert.ok(
+    policyTags[0].index > headStart && policyTags[0].index < headEnd,
+    "Pages CSP must remain inside the document head",
+  );
   const policy = quotedHtmlAttribute(
     policyTags[0][0],
     "content",
@@ -393,20 +413,27 @@ function assertPageSecurityPolicy(content) {
     "Pages CSP must precede every resource-bearing element",
   );
 
-  const scriptOpenings = [...activeContent.matchAll(/<script\b[^>]*>/giu)];
-  const scriptBlocks = [
-    ...activeContent.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script\s*>/giu),
-  ];
-  assert.equal(scriptBlocks.length, scriptOpenings.length, "Pages has an unterminated <script>");
-  assert.equal(scriptBlocks.length, 1, "Pages must load exactly one script");
-  assert.equal(scriptBlocks[0][1].trim(), "", "Pages script must be linked, not inline");
-  const scriptSource = quotedHtmlAttribute(
-    scriptOpenings[0][0],
-    "src",
-    "Pages script",
-    true,
+  const canonicalScript = '<script src="app.js" defer></script>';
+  const lowercaseContent = activeContent.toLowerCase();
+  const scriptStart = lowercaseContent.indexOf("<script");
+  const scriptEnd = lowercaseContent.indexOf("</script");
+  assert.notEqual(scriptStart, -1, "Pages must load its canonical script");
+  assert.notEqual(scriptEnd, -1, "Pages has an unterminated <script>");
+  assert.equal(
+    lowercaseContent.indexOf("<script", scriptStart + 1),
+    -1,
+    "Pages must load exactly one script",
   );
-  assert.equal(normalizeImageSource(scriptSource, "Pages script"), "app.js");
+  assert.equal(
+    lowercaseContent.indexOf("</script", scriptEnd + 1),
+    -1,
+    "Pages must close exactly one script",
+  );
+  assert.equal(
+    activeContent.slice(scriptStart, scriptStart + canonicalScript.length),
+    canonicalScript,
+    "Pages must load only the exact local empty-body script",
+  );
 }
 
 async function renderReadmeWithGitHub(content) {
@@ -911,6 +938,18 @@ test("native Pages CSP blocks uncatalogued resources introduced by JavaScript", 
     '<script src="app.js" defer></script>',
     '<script src="https://example.com/app.js" defer></script>',
   );
+  const noncanonicalScriptEnd = page.replace(
+    "</script>",
+    "</script\t\n data-noncanonical>",
+  );
+  const headContentStart = page.indexOf("<head>") + "<head>".length;
+  const headContentEnd = page.indexOf("</head>");
+  const bodyContentStart = page.indexOf("<body>") + "<body>".length;
+  const policyAndResourcesInBody =
+    page.slice(0, headContentStart) +
+    page.slice(headContentEnd, bodyContentStart) +
+    page.slice(headContentStart, headContentEnd) +
+    page.slice(bodyContentStart);
   for (const driftedPage of [
     page.replace(PAGE_CONTENT_SECURITY_POLICY, permissivePolicy),
     page.replace(PAGE_CONTENT_SECURITY_POLICY, broadHostPolicy),
@@ -919,9 +958,12 @@ test("native Pages CSP blocks uncatalogued resources introduced by JavaScript", 
     page.replace(PAGE_CONTENT_SECURITY_POLICY, duplicateDirectivePolicy),
     pageWithoutPolicy,
     page.replace(policyTag, `<!-- ${policyTag} -->`),
+    page.replace(policyTag, `<!-- ${policyTag} --!>`),
     movedPolicy,
     page.replace(policyTag, `${policyTag}\n  ${policyTag}`),
     externalScript,
+    noncanonicalScriptEnd,
+    policyAndResourcesInBody,
   ]) {
     assert.notEqual(driftedPage, page);
     await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));

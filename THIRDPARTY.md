@@ -118,8 +118,9 @@ The Pages JavaScript reads public profile and repository data from the GitHub
 REST API, and the contribution-snake generator reads the GitHub GraphQL API.
 The repository-local provenance gate submits the profile Markdown to GitHub's
 official REST Markdown endpoint in `gfm` mode so only images rendered by GitHub
-enter the exact media catalog; CI authenticates with its read-only repository
-token. Comments and code examples therefore follow GitHub's own renderer rather
-than a repository-specific Markdown parser.
+enter the exact media catalog. Pull-request CI uses the public endpoint without
+authentication; trusted-ref CI authenticates with its read-only repository token.
+Comments and code examples therefore follow GitHub's own renderer rather than a
+repository-specific Markdown parser.
 Those service interactions are governed by the applicable GitHub terms and do
 not add a software package dependency.
