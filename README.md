@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg" alt="LCV Ideas &amp; Software" width="560"/>
+  <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/lcv-ideas-software-logo.svg" alt="LCV Ideas &amp; Software" width="560"/>
 </div>
 
 <h1 align="center">

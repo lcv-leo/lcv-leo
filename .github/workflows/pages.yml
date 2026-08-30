@@ -17,10 +17,16 @@ on:
       - "site/**"
       - "README.md"
       - "THIRDPARTY.md"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.mjs"
       - "scripts/generate-contribution-snake.mjs"
       - "scripts/generate-contribution-snake.test.mjs"
       - "scripts/linear-release-trust.test.mjs"
+      - "scripts/pages-provenance-contract.mjs"
+      - "scripts/pages-provenance.spec.mjs"
       - "scripts/provenance-drift.test.mjs"
+      - ".github/workflows/actions.lock"
       - ".github/workflows/pages.yml"
       - ".github/workflows/linear-release.yml"
   workflow_dispatch:
@@ -35,7 +41,7 @@ jobs:
   test-snake:
     name: Test Pages and release contracts
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     permissions:
       contents: read # Check out untrusted PR content without granting write access or persisting credentials.
     steps:
@@ -43,21 +49,74 @@ jobs:
         with:
           persist-credentials: false
 
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.20.0"
+          package-manager-cache: false
+
+      - name: Install locked test dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
+
+      - name: Install official Playwright Chromium headless shell
+        run: npx --no-install playwright install --with-deps --only-shell chromium
+
+      - name: Install official GitHub Actions lock validator
+        shell: bash
+        env:
+          ACTIONS_LOCK_SHA256: 4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3
+          ACTIONS_LOCK_URL: https://github.com/github/gh-actions-lock/releases/download/v0.1.6/linux-amd64
+        run: |
+          set -euo pipefail
+          readonly binary="${RUNNER_TEMP}/gh-actions-lock"
+          curl \
+            --fail \
+            --location \
+            --proto '=https' \
+            --proto-redir '=https' \
+            --show-error \
+            --silent \
+            --tlsv1.2 \
+            "${ACTIONS_LOCK_URL}" \
+            --output "${binary}"
+          printf '%s  %s\n' "${ACTIONS_LOCK_SHA256}" "${binary}" | sha256sum --check --strict
+          chmod 0500 "${binary}"
+          printf '%s\n' "${RUNNER_TEMP}" >>"${GITHUB_PATH}"
+
+      - name: Verify actions.lock with the official GitHub validator
+        run: >-
+          gh-actions-lock
+          --verify-local
+          --no-fix
+          --no-migrate-local-actions
+
+      - name: Reverify actions.lock against GitHub on a trusted ref
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh-actions-lock
+          --verify
+          --no-migrate-local-actions
+
       - name: Run local repository tests without credentials
         run: >-
           node --test
           scripts/generate-contribution-snake.test.mjs
           scripts/linear-release-trust.test.mjs
 
-      - name: Run provenance test without credentials
+      - name: Run provenance tests without credentials
         if: github.event_name == 'pull_request'
-        run: node --test scripts/provenance-drift.test.mjs
+        run: |
+          node --test scripts/provenance-drift.test.mjs
+          npx --no-install playwright test
 
-      - name: Run provenance test on a trusted ref
+      - name: Run provenance tests on a trusted ref
         if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node --test scripts/provenance-drift.test.mjs
+        run: |
+          node --test scripts/provenance-drift.test.mjs
+          npx --no-install playwright test
 
   build:
     if: github.event_name != 'pull_request'
@@ -72,6 +131,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.20.0"
+          package-manager-cache: false
 
       - name: Generate contribution snake SVGs
         env:

@@ -2,564 +2,32 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+import {
+  DEVICON_COMMIT,
+  GIF_CATALOG_COMMIT,
+  GIF_URLS,
+} from "./pages-provenance-contract.mjs";
+
 const [
-  readme,
-  page,
-  pageStyles,
   thirdParty,
   actionsLock,
-  actionsLockValidatorWorkflow,
   codeqlWorkflow,
   linearWorkflow,
   pageWorkflow,
   scorecardWorkflow,
   zizmorWorkflow,
-] =
-  await Promise.all([
-    readFile(new URL("../README.md", import.meta.url), "utf8"),
-    readFile(new URL("../site/index.html", import.meta.url), "utf8"),
-    readFile(new URL("../site/styles.css", import.meta.url), "utf8"),
-    readFile(new URL("../THIRDPARTY.md", import.meta.url), "utf8"),
-    readFile(new URL("../.github/workflows/actions.lock", import.meta.url), "utf8"),
-    readFile(
-      new URL("../.github/workflows/actions-lock-validate.yml", import.meta.url),
-      "utf8",
-    ),
-    readFile(new URL("../.github/workflows/codeql.yml", import.meta.url), "utf8"),
-    readFile(new URL("../.github/workflows/linear-release.yml", import.meta.url), "utf8"),
-    readFile(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8"),
-    readFile(new URL("../.github/workflows/scorecard.yml", import.meta.url), "utf8"),
-    readFile(new URL("../.github/workflows/zizmor.yml", import.meta.url), "utf8"),
-  ]);
-
-const DEVICON_COMMIT = "7330accdbc47e2dc0c19789a48533c4a3c50fe58";
-const DEVICON_PREFIX = `https://raw.githubusercontent.com/devicons/devicon/${DEVICON_COMMIT}/`;
-const DEVICON_PATHS = [
-  "icons/typescript/typescript-original.svg",
-  "icons/javascript/javascript-original.svg",
-  "icons/rust/rust-original.svg",
-  "icons/python/python-original.svg",
-  "icons/sqlite/sqlite-original.svg",
-  "icons/html5/html5-original.svg",
-  "icons/css3/css3-original.svg",
-  "icons/react/react-original.svg",
-  "icons/vitejs/vitejs-original.svg",
-  "icons/cloudflareworkers/cloudflareworkers-original.svg",
-  "icons/cloudflare/cloudflare-original.svg",
-  "icons/nodejs/nodejs-original.svg",
-  "icons/tauri/tauri-original.svg",
-];
-
-const GIF_CATALOG_COMMIT = "278efd0acc149f89992349d4a5bd349b058aaf0e";
-const GIF_URLS = [
-  "https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif",
-  "https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif",
-  "https://user-images.githubusercontent.com/74038190/212747903-e9bdf048-2dc8-41f9-b973-0e72ff07bfba.gif",
-  "https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif",
-  "https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif",
-];
-
-const DEVICON_URLS = DEVICON_PATHS.map((path) => `${DEVICON_PREFIX}${path}`);
-const BRAND_LOGO_URL =
-  "https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg";
-const PAGE_STYLESHEET_URLS = [
-  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap",
-  "styles.css",
-];
-
-const SHIELDS_PATHS = [
-  "github/followers/lcv-leo?label=Followers&style=flat-square&color=3B82F6",
-  "github/stars/lcv-leo?label=Stars&style=flat-square&color=3B82F6",
-  "badge/TipTap-000000?style=flat-square&logo=tiptap&logoColor=white",
-  "badge/PWA-5A0FC8?style=flat-square&logo=pwa&logoColor=white",
-  "badge/DOMPurify-7952B3?style=flat-square",
-  "badge/Hono-E36002?style=flat-square&logo=hono&logoColor=white",
-  "badge/D1-F38020?style=flat-square&logo=cloudflare&logoColor=white",
-  "badge/Model_Context_Protocol-000000?style=for-the-badge&logo=anthropic&logoColor=white",
-  "badge/Vertex_AI_(Gemini)-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white",
-  "badge/Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white",
-  "badge/GPT-412991?style=for-the-badge&logo=openai&logoColor=white",
-  "badge/Grok-000000?style=for-the-badge&logo=x&logoColor=white",
-  "badge/DeepSeek-4D6BFE?style=for-the-badge",
-  "badge/Perplexity-1FB8CD?style=for-the-badge&logo=perplexity&logoColor=white",
-  "badge/Mercado_Pago-00B1EA?style=for-the-badge&logo=mercadopago&logoColor=white",
-  "badge/Stripe_(planned)-635BFF?style=for-the-badge&logo=stripe&logoColor=white",
-  "badge/Resend-000000?style=for-the-badge&logo=resend&logoColor=white",
-  "badge/Slack_Integrations-4A154B?style=for-the-badge&logo=slack&logoColor=white",
-  "badge/Linear-5E6AD2?style=for-the-badge&logo=linear&logoColor=white",
-  "badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white",
-  "badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white",
-  "badge/Biome-60A5FA?style=for-the-badge&logo=biome&logoColor=white",
-  "badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white",
-  "badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=black",
-  "badge/CodeQL-2088FF?style=for-the-badge&logo=github&logoColor=white",
-  "badge/Zizmor-FF6B6B?style=for-the-badge",
-  "badge/OpenSSF_Scorecard-2E7D32?style=for-the-badge&logo=openssf&logoColor=white",
-  "badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white",
-  "badge/Merge_Queues-181717?style=for-the-badge&logo=github&logoColor=white",
-  "badge/Wrangler-F38020?style=for-the-badge&logo=cloudflare&logoColor=white",
-  "badge/Dependabot-025E8C?style=for-the-badge&logo=dependabot&logoColor=white",
-  "badge/SHA--pinned_Actions-181717?style=for-the-badge&logo=git&logoColor=white",
-  "badge/npm_Publishing-CB3837?style=for-the-badge&logo=npm&logoColor=white",
-  "badge/Status-Live_on_npm-brightgreen?style=flat-square",
-  "badge/Status-Live_on_npm-brightgreen?style=flat-square",
-  "badge/Status-Live-brightgreen?style=flat-square",
-  "badge/Status-Live-brightgreen?style=flat-square",
-  "badge/Status-Shipping-blue?style=flat-square",
-  "badge/Status-Live_→_Stripe_planned-blue?style=flat-square",
-  "badge/TypeScript_end--to--end-3178C6?style=flat-square&logo=typescript&logoColor=white",
-  "badge/React_19_+_Vite-20232A?style=flat-square&logo=react&logoColor=61DAFB",
-  "badge/Cloudflare_Workers_+_Pages-F38020?style=flat-square&logo=cloudflare&logoColor=white",
-  "badge/Hono_on_the_edge-E36002?style=flat-square&logo=hono&logoColor=white",
-  "badge/D1_+_migrations-F38020?style=flat-square&logo=sqlite&logoColor=white",
-  "badge/MCP_servers_(stdio)-000000?style=flat-square&logo=anthropic&logoColor=white",
-  "badge/Vertex_AI_SA_OAuth-4285F4?style=flat-square&logo=googlecloud&logoColor=white",
-  "badge/Mercado_Pago_3DS-00B1EA?style=flat-square&logo=mercadopago&logoColor=white",
-  "badge/HMAC_signed_webhooks-333333?style=flat-square&logo=letsencrypt&logoColor=white",
-  "badge/Tauri_desktop-24C8DB?style=flat-square&logo=tauri&logoColor=white",
-  "badge/Vitest_TDD-6E9F18?style=flat-square&logo=vitest&logoColor=white",
-  "badge/Zod_validation-3E67B1?style=flat-square&logo=zod&logoColor=white",
-  "badge/Merge_queue_ALLGREEN-181717?style=flat-square&logo=github&logoColor=white",
-  "badge/actions.lock_+_SHA_pins-181717?style=flat-square&logo=git&logoColor=white",
-  "badge/npm_publishing-CB3837?style=flat-square&logo=npm&logoColor=white",
-  "badge/PWA_offline--first-5A0FC8?style=flat-square&logo=pwa&logoColor=white",
-  "badge/Stripe_migration-635BFF?style=flat-square&logo=stripe&logoColor=white",
-  "badge/Gemini_explicit_caching-4285F4?style=flat-square&logo=googlecloud&logoColor=white",
-  "badge/Android_(Play_Store)-3DDC84?style=flat-square&logo=android&logoColor=white",
-  "badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white",
-  "badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white",
-  "badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white",
-  "badge/www.lcv.dev-3B82F6?style=for-the-badge&logo=googlechrome&logoColor=white",
-  "badge/LCV_Ideas_%26_Software-0A66C2?style=for-the-badge&logo=github&logoColor=white",
-];
-
-const README_OTHER_IMAGE_URLS = [
-  BRAND_LOGO_URL,
-  "https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV+Ideas+%26+Software",
-  "https://komarev.com/ghpvc/?username=lcv-leo&label=Profile%20Views&color=3B82F6&style=flat-square",
-  "https://www.bestpractices.dev/projects/14239/badge",
-  "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true",
-  "https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&theme=tokyo-night&hide_border=true&area=true&custom_title=Leonardo%27s%20Contribution%20Graph",
-  "https://lcv-leo.lcv.dev/github-contribution-grid-snake-dark.svg",
-  "https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lcv-leo&theme=tokyonight",
-  "https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=lcv-leo&theme=tokyonight",
-  "https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=lcv-leo&theme=tokyonight",
-  "https://github-profile-summary-cards.vercel.app/api/cards/stats?username=lcv-leo&theme=tokyonight",
-  "https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=120&section=footer&text=Thanks%20for%20visiting!&fontSize=35&fontAlignY=70&animation=twinkling",
-  "https://komarev.com/ghpvc/?username=lcv-leo&label=Profile%20Views&color=3B82F6&style=for-the-badge",
-];
-
-const README_IMAGE_URLS = [
-  ...DEVICON_URLS,
-  ...GIF_URLS,
-  ...SHIELDS_PATHS.map((path) => `https://img.shields.io/${path}`),
-  ...README_OTHER_IMAGE_URLS,
-];
-
-const PAGE_IMAGE_URLS = [
-  BRAND_LOGO_URL,
-  BRAND_LOGO_URL,
-  "/github-contribution-grid-snake-dark.svg",
-  ...DEVICON_URLS,
-  "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true&background=1a1b26",
-  "https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&theme=tokyo-night&hide_border=true&area=true&custom_title=Leonardo%27s%20Contribution%20Graph",
-  "https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=lcv-leo&theme=tokyonight",
-  "https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=lcv-leo&theme=tokyonight",
-  "https://github-profile-summary-cards.vercel.app/api/cards/stats?username=lcv-leo&theme=tokyonight",
-];
-
-const PAGE_ORIGIN = "https://lcv-leo.lcv.dev";
-const PAGE_CSP_IMAGE_SOURCES = sorted(
-  new Set(
-    PAGE_IMAGE_URLS.map((source) => {
-      const url = new URL(source, PAGE_ORIGIN);
-      return `${url.origin}${url.pathname}`;
-    }),
-  ),
-);
-const PAGE_CONTENT_SECURITY_POLICY =
-  `default-src 'none'; base-uri 'none'; connect-src https://api.github.com https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; form-action 'none'; img-src ${PAGE_CSP_IMAGE_SOURCES.join(" ")}; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`;
-
-function normalizeImageSource(rawSource, sourceName) {
-  const source = rawSource.trim();
-  assert.notEqual(source, "", `${sourceName} has an empty image source`);
-  assert.doesNotMatch(
-    source,
-    /&#(?:\d+|x[0-9a-f]+);?/iu,
-    `${sourceName} must not contain numeric HTML references`,
-  );
-  const namedReferences = [...source.matchAll(/&([a-z][a-z0-9]+);/giu)];
-  assert.equal(
-    namedReferences.every((match) => match[1].toLowerCase() === "amp"),
-    true,
-    `${sourceName} must use its canonical literal URL`,
-  );
-  return source.replaceAll(/&amp;/giu, "&");
-}
-
-function quotedHtmlAttribute(tag, attribute, sourceName, required = false) {
-  assert.ok(
-    ["content", "href", "http-equiv", "property", "rel", "src", "style"].includes(attribute),
-  );
-  const assignmentPattern = new RegExp(
-    String.raw`(?:^|\s)${attribute}\s*=`,
-    "giu",
-  );
-  const assignments = [...tag.matchAll(assignmentPattern)];
-  assert.ok(assignments.length <= 1, `${sourceName} has duplicate ${attribute}`);
-  const pattern = new RegExp(
-    String.raw`(?:^|\s)${attribute}\s*=\s*(?:"([^"]*)"|'([^']*)')`,
-    "giu",
-  );
-  const matches = [...tag.matchAll(pattern)];
-  assert.equal(
-    matches.length,
-    assignments.length,
-    `${sourceName} ${attribute} must use a quoted canonical value`,
-  );
-  if (required) {
-    assert.equal(matches.length, 1, `${sourceName} needs one quoted ${attribute}`);
-  }
-  return matches.length === 0 ? undefined : (matches[0][1] ?? matches[0][2]).trim();
-}
-
-function htmlTokenAttribute(tag, attribute, sourceName) {
-  const value = quotedHtmlAttribute(tag, attribute, sourceName);
-  if (value === undefined) return undefined;
-  assert.equal(
-    value.includes("&"),
-    false,
-    `${sourceName} ${attribute} must not contain HTML references`,
-  );
-  return value.toLowerCase();
-}
-
-function extractImageSources(content, surfaceName, { preferCanonical = false } = {}) {
-  const normalized = content.toLowerCase();
-  const sources = [];
-  let cursor = 0;
-  while (true) {
-    const start = normalized.indexOf("<img", cursor);
-    if (start === -1) break;
-    assert.ok([" ", "\n", "\r", "\t", "\f", "/", ">"].includes(normalized[start + 4]));
-    const end = normalized.indexOf(">", start + 4);
-    assert.notEqual(end, -1, `${surfaceName} has an unterminated <img> tag`);
-    const tag = content.slice(start, end + 1);
-    assert.equal([...tag.matchAll(/(?:^|\s)src=/giu)].length, 1);
-    const matches = [...tag.matchAll(/\ssrc="([^"]*)"|\ssrc='([^']*)'/giu)];
-    assert.equal(matches.length, 1, `${surfaceName} <img> needs one quoted src`);
-    const canonicalMatches = [
-      ...tag.matchAll(/\sdata-canonical-src="([^"]*)"|\sdata-canonical-src='([^']*)'/giu),
-    ];
-    assert.ok(canonicalMatches.length <= 1, `${surfaceName} image has duplicate canonical src`);
-    const renderedCanonical = canonicalMatches[0]?.[1] ?? canonicalMatches[0]?.[2];
-    const loadedSource = matches[0][1] ?? matches[0][2];
-    const source = normalizeImageSource(
-      preferCanonical ? (renderedCanonical ?? loadedSource) : loadedSource,
-      `${surfaceName} image src`,
-    );
-    sources.push(source);
-    const srcsetMatches = [...tag.matchAll(/\ssrcset="([^"]*)"|\ssrcset='([^']*)'/giu)];
-    assert.ok(srcsetMatches.length <= 1, `${surfaceName} image has duplicate srcset`);
-    if (srcsetMatches.length === 1) {
-      for (const candidate of (srcsetMatches[0][1] ?? srcsetMatches[0][2]).split(",")) {
-        const srcsetSource = candidate.trim().split(/\s+/u)[0]?.replaceAll(/&amp;/giu, "&");
-        assert.ok(srcsetSource, `${surfaceName} image has an empty srcset candidate`);
-        sources.push(srcsetSource);
-      }
-    }
-    cursor = end + 1;
-  }
-
-  cursor = 0;
-  while (true) {
-    const start = normalized.indexOf("<source", cursor);
-    if (start === -1) break;
-    assert.ok([" ", "\n", "\r", "\t", "\f", "/", ">"].includes(normalized[start + 7]));
-    const end = normalized.indexOf(">", start + 7);
-    assert.notEqual(end, -1, `${surfaceName} has an unterminated <source> tag`);
-    const tag = content.slice(start, end + 1);
-    const matches = [...tag.matchAll(/\ssrcset="([^"]*)"|\ssrcset='([^']*)'/giu)];
-    assert.equal(matches.length, 1, `${surfaceName} <source> needs one quoted srcset`);
-    for (const candidate of (matches[0][1] ?? matches[0][2]).split(",")) {
-      const source = candidate.trim().split(/\s+/u)[0]?.replaceAll(/&amp;/giu, "&");
-      assert.ok(source, `${surfaceName} <source> has an empty srcset candidate`);
-      sources.push(source);
-    }
-    cursor = end + 1;
-  }
-
-  for (const match of content.matchAll(/<meta\b[^>]*>/giu)) {
-    const tag = match[0];
-    const property = htmlTokenAttribute(tag, "property", `${surfaceName} <meta>`);
-    if (property !== "og:image") continue;
-    const source = quotedHtmlAttribute(tag, "content", `${surfaceName} og:image`, true);
-    sources.push(normalizeImageSource(source, `${surfaceName} og:image`));
-  }
-
-  for (const match of content.matchAll(/<link\b[^>]*>/giu)) {
-    const tag = match[0];
-    const rel = htmlTokenAttribute(tag, "rel", `${surfaceName} <link>`);
-    if (!rel) continue;
-    const relTokens = rel.toLowerCase().split(/\s+/u);
-    if (!relTokens.some((token) => token === "icon" || token.endsWith("-icon"))) continue;
-    const source = quotedHtmlAttribute(tag, "href", `${surfaceName} icon`, true);
-    sources.push(normalizeImageSource(source, `${surfaceName} icon`));
-  }
-  return sources;
-}
-
-function extractPageStylesheetSources(content) {
-  const sources = [];
-  for (const match of content.matchAll(/<link\b[^>]*>/giu)) {
-    const tag = match[0];
-    const rel = htmlTokenAttribute(tag, "rel", "Pages <link>");
-    if (!rel?.split(/\s+/u).includes("stylesheet")) continue;
-    const source = quotedHtmlAttribute(tag, "href", "Pages stylesheet", true);
-    sources.push(normalizeImageSource(source, "Pages stylesheet"));
-  }
-  return sources;
-}
-
-function assertNoExternalCssResources(cssSource, sourceName) {
-  assert.doesNotMatch(
-    cssSource,
-    /\\|@import\b|(?:-webkit-)?image-set\s*\(|image\s*\(|url\s*\(/iu,
-    `${sourceName} contains forbidden external resource syntax`,
-  );
-}
-
-function assertPageCssSurfaces(content, pageStylesSource) {
-  assert.deepEqual(
-    sorted(extractPageStylesheetSources(content)),
-    sorted(PAGE_STYLESHEET_URLS),
-    "Pages stylesheet catalog drifted",
-  );
-  for (const match of content.matchAll(/<[a-z][^>]*>/giu)) {
-    const tag = match[0];
-    if (!/(?:^|\s)style\s*=/iu.test(tag)) continue;
-    const inlineStyle = quotedHtmlAttribute(tag, "style", "Pages inline style", true);
-    assertNoExternalCssResources(inlineStyle, "Pages inline style");
-  }
-  const styleOpenings = [...content.matchAll(/<style\b[^>]*>/giu)];
-  const styleBlocks = [...content.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/giu)];
-  assert.equal(styleBlocks.length, styleOpenings.length, "Pages has an unterminated <style>");
-  for (const block of styleBlocks) {
-    assertNoExternalCssResources(block[1], "Pages <style>");
-  }
-  assertNoExternalCssResources(pageStylesSource, "Pages stylesheet");
-}
-
-function activeHtml(content, sourceName) {
-  for (const marker of ["<!--", "-->", "--!>"]) {
-    assert.equal(
-      content.includes(marker),
-      false,
-      `${sourceName} must not contain HTML comment syntax`,
-    );
-  }
-  return content;
-}
-
-function assertPageSecurityPolicy(content) {
-  const activeContent = activeHtml(content, "Pages");
-  const headStart = activeContent.indexOf("<head>");
-  const headEnd = activeContent.indexOf("</head>");
-  const bodyStart = activeContent.indexOf("<body>");
-  assert.notEqual(headStart, -1, "Pages needs its canonical <head>");
-  assert.notEqual(headEnd, -1, "Pages needs its canonical </head>");
-  assert.notEqual(bodyStart, -1, "Pages needs its canonical <body>");
-  assert.equal(
-    activeContent.lastIndexOf("<head>"),
-    headStart,
-    "Pages must contain exactly one <head>",
-  );
-  assert.equal(
-    activeContent.lastIndexOf("</head>"),
-    headEnd,
-    "Pages must contain exactly one </head>",
-  );
-  assert.ok(
-    headStart < headEnd && headEnd < bodyStart,
-    "Pages head must close before the body begins",
-  );
-  const metaTags = [...activeContent.matchAll(/<meta\b[^>]*>/giu)];
-  const policyTags = metaTags.filter(
-    (match) =>
-      htmlTokenAttribute(match[0], "http-equiv", "Pages <meta>") ===
-      "content-security-policy",
-  );
-  assert.equal(policyTags.length, 1, "Pages needs exactly one enforced CSP meta tag");
-  assert.ok(
-    policyTags[0].index > headStart && policyTags[0].index < headEnd,
-    "Pages CSP must remain inside the document head",
-  );
-  const policy = quotedHtmlAttribute(
-    policyTags[0][0],
-    "content",
-    "Pages Content Security Policy",
-    true,
-  );
-  assert.equal(policy, PAGE_CONTENT_SECURITY_POLICY, "Pages CSP resource allowlist drifted");
-  assert.equal(
-    policy.split("; ").filter((directive) => directive.startsWith("img-src ")).length,
-    1,
-    "Pages CSP needs exactly one img-src directive",
-  );
-
-  const firstResource = activeContent.search(/<(?:img|link|script|source|style)\b/iu);
-  assert.ok(
-    firstResource === -1 || policyTags[0].index < firstResource,
-    "Pages CSP must precede every resource-bearing element",
-  );
-
-  const canonicalScript = '<script src="app.js" defer></script>';
-  const lowercaseContent = activeContent.toLowerCase();
-  const scriptStart = lowercaseContent.indexOf("<script");
-  const scriptEnd = lowercaseContent.indexOf("</script");
-  assert.notEqual(scriptStart, -1, "Pages must load its canonical script");
-  assert.notEqual(scriptEnd, -1, "Pages has an unterminated <script>");
-  assert.equal(
-    lowercaseContent.indexOf("<script", scriptStart + 1),
-    -1,
-    "Pages must load exactly one script",
-  );
-  assert.equal(
-    lowercaseContent.indexOf("</script", scriptEnd + 1),
-    -1,
-    "Pages must close exactly one script",
-  );
-  assert.equal(
-    activeContent.slice(scriptStart, scriptStart + canonicalScript.length),
-    canonicalScript,
-    "Pages must load only the exact local empty-body script",
-  );
-}
-
-async function renderReadmeWithGitHub(content) {
-  const cached = renderReadmeWithGitHub.cache.get(content);
-  if (cached) return cached;
-  const headers = {
-    Accept: "text/html",
-    "Content-Type": "application/json",
-    "User-Agent": "lcv-leo-provenance-gate",
-    "X-GitHub-Api-Version": "2026-03-10",
-  };
-  if (process.env.GITHUB_TOKEN) {
-    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-  }
-  renderReadmeWithGitHub.requestCount += 1;
-  const rendered = (async () => {
-    const response = await fetch("https://api.github.com/markdown", {
-      body: JSON.stringify({ context: "lcv-leo/lcv-leo", mode: "gfm", text: content }),
-      headers,
-      method: "POST",
-    });
-    assert.equal(
-      response.status,
-      200,
-      `GitHub GFM renderer failed closed with HTTP ${response.status}`,
-    );
-    return response.text();
-  })();
-  renderReadmeWithGitHub.cache.set(content, rendered);
-  return rendered;
-}
-renderReadmeWithGitHub.cache = new Map();
-renderReadmeWithGitHub.requestCount = 0;
-test.after(() => {
-  assert.ok(
-    renderReadmeWithGitHub.requestCount > 0 && renderReadmeWithGitHub.requestCount <= 2,
-    `GitHub GFM rendering must use at most two requests, received ${renderReadmeWithGitHub.requestCount}`,
-  );
-});
-
-async function extractSurfaceImageSources(content, surface, pageStylesSource = pageStyles) {
-  if (surface === "README") {
-    const rendered = await renderReadmeWithGitHub(content);
-    return extractImageSources(rendered, "GitHub-rendered README", {
-      preferCanonical: true,
-    });
-  }
-  assertPageSecurityPolicy(content);
-  assertPageCssSurfaces(content, pageStylesSource);
-  return extractImageSources(content, surface);
-}
+] = await Promise.all([
+  readFile(new URL("../THIRDPARTY.md", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/actions.lock", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/codeql.yml", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/linear-release.yml", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/scorecard.yml", import.meta.url), "utf8"),
+  readFile(new URL("../.github/workflows/zizmor.yml", import.meta.url), "utf8"),
+]);
 
 function sorted(values) {
   return [...values].sort((left, right) => left.localeCompare(right, "en"));
-}
-
-async function assertImageCatalog(
-  content,
-  surface,
-  predicate,
-  expected,
-  pageStylesSource = pageStyles,
-) {
-  const actual = (
-    await extractSurfaceImageSources(content, surface, pageStylesSource)
-  ).filter(predicate);
-  assert.deepEqual(sorted(actual), sorted(expected), `${surface} image catalog drifted`);
-}
-
-function assertRenderedReadmeImageCatalog(renderedSource, predicate, expected) {
-  const actual = extractImageSources(renderedSource, "GitHub-rendered README", {
-    preferCanonical: true,
-  }).filter(predicate);
-  assert.deepEqual(sorted(actual), sorted(expected), "README image catalog drifted");
-}
-
-async function assertImmutableDeviconInventory(readmeSource, pageSource) {
-  const isDevicon = (source) => source.toLowerCase().includes("devicon");
-  await assertImageCatalog(readmeSource, "README", isDevicon, DEVICON_URLS);
-  await assertImageCatalog(pageSource, "Pages", isDevicon, DEVICON_URLS);
-}
-
-async function assertImmutableDeviconInventoryFromRendered(renderedSource, pageSource) {
-  const isDevicon = (source) => source.toLowerCase().includes("devicon");
-  assertRenderedReadmeImageCatalog(renderedSource, isDevicon, DEVICON_URLS);
-  await assertImageCatalog(pageSource, "Pages", isDevicon, DEVICON_URLS);
-}
-
-function isGifSource(source) {
-  if (source.toLowerCase().startsWith("data:image/gif")) return true;
-  const pathname = new URL(source, "https://repository.invalid/").pathname;
-  return decodeURIComponent(pathname).toLowerCase().endsWith(".gif");
-}
-
-async function assertCataloguedGifInventory(readmeSource, pageSource) {
-  await assertImageCatalog(readmeSource, "README", isGifSource, GIF_URLS);
-  await assertImageCatalog(pageSource, "Pages", isGifSource, []);
-}
-
-async function assertCataloguedGifInventoryFromRendered(renderedSource, pageSource) {
-  assertRenderedReadmeImageCatalog(renderedSource, isGifSource, GIF_URLS);
-  await assertImageCatalog(pageSource, "Pages", isGifSource, []);
-}
-
-async function assertCompleteImageInventory(
-  readmeSource,
-  pageSource,
-  pageStylesSource = pageStyles,
-) {
-  const renderedSource = await renderReadmeWithGitHub(readmeSource);
-  await assertCompleteImageInventoryFromRendered(renderedSource, pageSource, pageStylesSource);
-}
-
-async function assertCompleteImageInventoryFromRendered(
-  renderedSource,
-  pageSource,
-  pageStylesSource = pageStyles,
-) {
-  assertRenderedReadmeImageCatalog(renderedSource, () => true, README_IMAGE_URLS);
-  await assertImageCatalog(
-    pageSource,
-    "Pages",
-    () => true,
-    PAGE_IMAGE_URLS,
-    pageStylesSource,
-  );
 }
 
 // These regular expressions parse isolated machine syntax, never prose.
@@ -567,6 +35,12 @@ function actionIdentityParts(identity, sourceName) {
   const match = /^([^/@]+\/[^/@]+)@([0-9a-f]{40})$/u.exec(identity);
   assert.ok(match, `${sourceName} has an invalid Action identity: ${identity}`);
   return { commit: match[2], repository: match[1] };
+}
+
+function actionReferenceParts(identity, sourceName) {
+  const match = /^([^/@]+\/[^/@]+)@([^\s@]+)$/u.exec(identity);
+  assert.ok(match, `${sourceName} has an invalid Action reference: ${identity}`);
+  return { reference: match[2], repository: match[1] };
 }
 
 function parseWorkflowVersions(workflowSources) {
@@ -600,11 +74,11 @@ function parseActionsLock(lockSource, workflowSources) {
   const workflowRows = lines
     .slice(workflowsStart + 1, dependenciesStart)
     .filter((line) => line.trimStart().startsWith("- "));
-  const direct = new Set(
+  const directLockIdentities = new Set(
     workflowRows.map((line) => {
       const match = /^ {8}- '([^']+)'$/u.exec(line);
       assert.ok(match, "actions.lock has a non-canonical workflow dependency");
-      actionIdentityParts(match[1], "actions.lock workflows");
+      actionReferenceParts(match[1], "actions.lock workflows");
       return match[1];
     }),
   );
@@ -616,9 +90,15 @@ function parseActionsLock(lockSource, workflowSources) {
     if (line === "") continue;
     const key = /^ {4}'([^']+)':$/u.exec(line);
     if (key) {
-      actionIdentityParts(key[1], "actions.lock dependencies");
+      actionReferenceParts(key[1], "actions.lock dependencies");
       assert.equal(dependencies.has(key[1]), false, "Duplicate actions.lock dependency");
-      current = { identity: key[1], parents: [], ref: undefined, uses: [] };
+      current = {
+        commit: undefined,
+        lockIdentity: key[1],
+        parents: [],
+        ref: undefined,
+        uses: [],
+      };
       dependencies.set(key[1], current);
       readingUses = false;
       continue;
@@ -631,6 +111,17 @@ function parseActionsLock(lockSource, workflowSources) {
       readingUses = false;
       continue;
     }
+    const commit = /^ {8}commit: 'sha1-([0-9a-f]{40})'$/u.exec(line);
+    if (commit) {
+      assert.equal(
+        current.commit,
+        undefined,
+        `Duplicate actions.lock commit: ${current.lockIdentity}`,
+      );
+      current.commit = commit[1];
+      readingUses = false;
+      continue;
+    }
     if (line === "        uses:") {
       assert.equal(readingUses, false, `Duplicate actions.lock uses: ${current.identity}`);
       readingUses = true;
@@ -639,35 +130,63 @@ function parseActionsLock(lockSource, workflowSources) {
     const usedIdentity = /^ {12}- '([^']+)'$/u.exec(line);
     if (usedIdentity) {
       assert.equal(readingUses, true, "actions.lock uses item is outside a uses list");
-      actionIdentityParts(usedIdentity[1], "actions.lock transitive dependency");
+      actionReferenceParts(usedIdentity[1], "actions.lock transitive dependency");
       current.uses.push(usedIdentity[1]);
       continue;
     }
     assert.match(
       line,
-      /^ {8}(?:commit: 'sha1-[0-9a-f]{40}'|owner_id: \d+|repo_id: \d+)$/u,
+      /^ {8}(?:owner_id: \d+|repo_id: \d+)$/u,
       `Non-canonical actions.lock dependency metadata: ${line}`,
     );
     readingUses = false;
   }
   assert.ok(dependencies.size > 0);
-  for (const identity of direct) assert.ok(dependencies.has(identity));
+  for (const identity of directLockIdentities) assert.ok(dependencies.has(identity));
   for (const dependency of dependencies.values()) {
-    assert.ok(dependency.ref, `actions.lock dependency has no ref: ${dependency.identity}`);
+    assert.ok(dependency.ref, `actions.lock dependency has no ref: ${dependency.lockIdentity}`);
+    assert.ok(
+      dependency.commit,
+      `actions.lock dependency has no commit: ${dependency.lockIdentity}`,
+    );
     assert.equal(new Set(dependency.uses).size, dependency.uses.length);
     for (const childIdentity of dependency.uses) {
       const child = dependencies.get(childIdentity);
       assert.ok(child, `actions.lock transitive dependency is missing: ${childIdentity}`);
-      child.parents.push(actionIdentityParts(dependency.identity, "actions.lock").repository);
+      child.parents.push(
+        actionReferenceParts(dependency.lockIdentity, "actions.lock").repository,
+      );
     }
+    const { repository } = actionReferenceParts(
+      dependency.lockIdentity,
+      "actions.lock",
+    );
+    dependency.identity = `${repository}@${dependency.commit}`;
   }
+  assert.equal(
+    new Set([...dependencies.values()].map((dependency) => dependency.identity)).size,
+    dependencies.size,
+    "actions.lock maps multiple references to the same repository commit",
+  );
+  const directDependencies = [...directLockIdentities].map((identity) =>
+    dependencies.get(identity),
+  );
+  const directIdentities = new Set(
+    directDependencies.map((dependency) => dependency.identity),
+  );
   const directVersions = parseWorkflowVersions(workflowSources);
-  for (const identity of direct) {
-    const dependency = dependencies.get(identity);
-    const workflowVersion = directVersions.get(identity);
-    assert.ok(workflowVersion, `Workflow version comment is missing: ${identity}`);
+  for (const dependency of directDependencies) {
+    const workflowVersion = directVersions.get(dependency.identity);
+    assert.ok(
+      workflowVersion,
+      `Workflow version comment is missing: ${dependency.identity}`,
+    );
     if (!/^[0-9a-f]{40}$/u.test(dependency.ref)) {
-      assert.equal(workflowVersion, dependency.ref, `Workflow version drifted: ${identity}`);
+      assert.equal(
+        workflowVersion,
+        dependency.ref,
+        `Workflow version drifted: ${dependency.identity}`,
+      );
     }
     dependency.version = workflowVersion;
   }
@@ -676,7 +195,7 @@ function parseActionsLock(lockSource, workflowSources) {
     dependency.version ??= dependency.ref;
   }
   const transitive = [...dependencies.values()].filter(
-    (dependency) => !direct.has(dependency.identity),
+    (dependency) => !directIdentities.has(dependency.identity),
   );
   for (const dependency of transitive) {
     assert.ok(
@@ -685,7 +204,9 @@ function parseActionsLock(lockSource, workflowSources) {
     );
   }
   return {
-    direct: sorted(direct).map((identity) => dependencies.get(identity)),
+    direct: directDependencies.sort((left, right) =>
+      left.identity.localeCompare(right.identity, "en"),
+    ),
     transitive: transitive.sort((left, right) =>
       left.identity.localeCompare(right.identity, "en"),
     ),
@@ -717,8 +238,8 @@ function extractActionRows(content, heading, nextHeading) {
 }
 
 const ACTION_LICENSES = new Map([
-  ["actions/create-github-app-token", "MIT"],
   ["actions/checkout", "MIT"],
+  ["actions/setup-node", "MIT"],
   ["github/codeql-action", "MIT"],
   ["linear/linear-release-action", "MIT"],
   ["actions/configure-pages", "MIT"],
@@ -730,8 +251,11 @@ const ACTION_LICENSES = new Map([
 ]);
 
 const DIRECT_ACTION_PURPOSES = new Map([
-  ["actions/create-github-app-token", "Create the least-privilege trusted-validator status token"],
   ["actions/checkout", "Read trusted repository snapshots"],
+  [
+    "actions/setup-node",
+    "Configure the exact Node.js runtime for validation and Pages generation",
+  ],
   ["github/codeql-action", "CodeQL analysis and SARIF upload"],
   ["linear/linear-release-action", "Synchronize successful Pages deployments with Linear"],
   ["actions/configure-pages", "Configure GitHub Pages"],
@@ -772,7 +296,6 @@ function assertInventoryRows(dependencies, rows, relationship) {
 
 function assertActionInventoryReconciled(actionsLockSource, thirdPartySource) {
   const workflowSources = [
-    actionsLockValidatorWorkflow,
     codeqlWorkflow,
     linearWorkflow,
     pageWorkflow,
@@ -791,184 +314,6 @@ function assertActionInventoryReconciled(actionsLockSource, thirdPartySource) {
     );
   }
 }
-
-test("profile and Pages use the immutable Devicon inventory", async () => {
-  await assertImmutableDeviconInventory(readme, page);
-});
-
-test("Devicon inventory rejects an image from another ref", async () => {
-  const mutableUrl =
-    "https://raw.githubusercontent.com/devicons/devicon/main/icons/go/go-original.svg";
-  const approvedUrl = `${DEVICON_PREFIX}${DEVICON_PATHS[0]}`;
-  const renderedReadme = await renderReadmeWithGitHub(readme);
-  for (const [scenario, driftedRenderedReadme] of [
-    ["active image", `${renderedReadme}\n<img src="${mutableUrl}">`],
-    ["missing approved image", renderedReadme.replaceAll(approvedUrl, "")],
-    ["unquoted source", `${renderedReadme}\n<img src=${mutableUrl}>`],
-  ]) {
-    await assert.rejects(
-      () => assertImmutableDeviconInventoryFromRendered(driftedRenderedReadme, page),
-      scenario,
-    );
-  }
-});
-
-test("profile and Pages use exactly the five catalogued GIFs", async () => {
-  await assertCataloguedGifInventory(readme, page);
-});
-
-test("GIF inventory rejects an image from another host", async () => {
-  const gif = "https://example.com/untracked.GIF?cache=1";
-  const renderedReadme = await renderReadmeWithGitHub(readme);
-  for (const [renderedSource, pageSource] of [
-    [renderedReadme, `${page}\n<img src="${gif}">`],
-    [`${renderedReadme}\n<img src="${gif}">`, page],
-    [renderedReadme, `${page}\n<img src="/safe.svg" srcset="${gif}">`],
-    [renderedReadme.replaceAll(GIF_URLS[0], ""), page],
-  ]) {
-    await assert.rejects(() =>
-      assertCataloguedGifInventoryFromRendered(renderedSource, pageSource),
-    );
-  }
-});
-
-test("image inventory rejects HTML character references in src", () => {
-  for (const source of [
-    "https://example.com/untracked&#46;gif",
-    "https://example.com/untracked&period;gif",
-    "https://raw.githubusercontent.com/devicons/devic&#111;n/main/icons/go/go-original.svg",
-  ]) {
-    assert.throws(() =>
-      extractImageSources(`${readme}\n<img src="${source}">`, "README"),
-    );
-  }
-});
-
-test("image inventory rejects every uncatalogued external image", async () => {
-  const renderedReadme = await renderReadmeWithGitHub(readme);
-  for (const source of [
-    "https://example.com/untracked.png",
-    "https://img.shields.io/badge/Uncatalogued-000000?style=flat-square",
-  ]) {
-    await assert.rejects(() =>
-      assertCompleteImageInventoryFromRendered(
-        `${renderedReadme}\n<img src="${source}">`,
-        page,
-      ),
-    );
-  }
-});
-
-test("Pages inventory covers metadata, icons, and local CSS resource syntax", async () => {
-  const logo =
-    "https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg";
-  for (const current of [
-    `<meta property="og:image" content="${logo}">`,
-    `<link rel="icon" href="${logo}">`,
-  ]) {
-    const driftedPage = page.replace(
-      current,
-      current.replace(logo, "https://example.com/uncatalogued.png"),
-    );
-    assert.notEqual(driftedPage, page);
-    await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));
-  }
-
-  for (const cssResource of [
-    ".external { background-image: url(https://example.com/uncatalogued.png); }",
-    '@import "https://example.com/uncatalogued.css";',
-    '.external { background-image: image-set("https://example.com/uncatalogued.png" 1x); }',
-    '.external { background-image: image("https://example.com/uncatalogued.png"); }',
-    '.external { background-image: u\\72l("https://example.com/uncatalogued.png"); }',
-  ]) {
-    await assert.rejects(() =>
-      assertCompleteImageInventory(readme, page, `${pageStyles}\n${cssResource}`),
-    );
-  }
-
-  const externalStylesheetPage = page.replace(
-    '<link rel="stylesheet" href="styles.css">',
-    '<link rel="stylesheet" href="https://example.com/untrusted.css">',
-  );
-  assert.notEqual(externalStylesheetPage, page);
-  await assert.rejects(() =>
-    assertCompleteImageInventory(readme, externalStylesheetPage),
-  );
-
-  for (const hiddenResource of [
-    '<meta property=og:image content="https://example.com/uncatalogued.png">',
-    '<link rel=icon href="https://example.com/uncatalogued.png">',
-    '<meta property="og&#58;image" content="https://example.com/uncatalogued.png">',
-    '<link rel="ic&#111;n" href="https://example.com/uncatalogued.png">',
-  ]) {
-    await assert.rejects(() =>
-      assertCompleteImageInventory(readme, `${page}\n${hiddenResource}`),
-    );
-  }
-});
-
-test("native Pages CSP blocks uncatalogued resources introduced by JavaScript", async () => {
-  const policyTag = `<meta http-equiv="Content-Security-Policy" content="${PAGE_CONTENT_SECURITY_POLICY}">`;
-  const permissivePolicy = PAGE_CONTENT_SECURITY_POLICY.replace(
-    "; object-src 'none'",
-    " https://example.com; object-src 'none'",
-  );
-  const broadHostPolicy = PAGE_CONTENT_SECURITY_POLICY.replace(
-    `${DEVICON_PREFIX}${DEVICON_PATHS[0]}`,
-    "https://raw.githubusercontent.com",
-  );
-  const broadLocalPolicy = PAGE_CONTENT_SECURITY_POLICY.replace(
-    `${PAGE_ORIGIN}/github-contribution-grid-snake-dark.svg`,
-    "'self'",
-  );
-  const wrongLocalPathPolicy = PAGE_CONTENT_SECURITY_POLICY.replace(
-    `${PAGE_ORIGIN}/github-contribution-grid-snake-dark.svg`,
-    `${PAGE_ORIGIN}/uncatalogued.svg`,
-  );
-  const duplicateDirectivePolicy = PAGE_CONTENT_SECURITY_POLICY.replace(
-    "; object-src 'none'",
-    "; img-src 'self'; object-src 'none'",
-  );
-  const pageWithoutPolicy = page.replace(policyTag, "");
-  const movedPolicy = pageWithoutPolicy.replace(
-    `<link rel="icon" href="${BRAND_LOGO_URL}">`,
-    `<link rel="icon" href="${BRAND_LOGO_URL}">\n  ${policyTag}`,
-  );
-  const externalScript = page.replace(
-    '<script src="app.js" defer></script>',
-    '<script src="https://example.com/app.js" defer></script>',
-  );
-  const noncanonicalScriptEnd = page.replace(
-    "</script>",
-    "</script\t\n data-noncanonical>",
-  );
-  const headContentStart = page.indexOf("<head>") + "<head>".length;
-  const headContentEnd = page.indexOf("</head>");
-  const bodyContentStart = page.indexOf("<body>") + "<body>".length;
-  const policyAndResourcesInBody =
-    page.slice(0, headContentStart) +
-    page.slice(headContentEnd, bodyContentStart) +
-    page.slice(headContentStart, headContentEnd) +
-    page.slice(bodyContentStart);
-  for (const driftedPage of [
-    page.replace(PAGE_CONTENT_SECURITY_POLICY, permissivePolicy),
-    page.replace(PAGE_CONTENT_SECURITY_POLICY, broadHostPolicy),
-    page.replace(PAGE_CONTENT_SECURITY_POLICY, broadLocalPolicy),
-    page.replace(PAGE_CONTENT_SECURITY_POLICY, wrongLocalPathPolicy),
-    page.replace(PAGE_CONTENT_SECURITY_POLICY, duplicateDirectivePolicy),
-    pageWithoutPolicy,
-    page.replace(policyTag, `<!-- ${policyTag} -->`),
-    page.replace(policyTag, `<!-- ${policyTag} --!>`),
-    movedPolicy,
-    page.replace(policyTag, `${policyTag}\n  ${policyTag}`),
-    externalScript,
-    noncanonicalScriptEnd,
-    policyAndResourcesInBody,
-  ]) {
-    assert.notEqual(driftedPage, page);
-    await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));
-  }
-});
 
 function assertPageTestTokenBoundary(workflowSource) {
   const normalizedWorkflow = workflowSource.replaceAll("\r\n", "\n");
@@ -993,6 +338,61 @@ function assertPageTestTokenBoundary(workflowSource) {
       "          persist-credentials: false",
     ].join("\n"),
     [
+      "      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+      "        with:",
+      '          node-version: "24.20.0"',
+      "          package-manager-cache: false",
+    ].join("\n"),
+    [
+      "      - name: Install locked test dependencies without lifecycle scripts",
+      "        run: npm ci --ignore-scripts",
+    ].join("\n"),
+    [
+      "      - name: Install official Playwright Chromium headless shell",
+      "        run: npx --no-install playwright install --with-deps --only-shell chromium",
+    ].join("\n"),
+    [
+      "      - name: Install official GitHub Actions lock validator",
+      "        shell: bash",
+      "        env:",
+      "          ACTIONS_LOCK_SHA256: 4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3",
+      "          ACTIONS_LOCK_URL: https://github.com/github/gh-actions-lock/releases/download/v0.1.6/linux-amd64",
+      "        run: |",
+      "          set -euo pipefail",
+      '          readonly binary="${RUNNER_TEMP}/gh-actions-lock"',
+      "          curl \\",
+      "            --fail \\",
+      "            --location \\",
+      "            --proto '=https' \\",
+      "            --proto-redir '=https' \\",
+      "            --show-error \\",
+      "            --silent \\",
+      "            --tlsv1.2 \\",
+      '            "${ACTIONS_LOCK_URL}" \\',
+      '            --output "${binary}"',
+      "          printf '%s  %s\\n' \"${ACTIONS_LOCK_SHA256}\" \"${binary}\" | sha256sum --check --strict",
+      '          chmod 0500 "${binary}"',
+      "          printf '%s\\n' \"${RUNNER_TEMP}\" >>\"${GITHUB_PATH}\"",
+    ].join("\n"),
+    [
+      "      - name: Verify actions.lock with the official GitHub validator",
+      "        run: >-",
+      "          gh-actions-lock",
+      "          --verify-local",
+      "          --no-fix",
+      "          --no-migrate-local-actions",
+    ].join("\n"),
+    [
+      "      - name: Reverify actions.lock against GitHub on a trusted ref",
+      "        if: github.event_name != 'pull_request'",
+      "        env:",
+      "          GH_TOKEN: ${{ github.token }}",
+      "        run: >-",
+      "          gh-actions-lock",
+      "          --verify",
+      "          --no-migrate-local-actions",
+    ].join("\n"),
+    [
       "      - name: Run local repository tests without credentials",
       "        run: >-",
       "          node --test",
@@ -1000,20 +400,25 @@ function assertPageTestTokenBoundary(workflowSource) {
       "          scripts/linear-release-trust.test.mjs",
     ].join("\n"),
     [
-      "      - name: Run provenance test without credentials",
+      "      - name: Run provenance tests without credentials",
       "        if: github.event_name == 'pull_request'",
-      "        run: node --test scripts/provenance-drift.test.mjs",
+      "        run: |",
+      "          node --test scripts/provenance-drift.test.mjs",
+      "          npx --no-install playwright test",
     ].join("\n"),
     [
-      "      - name: Run provenance test on a trusted ref",
+      "      - name: Run provenance tests on a trusted ref",
       "        if: github.event_name != 'pull_request'",
       "        env:",
       "          GITHUB_TOKEN: ${{ github.token }}",
-      "        run: node --test scripts/provenance-drift.test.mjs",
+      "        run: |",
+      "          node --test scripts/provenance-drift.test.mjs",
+      "          npx --no-install playwright test",
     ].join("\n"),
   ]);
-  assert.equal(testJob.split("${{ github.token }}").length - 1, 1);
+  assert.equal(testJob.split("${{ github.token }}").length - 1, 2);
   assert.equal(testJob.split("GITHUB_TOKEN:").length - 1, 1);
+  assert.equal(testJob.split("GH_TOKEN:").length - 1, 1);
 }
 
 test("pull-request tests never receive GITHUB_TOKEN", () => {
@@ -1028,16 +433,16 @@ test("pull-request tests never receive GITHUB_TOKEN", () => {
   const mutants = [
     pageWorkflow.replace("GITHUB_TOKEN: ${{ github.token }}", "GH_TOKEN: ${{ github.token }}"),
     pageWorkflow.replace(
-      "run: node --test scripts/provenance-drift.test.mjs",
-      'run: echo "${{ github.token }}" && node --test scripts/provenance-drift.test.mjs',
+      "          npx --no-install playwright test",
+      '          echo "${{ github.token }}"\n          npx --no-install playwright test',
     ),
     pageWorkflow.replace(
-      "    timeout-minutes: 5",
-      "    timeout-minutes: 5\n    env:\n      GITHUB_TOKEN: ${{ github.token }}",
+      "    timeout-minutes: 15",
+      "    timeout-minutes: 15\n    env:\n      GITHUB_TOKEN: ${{ github.token }}",
     ),
     pageWorkflow.replace(
-      "      - name: Run provenance test on a trusted ref",
-      "      - name: Run a second pull-request test\n        if: github.event_name == 'pull_request'\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n        run: node --test scripts/provenance-drift.test.mjs\n\n      - name: Run provenance test on a trusted ref",
+      "      - name: Run provenance tests on a trusted ref",
+      "      - name: Run a second pull-request test\n        if: github.event_name == 'pull_request'\n        env:\n          GITHUB_TOKEN: ${{ github.token }}\n        run: npx --no-install playwright test\n\n      - name: Run provenance tests on a trusted ref",
     ),
     pageWorkflow.replace(
       "      - name: Run local repository tests without credentials",
@@ -1048,44 +453,6 @@ test("pull-request tests never receive GITHUB_TOKEN", () => {
     assert.notEqual(mutant, pageWorkflow);
     assert.throws(() => assertPageTestTokenBoundary(mutant));
   }
-});
-
-test("ordinary Pages text may contain a backslash without becoming CSS", async () => {
-  await assert.doesNotReject(() =>
-    assertCompleteImageInventory(readme, `${page}\n<p>C:\\workspace</p>`),
-  );
-});
-
-test("raw Pages HTML never lets data-canonical-src mask the loaded src", async () => {
-  const approved = DEVICON_URLS[0];
-  const driftedPage = page.replace(
-    `src="${approved}"`,
-    `src="https://example.com/uncatalogued.png" data-canonical-src="${approved}"`,
-  );
-  assert.notEqual(driftedPage, page);
-  await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));
-});
-
-test("non-rendered Markdown examples do not enter the image inventory", async () => {
-  const activeUrls = [DEVICON_URLS[0], DEVICON_URLS[1]];
-  const examples = [
-    `![active Markdown image](${activeUrls[0]})`,
-    `<img src="${activeUrls[1]}" alt="active HTML image">`,
-    "<!-- ![commented image](https://example.com/comment.png) -->",
-    "`![inline example](https://example.com/inline.png)`",
-    "```css\n.example { background-image: url(https://example.com/code.png); }\n```",
-    "~~~html\n<source srcset=\"https://example.com/fenced.png\">\n~~~",
-    "    ![indented example](https://example.com/indented.png)",
-  ].join("\n\n");
-  const renderedFixture = await renderReadmeWithGitHub(examples);
-  assert.deepEqual(
-    sorted(
-      extractImageSources(renderedFixture, "GitHub-rendered fixture", {
-        preferCanonical: true,
-      }),
-    ),
-    sorted(activeUrls),
-  );
 });
 
 const RUNTIME_TOOL_ROWS = [
@@ -1116,6 +483,20 @@ const RUNTIME_TOOL_ROWS = [
     "Immutable release selected by the pinned Action's [`defaults.json`](https://github.com/github/codeql-action/blob/cdf488f595d80d6e07e03d4674febd5ab45fa938/src/defaults.json); Linux x64 `.tar.zst` SHA-256 `a9872c9075f85374a8d03546263c6dc01fde50a29baea9fc08dcc6b25cc2efd5`",
     "[GitHub CodeQL terms](https://docs.github.com/en/code-security/codeql-cli/codeql-cli-reference/about-the-codeql-cli#license)",
     "`github/codeql-action`",
+  ],
+  [
+    "[Node.js](https://github.com/nodejs/node/tree/71b8b174857e25106d39b61a9e6f30d927da8b01)",
+    "24.20.0",
+    "[Signed v24.20.0 release](https://nodejs.org/dist/v24.20.0/), commit `71b8b174857e25106d39b61a9e6f30d927da8b01`; Linux x64 `.tar.xz` SHA-256 `2f2c0da162318f0de47665410c7c8c2ed3d36c8f3105de4bbc61176c70a7cbf2`",
+    "[MIT](https://github.com/nodejs/node/blob/71b8b174857e25106d39b61a9e6f30d927da8b01/LICENSE)",
+    "`actions/setup-node` in validation and Pages build jobs",
+  ],
+  [
+    "[`npm` and `npx`](https://github.com/npm/cli/tree/bfacd33ccbcd908480610703b60455d2da5b57a9)",
+    "11.19.0",
+    "Bundled by the signed Node.js v24.20.0 distribution and recorded as `npm: 11.19.0` in the [official release index](https://nodejs.org/dist/index.json); integrity is covered by the Node.js archive SHA-256 above",
+    "[Artistic-2.0](https://github.com/npm/cli/blob/bfacd33ccbcd908480610703b60455d2da5b57a9/LICENSE)",
+    "Repository test and browser-install commands",
   ],
 ];
 
@@ -1255,15 +636,23 @@ function actionStepInputs(
 function assertRuntimeToolInventory(thirdPartySource, workflowOverrides = {}) {
   const currentLinearWorkflow = workflowOverrides.linearWorkflow ?? linearWorkflow;
   const currentZizmorWorkflow = workflowOverrides.zizmorWorkflow ?? zizmorWorkflow;
-  assert.ok(actionsLockValidatorWorkflow.includes("readonly lock_version='v0.1.6'"));
+  assert.equal(
+    pageWorkflow.split(
+      "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0",
+    ).length - 1,
+    2,
+  );
+  assert.equal(pageWorkflow.split('node-version: "24.20.0"').length - 1, 2);
+  assert.ok(pageWorkflow.includes("github/gh-actions-lock/releases/download/v0.1.6/linux-amd64"));
   assert.ok(
-    actionsLockValidatorWorkflow.includes(
-      "readonly lock_asset_url='https://github.com/github/gh-actions-lock/releases/download/v0.1.6/linux-amd64'",
+    pageWorkflow.includes(
+      "ACTIONS_LOCK_SHA256: 4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3",
     ),
   );
+  assert.ok(pageWorkflow.includes("gh-actions-lock\n          --verify-local\n          --no-fix"));
   assert.ok(
-    actionsLockValidatorWorkflow.includes(
-      "readonly lock_asset_sha256='4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3'",
+    pageWorkflow.includes(
+      "Reverify actions.lock against GitHub on a trusted ref\n        if: github.event_name != 'pull_request'\n        env:\n          GH_TOKEN: ${{ github.token }}\n        run: >-\n          gh-actions-lock\n          --verify",
     ),
   );
   assert.ok(
