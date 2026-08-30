@@ -19,7 +19,7 @@ All Actions are pinned to immutable commit SHAs in the workflows and in
 | [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token/tree/bcd2ba49218906704ab6c1aa796996da409d3eb1) | v3.2.0 | `bcd2ba49218906704ab6c1aa796996da409d3eb1` | MIT | Create the least-privilege trusted-validator status token |
 | [`actions/checkout`](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1) | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` | MIT | Read trusted repository snapshots |
 | [`github/codeql-action`](https://github.com/github/codeql-action/tree/cdf488f595d80d6e07e03d4674febd5ab45fa938) | v4.37.9 | `cdf488f595d80d6e07e03d4674febd5ab45fa938` | MIT | CodeQL analysis and SARIF upload |
-| [`linear/linear-release-action`](https://github.com/linear/linear-release-action/tree/0a25abab892a91062ebf42260dbb2ce6277aa205) | v0.16.0 | `0a25abab892a91062ebf42260dbb2ce6277aa205` | MIT | Synchronize successful Pages deployments with Linear |
+| [`linear/linear-release-action`](https://github.com/linear/linear-release-action/tree/3f31fcf14c110cc53579fcc3575a26d469c413b4) | v0.17.1 | `3f31fcf14c110cc53579fcc3575a26d469c413b4` | MIT | Synchronize successful Pages deployments with Linear |
 | [`actions/configure-pages`](https://github.com/actions/configure-pages/tree/45bfe0192ca1faeb007ade9deae92b16b8254a0d) | v6.0.0 | `45bfe0192ca1faeb007ade9deae92b16b8254a0d` | MIT | Configure GitHub Pages |
 | [`actions/deploy-pages`](https://github.com/actions/deploy-pages/tree/cd2ce8fcbc39b97be8ca5fce6e763baed58fa128) | v5.0.0 | `cd2ce8fcbc39b97be8ca5fce6e763baed58fa128` | MIT | Deploy the Pages artifact |
 | [`actions/upload-pages-artifact`](https://github.com/actions/upload-pages-artifact/tree/fc324d3547104276b827a68afc52ff2a11cc49c9) | v5.0.0 | `fc324d3547104276b827a68afc52ff2a11cc49c9` | MIT | Package the Pages artifact |
@@ -29,8 +29,9 @@ All Actions are pinned to immutable commit SHAs in the workflows and in
 
 The CodeQL CLI is separately governed by
 [GitHub's CodeQL terms](https://docs.github.com/en/code-security/codeql-cli/codeql-cli-reference/about-the-codeql-cli#license).
-The Linear Action currently downloads its selected CLI without a checksum or
-attestation; that upstream provenance gap is tracked in
+Since `v0.16.1` the Linear Action verifies its selected CLI against a published
+SHA-256 checksum before executing it, closing the upstream provenance gap
+tracked in
 [`linear/linear-release-action#59`](https://github.com/linear/linear-release-action/issues/59).
 
 ## Transitive GitHub Actions
