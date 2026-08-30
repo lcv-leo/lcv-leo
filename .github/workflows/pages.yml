@@ -43,14 +43,21 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run repository tests
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Run local repository tests without credentials
         run: >-
           node --test
           scripts/generate-contribution-snake.test.mjs
           scripts/linear-release-trust.test.mjs
-          scripts/provenance-drift.test.mjs
+
+      - name: Run provenance test without credentials
+        if: github.event_name == 'pull_request'
+        run: node --test scripts/provenance-drift.test.mjs
+
+      - name: Run provenance test on a trusted ref
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node --test scripts/provenance-drift.test.mjs
 
   build:
     if: github.event_name != 'pull_request'
