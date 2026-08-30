@@ -5,6 +5,7 @@ import test from "node:test";
 const [
   readme,
   page,
+  pageStyles,
   thirdParty,
   actionsLock,
   actionsLockValidatorWorkflow,
@@ -17,6 +18,7 @@ const [
   await Promise.all([
     readFile(new URL("../README.md", import.meta.url), "utf8"),
     readFile(new URL("../site/index.html", import.meta.url), "utf8"),
+    readFile(new URL("../site/styles.css", import.meta.url), "utf8"),
     readFile(new URL("../THIRDPARTY.md", import.meta.url), "utf8"),
     readFile(new URL("../.github/workflows/actions.lock", import.meta.url), "utf8"),
     readFile(
@@ -58,6 +60,12 @@ const GIF_URLS = [
 ];
 
 const DEVICON_URLS = DEVICON_PATHS.map((path) => `${DEVICON_PREFIX}${path}`);
+const BRAND_LOGO_URL =
+  "https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg";
+const PAGE_STYLESHEET_URLS = [
+  "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap",
+  "styles.css",
+];
 
 const SHIELDS_PATHS = [
   "github/followers/lcv-leo?label=Followers&style=flat-square&color=3B82F6",
@@ -126,7 +134,7 @@ const SHIELDS_PATHS = [
 ];
 
 const README_OTHER_IMAGE_URLS = [
-  "https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg",
+  BRAND_LOGO_URL,
   "https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV+Ideas+%26+Software",
   "https://komarev.com/ghpvc/?username=lcv-leo&label=Profile%20Views&color=3B82F6&style=flat-square",
   "https://www.bestpractices.dev/projects/14239/badge",
@@ -149,6 +157,8 @@ const README_IMAGE_URLS = [
 ];
 
 const PAGE_IMAGE_URLS = [
+  BRAND_LOGO_URL,
+  BRAND_LOGO_URL,
   "/github-contribution-grid-snake-dark.svg",
   ...DEVICON_URLS,
   "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true&background=1a1b26",
@@ -158,7 +168,59 @@ const PAGE_IMAGE_URLS = [
   "https://github-profile-summary-cards.vercel.app/api/cards/stats?username=lcv-leo&theme=tokyonight",
 ];
 
-function extractImageSources(content, surfaceName) {
+function normalizeImageSource(rawSource, sourceName) {
+  const source = rawSource.trim();
+  assert.notEqual(source, "", `${sourceName} has an empty image source`);
+  assert.doesNotMatch(
+    source,
+    /&#(?:\d+|x[0-9a-f]+);?/iu,
+    `${sourceName} must not contain numeric HTML references`,
+  );
+  const namedReferences = [...source.matchAll(/&([a-z][a-z0-9]+);/giu)];
+  assert.equal(
+    namedReferences.every((match) => match[1].toLowerCase() === "amp"),
+    true,
+    `${sourceName} must use its canonical literal URL`,
+  );
+  return source.replaceAll(/&amp;/giu, "&");
+}
+
+function quotedHtmlAttribute(tag, attribute, sourceName, required = false) {
+  assert.ok(["content", "href", "property", "rel", "style"].includes(attribute));
+  const assignmentPattern = new RegExp(
+    String.raw`(?:^|\s)${attribute}\s*=`,
+    "giu",
+  );
+  const assignments = [...tag.matchAll(assignmentPattern)];
+  assert.ok(assignments.length <= 1, `${sourceName} has duplicate ${attribute}`);
+  const pattern = new RegExp(
+    String.raw`(?:^|\s)${attribute}\s*=\s*(?:"([^"]*)"|'([^']*)')`,
+    "giu",
+  );
+  const matches = [...tag.matchAll(pattern)];
+  assert.equal(
+    matches.length,
+    assignments.length,
+    `${sourceName} ${attribute} must use a quoted canonical value`,
+  );
+  if (required) {
+    assert.equal(matches.length, 1, `${sourceName} needs one quoted ${attribute}`);
+  }
+  return matches.length === 0 ? undefined : (matches[0][1] ?? matches[0][2]).trim();
+}
+
+function htmlTokenAttribute(tag, attribute, sourceName) {
+  const value = quotedHtmlAttribute(tag, attribute, sourceName);
+  if (value === undefined) return undefined;
+  assert.equal(
+    value.includes("&"),
+    false,
+    `${sourceName} ${attribute} must not contain HTML references`,
+  );
+  return value.toLowerCase();
+}
+
+function extractImageSources(content, surfaceName, { preferCanonical = false } = {}) {
   const normalized = content.toLowerCase();
   const sources = [];
   let cursor = 0;
@@ -176,25 +238,12 @@ function extractImageSources(content, surfaceName) {
       ...tag.matchAll(/\sdata-canonical-src="([^"]*)"|\sdata-canonical-src='([^']*)'/giu),
     ];
     assert.ok(canonicalMatches.length <= 1, `${surfaceName} image has duplicate canonical src`);
-    const rawSource = (
-      canonicalMatches[0]?.[1] ??
-      canonicalMatches[0]?.[2] ??
-      matches[0][1] ??
-      matches[0][2]
-    ).trim();
-    assert.notEqual(rawSource, "", `${surfaceName} has an empty image src`);
-    assert.doesNotMatch(
-      rawSource,
-      /&#(?:\d+|x[0-9a-f]+);?/iu,
-      `${surfaceName} image src must not contain numeric HTML references`,
+    const renderedCanonical = canonicalMatches[0]?.[1] ?? canonicalMatches[0]?.[2];
+    const loadedSource = matches[0][1] ?? matches[0][2];
+    const source = normalizeImageSource(
+      preferCanonical ? (renderedCanonical ?? loadedSource) : loadedSource,
+      `${surfaceName} image src`,
     );
-    const namedReferences = [...rawSource.matchAll(/&([a-z][a-z0-9]+);/giu)];
-    assert.equal(
-      namedReferences.every((match) => match[1].toLowerCase() === "amp"),
-      true,
-      `${surfaceName} image src must use its canonical literal URL`,
-    );
-    const source = rawSource.replaceAll(/&amp;/giu, "&");
     sources.push(source);
     const srcsetMatches = [...tag.matchAll(/\ssrcset="([^"]*)"|\ssrcset='([^']*)'/giu)];
     assert.ok(srcsetMatches.length <= 1, `${surfaceName} image has duplicate srcset`);
@@ -225,7 +274,66 @@ function extractImageSources(content, surfaceName) {
     }
     cursor = end + 1;
   }
+
+  for (const match of content.matchAll(/<meta\b[^>]*>/giu)) {
+    const tag = match[0];
+    const property = htmlTokenAttribute(tag, "property", `${surfaceName} <meta>`);
+    if (property !== "og:image") continue;
+    const source = quotedHtmlAttribute(tag, "content", `${surfaceName} og:image`, true);
+    sources.push(normalizeImageSource(source, `${surfaceName} og:image`));
+  }
+
+  for (const match of content.matchAll(/<link\b[^>]*>/giu)) {
+    const tag = match[0];
+    const rel = htmlTokenAttribute(tag, "rel", `${surfaceName} <link>`);
+    if (!rel) continue;
+    const relTokens = rel.toLowerCase().split(/\s+/u);
+    if (!relTokens.some((token) => token === "icon" || token.endsWith("-icon"))) continue;
+    const source = quotedHtmlAttribute(tag, "href", `${surfaceName} icon`, true);
+    sources.push(normalizeImageSource(source, `${surfaceName} icon`));
+  }
   return sources;
+}
+
+function extractPageStylesheetSources(content) {
+  const sources = [];
+  for (const match of content.matchAll(/<link\b[^>]*>/giu)) {
+    const tag = match[0];
+    const rel = htmlTokenAttribute(tag, "rel", "Pages <link>");
+    if (!rel?.split(/\s+/u).includes("stylesheet")) continue;
+    const source = quotedHtmlAttribute(tag, "href", "Pages stylesheet", true);
+    sources.push(normalizeImageSource(source, "Pages stylesheet"));
+  }
+  return sources;
+}
+
+function assertNoExternalCssResources(cssSource, sourceName) {
+  assert.doesNotMatch(
+    cssSource,
+    /\\|@import\b|(?:-webkit-)?image-set\s*\(|image\s*\(|url\s*\(/iu,
+    `${sourceName} contains forbidden external resource syntax`,
+  );
+}
+
+function assertPageCssSurfaces(content, pageStylesSource) {
+  assert.deepEqual(
+    sorted(extractPageStylesheetSources(content)),
+    sorted(PAGE_STYLESHEET_URLS),
+    "Pages stylesheet catalog drifted",
+  );
+  for (const match of content.matchAll(/<[a-z][^>]*>/giu)) {
+    const tag = match[0];
+    if (!/(?:^|\s)style\s*=/iu.test(tag)) continue;
+    const inlineStyle = quotedHtmlAttribute(tag, "style", "Pages inline style", true);
+    assertNoExternalCssResources(inlineStyle, "Pages inline style");
+  }
+  const styleOpenings = [...content.matchAll(/<style\b[^>]*>/giu)];
+  const styleBlocks = [...content.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style\s*>/giu)];
+  assert.equal(styleBlocks.length, styleOpenings.length, "Pages has an unterminated <style>");
+  for (const block of styleBlocks) {
+    assertNoExternalCssResources(block[1], "Pages <style>");
+  }
+  assertNoExternalCssResources(pageStylesSource, "Pages stylesheet");
 }
 
 async function renderReadmeWithGitHub(content) {
@@ -258,12 +366,14 @@ async function renderReadmeWithGitHub(content) {
 }
 renderReadmeWithGitHub.cache = new Map();
 
-async function extractSurfaceImageSources(content, surface) {
+async function extractSurfaceImageSources(content, surface, pageStylesSource = pageStyles) {
   if (surface === "README") {
     const rendered = await renderReadmeWithGitHub(content);
-    return extractImageSources(rendered, "GitHub-rendered README");
+    return extractImageSources(rendered, "GitHub-rendered README", {
+      preferCanonical: true,
+    });
   }
-  assert.equal(content.toLowerCase().includes("url("), false, `${surface} uses CSS images`);
+  assertPageCssSurfaces(content, pageStylesSource);
   return extractImageSources(content, surface);
 }
 
@@ -271,8 +381,16 @@ function sorted(values) {
   return [...values].sort((left, right) => left.localeCompare(right, "en"));
 }
 
-async function assertImageCatalog(content, surface, predicate, expected) {
-  const actual = (await extractSurfaceImageSources(content, surface)).filter(predicate);
+async function assertImageCatalog(
+  content,
+  surface,
+  predicate,
+  expected,
+  pageStylesSource = pageStyles,
+) {
+  const actual = (
+    await extractSurfaceImageSources(content, surface, pageStylesSource)
+  ).filter(predicate);
   assert.deepEqual(sorted(actual), sorted(expected), `${surface} image catalog drifted`);
 }
 
@@ -293,9 +411,19 @@ async function assertCataloguedGifInventory(readmeSource, pageSource) {
   await assertImageCatalog(pageSource, "Pages", isGifSource, []);
 }
 
-async function assertCompleteImageInventory(readmeSource, pageSource) {
+async function assertCompleteImageInventory(
+  readmeSource,
+  pageSource,
+  pageStylesSource = pageStyles,
+) {
   await assertImageCatalog(readmeSource, "README", () => true, README_IMAGE_URLS);
-  await assertImageCatalog(pageSource, "Pages", () => true, PAGE_IMAGE_URLS);
+  await assertImageCatalog(
+    pageSource,
+    "Pages",
+    () => true,
+    PAGE_IMAGE_URLS,
+    pageStylesSource,
+  );
 }
 
 // These regular expressions parse isolated machine syntax, never prose.
@@ -600,6 +728,70 @@ test("image inventory rejects every uncatalogued external image", async () => {
   }
 });
 
+test("Pages inventory covers metadata, icons, and local CSS resource syntax", async () => {
+  const logo =
+    "https://raw.githubusercontent.com/LCV-Ideas-Software/.github/main/profile/assets/lcv-ideas-software-logo.svg";
+  for (const current of [
+    `<meta property="og:image" content="${logo}">`,
+    `<link rel="icon" href="${logo}">`,
+  ]) {
+    const driftedPage = page.replace(
+      current,
+      current.replace(logo, "https://example.com/uncatalogued.png"),
+    );
+    assert.notEqual(driftedPage, page);
+    await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));
+  }
+
+  for (const cssResource of [
+    ".external { background-image: url(https://example.com/uncatalogued.png); }",
+    '@import "https://example.com/uncatalogued.css";',
+    '.external { background-image: image-set("https://example.com/uncatalogued.png" 1x); }',
+    '.external { background-image: image("https://example.com/uncatalogued.png"); }',
+    '.external { background-image: u\\72l("https://example.com/uncatalogued.png"); }',
+  ]) {
+    await assert.rejects(() =>
+      assertCompleteImageInventory(readme, page, `${pageStyles}\n${cssResource}`),
+    );
+  }
+
+  const externalStylesheetPage = page.replace(
+    '<link rel="stylesheet" href="styles.css">',
+    '<link rel="stylesheet" href="https://example.com/untrusted.css">',
+  );
+  assert.notEqual(externalStylesheetPage, page);
+  await assert.rejects(() =>
+    assertCompleteImageInventory(readme, externalStylesheetPage),
+  );
+
+  for (const hiddenResource of [
+    '<meta property=og:image content="https://example.com/uncatalogued.png">',
+    '<link rel=icon href="https://example.com/uncatalogued.png">',
+    '<meta property="og&#58;image" content="https://example.com/uncatalogued.png">',
+    '<link rel="ic&#111;n" href="https://example.com/uncatalogued.png">',
+  ]) {
+    await assert.rejects(() =>
+      assertCompleteImageInventory(readme, `${page}\n${hiddenResource}`),
+    );
+  }
+});
+
+test("ordinary Pages text may contain a backslash without becoming CSS", async () => {
+  await assert.doesNotReject(() =>
+    assertCompleteImageInventory(readme, `${page}\n<p>C:\\workspace</p>`),
+  );
+});
+
+test("raw Pages HTML never lets data-canonical-src mask the loaded src", async () => {
+  const approved = DEVICON_URLS[0];
+  const driftedPage = page.replace(
+    `src="${approved}"`,
+    `src="https://example.com/uncatalogued.png" data-canonical-src="${approved}"`,
+  );
+  assert.notEqual(driftedPage, page);
+  await assert.rejects(() => assertCompleteImageInventory(readme, driftedPage));
+});
+
 test("non-rendered Markdown examples do not enter the image inventory", async () => {
   const examples = [
     "<!-- ![commented image](https://example.com/comment.png) -->",
@@ -644,6 +836,14 @@ const RUNTIME_TOOL_ROWS = [
   ],
 ];
 
+const TRUSTED_VALIDATION_TOOL_ROW = [
+  "[`github/gh-actions-lock`](https://github.com/github/gh-actions-lock/tree/047fddf38163b304f1e6ef5649f5ac1646edc6a3)",
+  "v0.1.6",
+  "[Release](https://github.com/github/gh-actions-lock/releases/tag/v0.1.6), signed commit `047fddf38163b304f1e6ef5649f5ac1646edc6a3`; Linux AMD64 SHA-256 `4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3`",
+  "[MIT](https://github.com/github/gh-actions-lock/blob/047fddf38163b304f1e6ef5649f5ac1646edc6a3/LICENSE)",
+  "Verify Action pins and lockfile coverage",
+];
+
 function extractRuntimeToolRows(content) {
   const section = extractSection(
     content,
@@ -664,6 +864,29 @@ function extractRuntimeToolRows(content) {
       .slice(1, -1)
       .map((cell) => cell.trim());
     assert.equal(cells.length, 5, "Runtime inventory must have exactly five cells");
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function extractTrustedValidationToolRows(content) {
+  const section = extractSection(
+    content,
+    "## Trusted validation tooling",
+    "## Fonts, icons, and hosted media",
+  );
+  const lines = section.split("\n").map((line) => line.trimEnd());
+  const header = lines.indexOf("| Component | Version | Integrity | License | Purpose |");
+  assert.ok(header !== -1 && lines[header + 1] === "| --- | --- | --- | --- | --- |");
+  const rows = [];
+  for (const line of lines.slice(header + 2)) {
+    if (line === "") break;
+    assert.ok(line.startsWith("|") && line.endsWith("|"), "Non-canonical trusted row");
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((cell) => cell.trim());
+    assert.equal(cells.length, 5, "Trusted inventory must have exactly five cells");
     rows.push(cells);
   }
   return rows;
@@ -711,18 +934,13 @@ function assertRuntimeToolInventory(thirdPartySource) {
     assert.equal(matches.length, 1, `Runtime inventory component drifted: ${expected[0]}`);
     assert.deepEqual(matches[0], expected, `Runtime inventory row drifted: ${expected[0]}`);
   }
-
-  for (const evidence of [
-    "github/gh-actions-lock/releases/tag/v0.1.6",
-    "047fddf38163b304f1e6ef5649f5ac1646edc6a3",
-    "github/gh-actions-lock/blob/047fddf38163b304f1e6ef5649f5ac1646edc6a3/LICENSE",
-    "4181ec1da5408b34b9a542a7ee5c6ce3a4d6ac815c7d0206a00ceca8a817f4e3",
-  ]) {
-    assert.ok(
-      thirdPartySource.includes(evidence),
-      `Missing runtime provenance: ${evidence}`,
-    );
-  }
+  const trustedRows = extractTrustedValidationToolRows(thirdPartySource);
+  assert.equal(trustedRows.length, 1, "Trusted validation inventory must contain one row");
+  assert.deepEqual(
+    trustedRows[0],
+    TRUSTED_VALIDATION_TOOL_ROW,
+    "gh-actions-lock trusted validation row drifted",
+  );
 }
 
 test("runtime tool versions and immutable origins stay inventoried", () => {
@@ -741,6 +959,21 @@ test("runtime provenance stays attached to the correct component row", () => {
       "Unknown terms",
     ],
     ["`github/codeql-action` |", "`example/unrelated-action` |"],
+  ]) {
+    const driftedInventory = thirdParty.replace(current, drifted);
+    assert.notEqual(driftedInventory, thirdParty);
+    assert.throws(() => assertRuntimeToolInventory(driftedInventory));
+  }
+});
+
+test("trusted gh-actions-lock metadata stays attached to its exact row", () => {
+  for (const [current, drifted] of [
+    ["| v0.1.6 |", "| v0.0.0 |"],
+    [
+      "[MIT](https://github.com/github/gh-actions-lock/blob/047fddf38163b304f1e6ef5649f5ac1646edc6a3/LICENSE)",
+      "[Apache-2.0](https://github.com/github/gh-actions-lock/blob/047fddf38163b304f1e6ef5649f5ac1646edc6a3/LICENSE)",
+    ],
+    ["Verify Action pins and lockfile coverage", "Unrelated validation purpose"],
   ]) {
     const driftedInventory = thirdParty.replace(current, drifted);
     assert.notEqual(driftedInventory, thirdParty);
