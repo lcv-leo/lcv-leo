@@ -11,8 +11,12 @@ const triggerUrl = new URL(
   import.meta.url,
 );
 
+async function readNormalizedText(url) {
+  return (await readFile(url, "utf8")).replaceAll("\r\n", "\n");
+}
+
 test("the trusted validator consumes the pinned central semantic bundle", async () => {
-  const workflow = await readFile(workflowUrl, "utf8");
+  const workflow = await readNormalizedText(workflowUrl);
 
   assert.match(
     workflow,
@@ -34,7 +38,7 @@ test("the trusted validator consumes the pinned central semantic bundle", async 
 });
 
 test("the status publisher uses the official action and a dedicated least-privilege App", async () => {
-  const workflow = await readFile(workflowUrl, "utf8");
+  const workflow = await readNormalizedText(workflowUrl);
 
   assert.match(workflow, /environment: actions-lock-validation/u);
   assert.match(
@@ -68,7 +72,7 @@ test("the status publisher uses the official action and a dedicated least-privil
 });
 
 test("the unprivileged trigger covers pull requests retargeted to main", async () => {
-  const trigger = await readFile(triggerUrl, "utf8");
+  const trigger = await readNormalizedText(triggerUrl);
 
   assert.match(trigger, /^\s*- edited\s*$/mu);
 });
