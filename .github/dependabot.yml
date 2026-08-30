@@ -1,5 +1,5 @@
-# Único ecossistema deste repositório: GitHub Actions (pages.yml, codeql.yml).
-# As actions são pinadas por SHA; o Dependabot atualiza o pin e o comentário de versão.
+# Ecossistemas deste repositório: GitHub Actions e npm para ferramentas de teste.
+# As Actions são pinadas por SHA; o Dependabot atualiza o pin e o comentário de versão.
 version: 2
 updates:
   - package-ecosystem: "github-actions"
@@ -13,3 +13,10 @@ updates:
       exclude:
         - "actions/*"
         - "github/*"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    cooldown:
+      default-days: 7
