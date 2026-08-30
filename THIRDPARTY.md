@@ -20,7 +20,7 @@ All Actions are pinned to immutable commit SHAs in the workflows and in
 
 | Component | Version | Commit SHA | License | Purpose |
 | --- | --- | --- | --- | --- |
-| [`actions/checkout`](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1) | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` | MIT | Read trusted repository snapshots |
+| [`actions/checkout`](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1) | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` | MIT | Read repository snapshots without persisting credentials |
 | [`actions/setup-node`](https://github.com/actions/setup-node/tree/820762786026740c76f36085b0efc47a31fe5020) | v7.0.0 | `820762786026740c76f36085b0efc47a31fe5020` | MIT | Configure the exact Node.js runtime for validation and Pages generation |
 | [`github/codeql-action`](https://github.com/github/codeql-action/tree/cdf488f595d80d6e07e03d4674febd5ab45fa938) | v4.37.9 | `cdf488f595d80d6e07e03d4674febd5ab45fa938` | MIT | CodeQL analysis and SARIF upload |
 | [`linear/linear-release-action`](https://github.com/linear/linear-release-action/tree/3f31fcf14c110cc53579fcc3575a26d469c413b4) | v0.17.1 | `3f31fcf14c110cc53579fcc3575a26d469c413b4` | MIT | Synchronize successful Pages deployments with Linear |

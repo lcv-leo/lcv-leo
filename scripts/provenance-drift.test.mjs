@@ -142,6 +142,12 @@ function parseActionsLock(lockSource, workflowSources) {
     readingUses = false;
   }
   assert.ok(dependencies.size > 0);
+  const directVersions = parseWorkflowVersions(workflowSources);
+  assert.deepEqual(
+    sorted(directLockIdentities),
+    sorted(directVersions.keys()),
+    "actions.lock workflows must use the exact refs declared by workflow uses",
+  );
   for (const identity of directLockIdentities) assert.ok(dependencies.has(identity));
   for (const dependency of dependencies.values()) {
     assert.ok(dependency.ref, `actions.lock dependency has no ref: ${dependency.lockIdentity}`);
@@ -174,7 +180,6 @@ function parseActionsLock(lockSource, workflowSources) {
   const directIdentities = new Set(
     directDependencies.map((dependency) => dependency.identity),
   );
-  const directVersions = parseWorkflowVersions(workflowSources);
   for (const dependency of directDependencies) {
     const workflowVersion = directVersions.get(dependency.identity);
     assert.ok(
@@ -251,7 +256,7 @@ const ACTION_LICENSES = new Map([
 ]);
 
 const DIRECT_ACTION_PURPOSES = new Map([
-  ["actions/checkout", "Read trusted repository snapshots"],
+  ["actions/checkout", "Read repository snapshots without persisting credentials"],
   [
     "actions/setup-node",
     "Configure the exact Node.js runtime for validation and Pages generation",
@@ -795,6 +800,16 @@ test("THIRDPARTY Action components equal all actions.lock dependencies", () => {
   assertActionInventoryReconciled(actionsLock, thirdParty);
 });
 
+test("actions.lock rejects a symbolic direct ref backed by the same commit", () => {
+  const directSha =
+    "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020";
+  const symbolicRef = "actions/setup-node@v7.0.0";
+  const driftedLock = actionsLock.replaceAll(directSha, symbolicRef);
+  assert.notEqual(driftedLock, actionsLock);
+  assert.ok(driftedLock.includes("commit: 'sha1-820762786026740c76f36085b0efc47a31fe5020'"));
+  assert.throws(() => assertActionInventoryReconciled(driftedLock, thirdParty));
+});
+
 test("third-party inventory rejects an action added only to actions.lock", () => {
   const untrackedIdentity = `example/action@${"a".repeat(40)}`;
   for (const dependencyKey of [`'${untrackedIdentity}'`, `"${untrackedIdentity}"`]) {
@@ -878,7 +893,7 @@ test("Action inventory rejects an incorrect license", () => {
   assert.throws(() => assertActionInventoryReconciled(actionsLock, wrongLicenseInventory));
 
   const wrongPurposeRow = checkoutRow.replace(
-    "Read trusted repository snapshots",
+    "Read repository snapshots without persisting credentials",
     "Unrelated purpose",
   );
   assert.notEqual(wrongPurposeRow, checkoutRow);
