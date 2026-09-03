@@ -6,6 +6,14 @@ on:
   pull_request:
     branches:
       - main
+    # `edited` covers a pull request retargeted to main; without it the
+    # required check would not run until the next push.
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - edited
   schedule:
     - cron: "17 6 * * *" # daily, 03:17 in Brasília; avoids the top-of-the-hour peak
   push:

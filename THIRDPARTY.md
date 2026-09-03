@@ -15,7 +15,7 @@ immutable commit pins live only in `package.json`, `package-lock.json` and the
 workflow files, where Dependabot updates them; this document deliberately does
 not repeat them, so it can never drift from those sources. The official GitHub
 Dependency Review action evaluates manifest and lockfile changes on every pull
-request, and the Pages workflow installs the committed lockfile with lifecycle
+request to `main`, and the Pages workflow installs the committed lockfile with lifecycle
 scripts disabled.
 
 The repository's original content is proprietary and all rights are reserved.
