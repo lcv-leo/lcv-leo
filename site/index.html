@@ -7,7 +7,7 @@
   <title>Leonardo Cardozo Vargas — LCV Ideas &amp; Software</title>
   <meta name="description" content="Founder &amp; Developer at LCV Ideas &amp; Software. TypeScript, React, Cloudflare Workers, Rust/Tauri, MCP servers — shipping real products with test-driven, fail-closed engineering.">
   <meta property="og:title" content="Leonardo Cardozo Vargas — LCV Ideas &amp; Software">
-  <meta property="og:description" content="Full-Stack &amp; Edge Developer. TypeScript • React • Cloudflare • Rust/Tauri • MCP servers. Fail closed, test first, ship through the queue.">
+  <meta property="og:description" content="Full-Stack &amp; Edge Developer. TypeScript • React • Cloudflare • Rust/Tauri • MCP servers. Fail closed, test first, ship through pull requests.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://lcv-leo.lcv.dev">
   <meta property="og:image" content="https://lcv-leo.lcv.dev/assets/lcv-ideas-software-logo.svg">
@@ -137,8 +137,8 @@
       </article>
       <article class="card card--wide reveal" style="--accent: var(--tn-red)">
         <h3>A fleet that deploys itself</h3>
-        <p>Operating repositories with <strong>merge queues, SHA-pinned actions, actions.lock,
-        CodeQL, Zizmor and OpenSSF Scorecard</strong> — deploys only through CI. Practicing TDD with
+        <p>Operating repositories with <strong>SHA-pinned actions, CodeQL, Zizmor and OpenSSF
+        Scorecard</strong> — deploys only through CI. Practicing TDD with
         fail-closed design: RED before GREEN, gates that refuse to guess. Open to collaborate
         on <strong>Edge, MCP &amp; Full-Stack projects</strong>.</p>
       </article>
@@ -230,7 +230,6 @@
         <h3 class="stackrow__label mono">deployment &amp; devops</h3>
         <ul class="chips">
           <li style="--dot:#2088FF">GitHub Actions</li>
-          <li style="--dot:#c0caf5">Merge Queues</li>
           <li style="--dot:#F38020">Wrangler</li>
           <li style="--dot:#31C4F3">Dependabot</li>
           <li style="--dot:#F05032">SHA-pinned Actions</li>
@@ -249,7 +248,7 @@
       <p role="listitem"><span class="terminal__n">1</span>Fail closed: a gate that cannot verify must <em>refuse</em>, never guess</p>
       <p role="listitem"><span class="terminal__n">2</span>RED before GREEN — the failing test is half the proof</p>
       <p role="listitem"><span class="terminal__n">3</span>Every external action pinned to a full commit SHA, every dependency in a lockfile</p>
-      <p role="listitem"><span class="terminal__n">4</span>Nothing reaches production outside the merge queue — no manual deploys, ever</p>
+      <p role="listitem"><span class="terminal__n">4</span>Nothing reaches production outside a pull request merged into main</p>
       <p role="listitem"><span class="terminal__n">5</span>Six AI models argue over my code before it ships — unanimity or it doesn't merge</p>
       <p role="listitem"><span class="terminal__n">6</span>Evidence over narrative: logs, SHAs and run IDs, or it didn't happen</p>
       <p role="listitem"><span class="terminal__n">7</span>From idea to deployed edge worker is my favorite journey</p>
@@ -310,8 +309,7 @@
           <li style="--dot:#24C8DB">Tauri desktop</li>
           <li style="--dot:#6E9F18">Vitest TDD</li>
           <li style="--dot:#3E67B1">Zod validation</li>
-          <li style="--dot:#c0caf5">Merge queue ALLGREEN</li>
-          <li style="--dot:#F05032">actions.lock + SHA pins</li>
+          <li style="--dot:#F05032">SHA-pinned actions</li>
           <li style="--dot:#CB3837">npm publishing</li>
           <li style="--dot:#5A0FC8">PWA offline-first</li>
         </ul>

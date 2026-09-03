@@ -44,7 +44,7 @@ stack:
   ai:        [MCP servers, Vertex AI (Gemini), Claude, GPT, Grok, DeepSeek, Perplexity]
   payments:  [Mercado Pago (Orders API + 3DS), Stripe (planned)]
   quality:   [Vitest, Zod, Biome, ESLint, Prettier, CodeQL, Zizmor, OpenSSF Scorecard]
-  ops:       [GitHub Actions, Merge Queues, Wrangler, Dependabot, Linear, Slack]
+  ops:       [GitHub Actions, Wrangler, Dependabot, Linear, Slack]
 current:
   - cross-review   → Multi-model adversarial code review MCP server (6 AI peers, unanimous gates) [npm]
   - ultrabrain-mcp → Structured deep-reasoning MCP server [npm]
@@ -52,7 +52,7 @@ current:
   - Oráculo Financeiro → Inflation-indexed fixed-income dashboard (React + Workers + D1) [Live]
   - Maestro        → Desktop writing/orchestration studio (Tauri + Rust) [Shipping]
   - Sponsor Motor  → Donation payments worker (Mercado Pago → Stripe migration planned) [Live]
-motto: "Fail closed, test first, ship through the queue."
+motto: "Fail closed, test first, ship through pull requests."
 ```
 
 <img align="right" alt="Coding" width="400" src="https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif">
@@ -65,7 +65,7 @@ motto: "Fail closed, test first, ship through the queue."
 - Shipping **Oráculo Financeiro** — an inflation-indexed fixed-income dashboard (React, Workers, D1, AI analysis)
 - Building **Maestro** — a desktop writing & orchestration studio in **Tauri/Rust** with deterministic engines (citations, link integrity, web evidence)
 - Running **payments in production** — Mercado Pago Checkout Transparente + Orders API with 3DS and HMAC-signed webhooks; Stripe migration planned
-- Operating a fleet of repos with **merge queues, SHA-pinned actions, actions.lock, CodeQL, Zizmor and Scorecard** — deploys only through CI
+- Operating a fleet of repos with **SHA-pinned actions, CodeQL, Zizmor and Scorecard** — deploys only through CI
 - Practicing **TDD with fail-closed design** — RED before GREEN, gates that refuse to guess
 - Open to collaborate on **Edge, MCP & Full-Stack Projects**
 - Reach me at **contato@lcv.dev**
@@ -203,7 +203,6 @@ motto: "Fail closed, test first, ship through the queue."
 ### Deployment & DevOps
 <p align="center">
   <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" />
-  <img src="https://img.shields.io/badge/Merge_Queues-181717?style=for-the-badge&logo=github&logoColor=white" />
   <img src="https://img.shields.io/badge/Wrangler-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" />
   <img src="https://img.shields.io/badge/Dependabot-025E8C?style=for-the-badge&logo=dependabot&logoColor=white" />
   <img src="https://img.shields.io/badge/SHA--pinned_Actions-181717?style=for-the-badge&logo=git&logoColor=white" />
@@ -220,7 +219,7 @@ motto: "Fail closed, test first, ship through the queue."
 Fail closed: a gate that cannot verify must refuse, never guess
 RED before GREEN — the failing test is half the proof
 Every external action pinned to a full commit SHA, every dependency in a lockfile
-Nothing reaches production outside the merge queue — no manual deploys, ever
+Nothing reaches production outside a pull request merged into main
 Six AI models argue over my code before it ships — unanimity or it doesn't merge
 Evidence over narrative: logs, SHAs and run IDs, or it didn't happen
 From idea to deployed edge worker is my favorite journey
@@ -303,8 +302,6 @@ From idea to deployed edge worker is my favorite journey
 <img src="https://img.shields.io/badge/Tauri_desktop-24C8DB?style=flat-square&logo=tauri&logoColor=white" />
 <img src="https://img.shields.io/badge/Vitest_TDD-6E9F18?style=flat-square&logo=vitest&logoColor=white" />
 <img src="https://img.shields.io/badge/Zod_validation-3E67B1?style=flat-square&logo=zod&logoColor=white" />
-<img src="https://img.shields.io/badge/Merge_queue_ALLGREEN-181717?style=flat-square&logo=github&logoColor=white" />
-<img src="https://img.shields.io/badge/actions.lock_+_SHA_pins-181717?style=flat-square&logo=git&logoColor=white" />
 <img src="https://img.shields.io/badge/npm_publishing-CB3837?style=flat-square&logo=npm&logoColor=white" />
 <img src="https://img.shields.io/badge/PWA_offline--first-5A0FC8?style=flat-square&logo=pwa&logoColor=white" />
 

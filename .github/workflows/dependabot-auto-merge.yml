@@ -1,0 +1,47 @@
+name: Dependabot auto-merge
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions: {}
+
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-merge:
+    name: Enable auto-merge for Dependabot
+    # Runs only on Dependabot's own pull requests from this repository. The
+    # pull request author is the condition recommended by zizmor: the actor
+    # contexts are spoofable. Dependabot-initiated runs receive Dependabot
+    # secrets; a run initiated by a person receives Actions secrets, finds no
+    # token and ends without arming anything. Such a pull request is armed
+    # again on the next Dependabot synchronization (or "@dependabot recreate").
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The token is a fine-grained personal access token stored as a Dependabot
+      # secret (Contents, Pull requests and Workflows: read and write). The
+      # built-in Actions token is never used, so the merge performed later by
+      # GitHub triggers the default-branch workflows normally.
+      # --match-head-commit binds the arming request to the exact head of this
+      # event.
+      - name: Enable GitHub native auto-merge with squash
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ secrets.DEPENDABOT_AUTOMERGE_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::No Dependabot secret in this run: the event was not initiated by Dependabot. Nothing armed."
+            exit 0
+          fi
+          gh pr merge --auto --squash --match-head-commit "$HEAD_SHA" "$PR_URL"
