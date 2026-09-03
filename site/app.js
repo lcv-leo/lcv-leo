@@ -20,7 +20,7 @@
     [[P, "  "], [K, "ai"], [P, ":        ["], [S, "MCP servers, Vertex AI, Claude, GPT, Grok, DeepSeek, Perplexity"], [P, "]"]],
     [[P, "  "], [K, "payments"], [P, ":  ["], [S, "Mercado Pago (Orders API + 3DS), Stripe (planned)"], [P, "]"]],
     [[P, "  "], [K, "quality"], [P, ":   ["], [S, "Vitest, Zod, Biome, CodeQL, Zizmor, Scorecard"], [P, "]"]],
-    [[P, "  "], [K, "ops"], [P, ":       ["], [S, "GitHub Actions, Merge Queues, Dependabot, Linear, Slack"], [P, "]"]],
+    [[P, "  "], [K, "ops"], [P, ":       ["], [S, "GitHub Actions, Dependabot, Linear, Slack"], [P, "]"]],
     [[K, "current"], [P, ":"]],
     [[P, "  - "], [T, "cross-review"], [P, "   "], [A, "→"], [S, " 6-AI adversarial code review MCP "], [P, "["], [T, "npm"], [P, "]"]],
     [[P, "  - "], [T, "ultrabrain-mcp"], [P, " "], [A, "→"], [S, " structured deep-reasoning MCP "], [P, "["], [T, "npm"], [P, "]"]],
@@ -28,7 +28,7 @@
     [[P, "  - "], [T, "Oráculo Financeiro"], [P, " "], [A, "→"], [S, " fixed-income dashboard "], [P, "["], [T, "Live"], [P, "]"]],
     [[P, "  - "], [T, "Maestro"], [P, "        "], [A, "→"], [S, " desktop studio · Tauri + Rust "], [P, "["], [T, "Shipping"], [P, "]"]],
     [[P, "  - "], [T, "Sponsor Motor"], [P, "  "], [A, "→"], [S, " donation payments worker "], [P, "["], [T, "Live"], [P, "]"]],
-    [[K, "motto"], [P, ": "], [S, "\"Fail closed, test first, ship through the queue.\""]],
+    [[K, "motto"], [P, ": "], [S, "\"Fail closed, test first, ship through pull requests.\""]],
   ];
 
   const code = document.getElementById("editor-code");
