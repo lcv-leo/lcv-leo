@@ -5,7 +5,6 @@ import { expect, test } from "@playwright/test";
 import {
   BRAND_LOGO_URL,
   DEVICON_PATHS,
-  DEVICON_PREFIX,
   DEVICON_URLS,
   GIF_URLS,
   PAGE_BRAND_LOGO_PATH,
@@ -28,6 +27,7 @@ const CACHE_BUSTER = "2026083013";
 const DEFERRED_RESOURCE_WINDOW_MS = 2_147_483_647;
 const APP_URL = new URL("app.js", PAGE_DOCUMENT_URL).href;
 const LOCAL_STYLESHEET_URL = new URL("styles.css", PAGE_DOCUMENT_URL).href;
+const PAGE_DEVICON_PREFIX = new URL("assets/devicon/", PAGE_DOCUMENT_URL).href;
 const PROFILE_API_URL = "https://api.github.com/users/lcv-leo";
 const REPOSITORIES_API_URL =
   "https://api.github.com/users/lcv-leo/repos?per_page=100";
@@ -615,7 +615,9 @@ async function assertAnalyticsRetrySemantics(browser) {
   page.on("request", (request) => requests.push(request.url()));
   page.on("requestfailed", (request) => failedRequests.push(request.url()));
   page.on("pageerror", (error) => pageErrors.push(error.message));
-  await page.clock.install({ time: FIXED_TIME });
+  await page.clock.install({ time: Date.parse(FIXED_TIME) - 60_000 });
+  // Keep wall-clock time out of the exact 2499/2500 ms retry boundary.
+  await page.clock.pauseAt(FIXED_TIME);
 
   await context.route("**/*", async (route) => {
     const url = route.request().url();
@@ -676,6 +678,7 @@ async function assertAnalyticsRetrySemantics(browser) {
     await target.scrollIntoViewIfNeeded();
     await expect.poll(() => count(requests, normalUrl)).toBe(1);
     await expect.poll(() => count(failedRequests, normalUrl)).toBe(1);
+    await expect(target).toHaveAttribute("data-retries", "1");
 
     await page.clock.fastForward(2_499);
     expect(count(requests, retryUrl)).toBe(0);
@@ -872,30 +875,30 @@ test("browser network inventory rejects dynamic query and CSS resource drift", a
   );
   const hiddenRequestScript = scriptSource.replace(
     '"use strict";',
-    `"use strict";\n  const untrackedImage = new Image();\n  untrackedImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1";`,
+    `"use strict";\n  const untrackedImage = new Image();\n  untrackedImage.src = "${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1";`,
   );
   const delayedRequestScript = scriptSource.replace(
     '"use strict";',
-    `"use strict";\n  setTimeout(() => {\n    const delayedImage = new Image();\n    delayedImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=delayed";\n  }, 2147483646);`,
+    `"use strict";\n  setTimeout(() => {\n    const delayedImage = new Image();\n    delayedImage.src = "${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=delayed";\n  }, 2147483646);`,
   );
   const eventRequestScript = scriptSource.replace(
     '"use strict";',
-    `"use strict";\n  document.addEventListener("click", () => {\n    const eventImage = new Image();\n    eventImage.src = "${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=event";\n  }, { once: true });`,
+    `"use strict";\n  document.addEventListener("click", () => {\n    const eventImage = new Image();\n    eventImage.src = "${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=event";\n  }, { once: true });`,
   );
   const deferredEventUrl =
-    `${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-event`;
+    `${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-event`;
   const deferredEventRequestScript = scriptSource.replace(
     '"use strict";',
     `"use strict";\n  setTimeout(() => {\n    document.addEventListener("click", (event) => {\n      if (!event.isTrusted) return;\n      const deferredEventImage = new Image();\n      deferredEventImage.src = "${deferredEventUrl}";\n    }, { once: true });\n  }, 1000);`,
   );
   const deferredKeyboardUrl =
-    `${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-keyboard`;
+    `${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=deferred-keyboard`;
   const deferredKeyboardRequestScript = scriptSource.replace(
     '"use strict";',
     `"use strict";\n  setTimeout(() => {\n    document.addEventListener("keydown", (event) => {\n      if (!event.isTrusted) return;\n      const deferredKeyboardImage = new Image();\n      deferredKeyboardImage.src = "${deferredKeyboardUrl}";\n    }, { once: true });\n  }, 1000);`,
   );
   const stylesheetDrift =
-    `${stylesheetSource}\nbody { background-image: url("${DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1"); }`;
+    `${stylesheetSource}\nbody { background-image: url("${PAGE_DEVICON_PREFIX}${DEVICON_PATHS[0]}?uncatalogued=1"); }`;
 
   for (const [name, mutation, expectedUnknownRequest] of [
     ["analytics query", { script: queryDriftScript }],

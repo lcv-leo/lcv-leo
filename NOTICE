@@ -17,3 +17,14 @@ Names, personal identity, biographical material, and third-party trademarks
 remain the property of their respective owners. Their presence in this
 repository does not grant permission to use them for endorsement, promotion,
 or another purpose.
+
+Vendored visual assets
+
+Devicon icons: MIT License, Copyright (c) 2015 konpa.
+The original notice is included in site/assets/devicon/LICENSE.
+
+Profile GIF catalog: declared MIT License, Copyright (c) 2023 Anmol Baranwal.
+The catalog's original notice is included in site/assets/profile-gifs/LICENSE.
+Source URLs, exact catalog revisions, local file digests and the distinction
+between catalog provenance and original artistic authorship are documented
+in THIRDPARTY.md. These are not original LCV-authored animations.
