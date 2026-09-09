@@ -1,6 +1,6 @@
 export const DEVICON_COMMIT = "7330accdbc47e2dc0c19789a48533c4a3c50fe58";
 export const DEVICON_PREFIX =
-  `https://raw.githubusercontent.com/devicons/devicon/${DEVICON_COMMIT}/`;
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/";
 export const DEVICON_PATHS = [
   "icons/typescript/typescript-original.svg",
   "icons/javascript/javascript-original.svg",
@@ -30,11 +30,11 @@ export const README_BRAND_LOGO_URL =
 
 export const GIF_CATALOG_COMMIT = "278efd0acc149f89992349d4a5bd349b058aaf0e";
 export const GIF_URLS = [
-  "https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif",
-  "https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif",
-  "https://user-images.githubusercontent.com/74038190/212747903-e9bdf048-2dc8-41f9-b973-0e72ff07bfba.gif",
-  "https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif",
-  "https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif",
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/fading-line.gif",
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/awesome-workspace.gif",
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/curious-tech-geek.gif",
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/pacman.gif",
+  "https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/gradient-line.gif",
 ];
 
 const SHIELDS_PATHS = [
@@ -108,7 +108,7 @@ const README_OTHER_IMAGE_URLS = [
   "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true",
   "https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&theme=tokyo-night&hide_border=true&area=true&custom_title=Leonardo%27s%20Contribution%20Graph",
   "https://lcv-leo.lcv.dev/github-contribution-grid-snake-dark.svg",
-  "https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lcv-leo&theme=tokyonight",
+  "https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lcv-leo&theme=tokyonight&name=lcv-leo%20%28LCV%29",
   "https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=lcv-leo&theme=tokyonight",
   "https://github-profile-summary-cards.vercel.app/api/cards/most-commit-language?username=lcv-leo&theme=tokyonight",
   "https://github-profile-summary-cards.vercel.app/api/cards/stats?username=lcv-leo&theme=tokyonight",
@@ -131,7 +131,7 @@ export const PAGE_IMAGE_URLS = [
   PAGE_BRAND_LOGO_PATH,
   PAGE_BRAND_LOGO_PATH,
   "/github-contribution-grid-snake-dark.svg",
-  ...DEVICON_URLS,
+  ...DEVICON_PATHS.map((path) => `assets/devicon/${path}`),
   "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true&background=1a1b26",
   "https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&theme=tokyo-night&hide_border=true&area=true&custom_title=Leonardo%27s%20Contribution%20Graph",
   "https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=lcv-leo&theme=tokyonight",

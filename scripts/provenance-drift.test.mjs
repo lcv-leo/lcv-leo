@@ -73,7 +73,7 @@ test("brand logo provenance rejects byte and documented-digest drift", () => {
   assert.throws(() => assertBrandLogoProvenance(driftedDocumentation, brandLogo));
 });
 
-test("hosted media origins stay immutable and complete", () => {
+test("vendored media sources and catalog provenance stay complete", () => {
   assert.ok(thirdParty.includes(DEVICON_COMMIT));
   assert.ok(thirdParty.includes(GIF_CATALOG_COMMIT));
   assert.ok(

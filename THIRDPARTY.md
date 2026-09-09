@@ -75,8 +75,9 @@ redistribution.
 
 ## Fonts, icons, and hosted media
 
-These resources are loaded from their providers at render time and are not
-vendored in this repository.
+Fonts are loaded from their providers at render time. The Devicon icons and
+decorative profile GIFs are vendored locally with the source notices below;
+service-generated statistics and badges remain dynamic.
 
 | Component      | Source                                                                                                                                           | License or terms                                                                                 | Use                                            |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
@@ -98,26 +99,61 @@ The MIT license applies to the Devicon project assets. Devicon's
 also states that product names, logos and brands remain subject to their
 respective owners' trademark and brand policies.
 
+
+The vendored icon files come from the exact Devicon commit above:
+
+| Local file | Upstream file | SHA-256 |
+| --- | --- | --- |
+| [site/assets/devicon/icons/typescript/typescript-original.svg](site/assets/devicon/icons/typescript/typescript-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/typescript/typescript-original.svg) | `c9191199f4049920c2fc19035b8a6664f37f4689fcd9e8434e786097e78863f0` |
+| [site/assets/devicon/icons/javascript/javascript-original.svg](site/assets/devicon/icons/javascript/javascript-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/javascript/javascript-original.svg) | `0656ff65fc8eeacda5c78d7f9ffe91ec1eb919db64f56e0b7dcd460af4bbd36c` |
+| [site/assets/devicon/icons/rust/rust-original.svg](site/assets/devicon/icons/rust/rust-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/rust/rust-original.svg) | `16c6c6a98e990944fc5e1cc64cc8fc7b8be3a662ec4ee7951b7995d2e52f5e12` |
+| [site/assets/devicon/icons/python/python-original.svg](site/assets/devicon/icons/python/python-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/python/python-original.svg) | `71493b4a732f0532b3a03a7a95da3ee11a65766367c8303b901ffbe7bf91a3a2` |
+| [site/assets/devicon/icons/sqlite/sqlite-original.svg](site/assets/devicon/icons/sqlite/sqlite-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/sqlite/sqlite-original.svg) | `2b91c30887d3602479ba845cc012ef6ae577fba71eb96705a05b12e35d2c5e7e` |
+| [site/assets/devicon/icons/html5/html5-original.svg](site/assets/devicon/icons/html5/html5-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/html5/html5-original.svg) | `34826e5b3315daadf4fa15f723a3c1d5ba4a89277bfd94e22ac4d7d3d54338c5` |
+| [site/assets/devicon/icons/css3/css3-original.svg](site/assets/devicon/icons/css3/css3-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/css3/css3-original.svg) | `36b7d94b657d571d3f94042acbf6a4c86a5301a222f83f4b4583ad2acf6e297d` |
+| [site/assets/devicon/icons/react/react-original.svg](site/assets/devicon/icons/react/react-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/react/react-original.svg) | `5825b649c8c04dec13ecf01d0182401bd0ec71789d2fa06224866d882cd1515f` |
+| [site/assets/devicon/icons/vitejs/vitejs-original.svg](site/assets/devicon/icons/vitejs/vitejs-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/vitejs/vitejs-original.svg) | `f84e50febcb3a2a81399c9a1ae76d96dc235428202f91610b6f36bfb5b62051a` |
+| [site/assets/devicon/icons/cloudflareworkers/cloudflareworkers-original.svg](site/assets/devicon/icons/cloudflareworkers/cloudflareworkers-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/cloudflareworkers/cloudflareworkers-original.svg) | `6b3490a3395c3ccd0d79c8972ac9fa4e131b5d9564394efe1de1a787d269e858` |
+| [site/assets/devicon/icons/cloudflare/cloudflare-original.svg](site/assets/devicon/icons/cloudflare/cloudflare-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/cloudflare/cloudflare-original.svg) | `6bb87edf9d3759ab11efb064a4cbe25271d4761539aa4928e68bcaf795839c63` |
+| [site/assets/devicon/icons/nodejs/nodejs-original.svg](site/assets/devicon/icons/nodejs/nodejs-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/nodejs/nodejs-original.svg) | `3218687c5ea24a4d4c0a33dc5c287da38c33a72dcfe9382469d7ce4e0bf661fb` |
+| [site/assets/devicon/icons/tauri/tauri-original.svg](site/assets/devicon/icons/tauri/tauri-original.svg) | [Source](https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/tauri/tauri-original.svg) | `ead32ee5a82726948b9038ccae84f8c071681db1df988460ecd1c8ac3b132744` |
 ### Decorative profile GIFs
 
-The five published URLs appear in the catalog at commit
-[`278efd0acc149f89992349d4a5bd349b058aaf0e`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md),
-whose repository is under the [MIT license](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/LICENSE).
-That commit establishes catalog provenance, but the URLs resolve to external
-`user-images.githubusercontent.com` blobs rather than files in the licensed
-tree. Ownership and individual licensing of those five blobs therefore remain
-**INCONCLUSIVE**. They are embedded remotely and are not vendored or
-redistributed in this repository.
+The operator requested local copies of the five existing animations on
+09/09/2026, superseding the earlier replacement-artwork approach. The files
+below are copied byte for byte, without resizing, re-encoding or removing
+frames. The README no longer loads them from another profile's uploads.
 
-| Published asset                                                                                                | Immutable catalog evidence                                                                                                                       | Use                 |
-| -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
-| [GIF 1](https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif) | [`Cool-GIFs-For-GitHub@278efd0`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md) | Profile separator   |
-| [GIF 2](https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif) | [`Cool-GIFs-For-GitHub@278efd0`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md) | Coding illustration |
-| [GIF 3](https://user-images.githubusercontent.com/74038190/212747903-e9bdf048-2dc8-41f9-b973-0e72ff07bfba.gif) | [`Cool-GIFs-For-GitHub@278efd0`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md) | Profile separator   |
-| [GIF 4](https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif) | [`Cool-GIFs-For-GitHub@278efd0`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md) | Profile decoration  |
-| [GIF 5](https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif) | [`Cool-GIFs-For-GitHub@278efd0`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md) | Profile decoration  |
+**Declared upstream license: MIT.** The original copyright and license notice
+is preserved verbatim in
+[`site/assets/profile-gifs/LICENSE`](site/assets/profile-gifs/LICENSE), from
+[`Anmol-Baranwal/Cool-GIFs-For-GitHub@278efd0acc149f89992349d4a5bd349b058aaf0e`](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/LICENSE).
+The [catalog README at that commit](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/blob/278efd0acc149f89992349d4a5bd349b058aaf0e/README.md)
+contains all five source URLs. The commit identifies the catalog revision;
+the SHA-256 values below identify the downloaded binary files.
+
+This records the catalog's license declaration, not original authorship by LCV.
+The catalog does not identify each original artist; the maintainer describes
+the indirect sourcing in
+[upstream issue #5](https://github.com/Anmol-Baranwal/Cool-GIFs-For-GitHub/issues/5#issuecomment-2019568216).
+Copying the files and preserving that notice do not establish independent
+verification of each artist's rights. Third-party rights remain with their
+respective holders.
+
+| Repository-hosted file | Original download | SHA-256 |
+| --- | --- | --- |
+| [site/assets/profile-gifs/fading-line.gif](https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/fading-line.gif) | [Source](https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif) | `66755568f640f93051ca779dd85131a85bc03d6385f7c57bdaaf388de6854fbc` |
+| [site/assets/profile-gifs/awesome-workspace.gif](https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/awesome-workspace.gif) | [Source](https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif) | `d59b78f7c6ae48d28f26e0f28794f8ad2cfd431b3c5fa268544acf5d6415043b` |
+| [site/assets/profile-gifs/curious-tech-geek.gif](https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/curious-tech-geek.gif) | [Source](https://user-images.githubusercontent.com/74038190/212747903-e9bdf048-2dc8-41f9-b973-0e72ff07bfba.gif) | `3cab8b519d8a85ecab393e388703867d2c6cfe7882d6a6a27b5ed1b6f5b718da` |
+| [site/assets/profile-gifs/pacman.gif](https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/pacman.gif) | [Source](https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif) | `d91d83139a869f7c77497036e0850d40e54b1daa42d256ea34b3bd7f54bde8ff` |
+| [site/assets/profile-gifs/gradient-line.gif](https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/gradient-line.gif) | [Source](https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif) | `f5d8f1f1971ee82a1f201aced2477d7acc11ca956308df5923e0d16860111cd4` |
 
 ## External services and generated images
+
+Dynamic services remain live; no counters, statistics, graphs, badges or service
+responses have been converted to static snapshots. The existing contribution
+snake generation, client-side API requests, refresh behavior and workflows
+are unchanged.
 
 The profile and Pages site embed responses generated or hosted by GitHub,
 Google Fonts, Shields.io, Best Practices Badge, Komarev Profile Views,

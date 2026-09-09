@@ -9,6 +9,27 @@ This repository is **not versioned**: it publishes the personal profile of
 or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
+## 09/09/2026 — Mídia do perfil hospedada no próprio repositório (LCV2-24)
+
+### Changed
+
+- Os cinco GIFs e os 13 ícones Devicon usados no perfil agora têm cópias locais
+  byte a byte, com referências ao próprio repositório; o Pages usa os ícones
+  locais. As animações, a composição e as dimensões foram preservadas.
+- Fontes, contadores, estatísticas, gráficos, badges e demais serviços dinâmicos
+  permanecem ativos, sem snapshots ou alteração dos workflows.
+- O cartão dinâmico de detalhes do README exibe `lcv-leo (LCV)` usando o
+  parâmetro oficial `name` do provedor, evitando o corte do nome. O nome do
+  perfil GitHub e o título equivalente no Pages não foram alterados.
+- Incluídos os textos MIT originais do Devicon e do catálogo dos GIFs, com
+  créditos, fontes e hashes em THIRDPARTY; a declaração do catálogo não foi
+  apresentada como comprovação de autoria individual das animações.
+- Ajustados somente o inventário de mídia, a política de imagens do Pages e
+  a descrição do teste de proveniência correspondente.
+- O teste existente de retry usa `Clock.pauseAt` do Playwright e aguarda o
+  agendamento antes de verificar o limite de 2.500 ms, sem alterar a lógica
+  do site ou relaxar as asserções.
+
 ## 02/09/2026 — Governança nativa do repositório ([#51](https://github.com/lcv-leo/lcv-leo/issues/51), LCV2-21)
 
 ### Removed

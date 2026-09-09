@@ -24,7 +24,7 @@
 <br>
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="700">
+  <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/fading-line.gif" width="700">
 </div>
 
 <br>
@@ -55,7 +55,7 @@ current:
 motto: "Fail closed, test first, ship through pull requests."
 ```
 
-<img align="right" alt="Coding" width="400" src="https://user-images.githubusercontent.com/74038190/229223263-cf2e4b07-2615-4f87-9c38-e37600f8381a.gif">
+<img align="right" alt="Coding" width="400" src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/awesome-workspace.gif">
 
 ### What I Do
 
@@ -82,31 +82,31 @@ motto: "Fail closed, test first, ship through pull requests."
 <table>
 <tr>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/typescript/typescript-original.svg" width="50" height="50" alt="TypeScript" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/typescript/typescript-original.svg" width="50" height="50" alt="TypeScript" />
     <br><sub><b>TypeScript</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/javascript/javascript-original.svg" width="50" height="50" alt="JavaScript" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/javascript/javascript-original.svg" width="50" height="50" alt="JavaScript" />
     <br><sub><b>JavaScript</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/rust/rust-original.svg" width="50" height="50" alt="Rust" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/rust/rust-original.svg" width="50" height="50" alt="Rust" />
     <br><sub><b>Rust</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/python/python-original.svg" width="50" height="50" alt="Python" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/python/python-original.svg" width="50" height="50" alt="Python" />
     <br><sub><b>Python</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/sqlite/sqlite-original.svg" width="50" height="50" alt="SQL / SQLite" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/sqlite/sqlite-original.svg" width="50" height="50" alt="SQL / SQLite" />
     <br><sub><b>SQL / SQLite</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/html5/html5-original.svg" width="50" height="50" alt="HTML5" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/html5/html5-original.svg" width="50" height="50" alt="HTML5" />
     <br><sub><b>HTML5</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/css3/css3-original.svg" width="50" height="50" alt="CSS3" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/css3/css3-original.svg" width="50" height="50" alt="CSS3" />
     <br><sub><b>CSS3</b></sub>
   </td>
 </tr>
@@ -116,11 +116,11 @@ motto: "Fail closed, test first, ship through pull requests."
 <table>
 <tr>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/react/react-original.svg" width="50" height="50" alt="React" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/react/react-original.svg" width="50" height="50" alt="React" />
     <br><sub><b>React 19</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/vitejs/vitejs-original.svg" width="50" height="50" alt="Vite" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/vitejs/vitejs-original.svg" width="50" height="50" alt="Vite" />
     <br><sub><b>Vite</b></sub>
   </td>
   <td align="center" width="100">
@@ -142,11 +142,11 @@ motto: "Fail closed, test first, ship through pull requests."
 <table>
 <tr>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/cloudflareworkers/cloudflareworkers-original.svg" width="50" height="50" alt="Cloudflare Workers" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/cloudflareworkers/cloudflareworkers-original.svg" width="50" height="50" alt="Cloudflare Workers" />
     <br><sub><b>CF Workers</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/cloudflare/cloudflare-original.svg" width="50" height="50" alt="Cloudflare Pages" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/cloudflare/cloudflare-original.svg" width="50" height="50" alt="Cloudflare Pages" />
     <br><sub><b>CF Pages</b></sub>
   </td>
   <td align="center" width="100">
@@ -154,7 +154,7 @@ motto: "Fail closed, test first, ship through pull requests."
     <br><sub><b>Hono</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Node.js" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/nodejs/nodejs-original.svg" width="50" height="50" alt="Node.js" />
     <br><sub><b>Node.js</b></sub>
   </td>
   <td align="center" width="100">
@@ -162,7 +162,7 @@ motto: "Fail closed, test first, ship through pull requests."
     <br><sub><b>D1 (SQLite)</b></sub>
   </td>
   <td align="center" width="100">
-    <img src="https://raw.githubusercontent.com/devicons/devicon/7330accdbc47e2dc0c19789a48533c4a3c50fe58/icons/tauri/tauri-original.svg" width="50" height="50" alt="Tauri" />
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/tauri/tauri-original.svg" width="50" height="50" alt="Tauri" />
     <br><sub><b>Tauri</b></sub>
   </td>
 </tr>
@@ -228,7 +228,7 @@ From idea to deployed edge worker is my favorite journey
 </div>
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/74038190/212747903-e9bdf048-2dc8-41f9-b973-0e72ff07bfba.gif" width="500" />
+  <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/curious-tech-geek.gif" width="500" />
 </div>
 
 ## Current Focus
@@ -339,7 +339,7 @@ From idea to deployed edge worker is my favorite journey
 
 <div align="center">
 
-<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lcv-leo&theme=tokyonight" width="98%" />
+<img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=lcv-leo&theme=tokyonight&name=lcv-leo%20%28LCV%29" width="98%" />
 
 <br/>
 
@@ -349,7 +349,7 @@ From idea to deployed edge worker is my favorite journey
 
 <br/><br/>
 
-<img src="https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif" width="400" />
+<img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/pacman.gif" width="400" />
 
 </div>
 
@@ -374,7 +374,7 @@ From idea to deployed edge worker is my favorite journey
 </p>
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/74038190/212284115-f47cd8ff-2ffb-4b04-b5bf-4d1c14c0247f.gif" width="400" />
+  <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/profile-gifs/gradient-line.gif" width="400" />
 </div>
 
 <div align="center">
