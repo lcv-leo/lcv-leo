@@ -9,6 +9,13 @@ This repository is **not versioned**: it publishes the personal profile of
 or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
+## Unreleased
+
+### Changed
+
+- Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.38.0 e do
+  zizmor-action para v0.6.4, com os SHAs completos das respectivas releases.
+
 ## 09/09/2026 — Mídia do perfil hospedada no próprio repositório (LCV2-24)
 
 ### Changed
