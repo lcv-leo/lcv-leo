@@ -13,6 +13,8 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ### Changed
 
+- Dependabot verifica GitHub Actions e npm todos os dias, inclusive fins de
+  semana, às 05h, e agrupa as correções de segurança separadamente por ecossistema.
 - Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.38.0 e do
   zizmor-action para v0.6.4, com os SHAs completos das respectivas releases.
 
