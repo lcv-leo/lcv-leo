@@ -65,7 +65,6 @@ the profile or Pages site.
 | `@playwright/test` | Direct development dependency                               | [Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE) | https://www.npmjs.com/package/@playwright/test |
 | `playwright`       | Transitive dependency of `@playwright/test`                 | [Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE) | https://www.npmjs.com/package/playwright       |
 | `playwright-core`  | Transitive dependency of `playwright`                       | [Apache-2.0](https://github.com/microsoft/playwright/blob/main/LICENSE) | https://www.npmjs.com/package/playwright-core  |
-| `fsevents`         | Optional transitive dependency of `playwright`; Darwin only | [MIT](https://github.com/fsevents/fsevents/blob/master/LICENSE)         | https://www.npmjs.com/package/fsevents         |
 
 Playwright's official installer additionally obtains the Chrome Headless Shell
 and the Playwright FFmpeg build selected by the installed Playwright release.

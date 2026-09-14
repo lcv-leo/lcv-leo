@@ -11,6 +11,11 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+### Fixed
+
+- Removida a referência obsoleta a fsevents do inventário de desenvolvimento;
+  o lockfile atual do Playwright não contém esse pacote.
+
 ### Changed
 
 - Dependabot verifica GitHub Actions e npm todos os dias, inclusive fins de
