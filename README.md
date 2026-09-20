@@ -3,10 +3,10 @@
 </div>
 
 <h1 align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV+Ideas+%26+Software" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Kotlin+%E2%80%A2+Jetpack+Compose+%E2%80%A2+Android;Building+Real+Products+at+LCV+Ideas+%26+Software" alt="Typing SVG" />
 </h1>
 
-<h3 align="center">Founder & Developer @ LCV Ideas & Software<br>TypeScript • React • Cloudflare Workers • Rust/Tauri • MCP</h3>
+<h3 align="center">Founder & Developer @ LCV Ideas & Software<br>TypeScript • React • Cloudflare Workers • Rust/Tauri • Kotlin/Compose • MCP</h3>
 
 <p align="center">
   <em>A passionate developer from Brazil</em><br>
@@ -37,10 +37,11 @@ role: Founder, Full-Stack & Edge Developer
 location: Brazil
 organization: LCV Ideas & Software — https://www.lcv.dev
 stack:
-  languages: [TypeScript, JavaScript, Rust, Python, SQL, HTML, CSS]
+  languages: [TypeScript, JavaScript, Kotlin, Rust, Python, SQL, HTML, CSS]
   frontend:  [React 19, Vite, TipTap, PWA/Workbox, DOMPurify]
   edge:      [Cloudflare Workers, Cloudflare Pages, Hono, D1 (SQLite), Secrets Store, Cron Triggers]
   desktop:   [Tauri (Rust)]
+  mobile:    [Kotlin, Jetpack Compose, Material 3, Hilt, Room, Retrofit/OkHttp, Gradle]
   ai:        [MCP servers, Vertex AI (Gemini), Claude, GPT, Grok, DeepSeek, Perplexity]
   payments:  [Mercado Pago (Orders API + 3DS), Stripe (planned)]
   quality:   [Vitest, Zod, Biome, ESLint, Prettier, CodeQL, Zizmor, OpenSSF Scorecard]
@@ -50,6 +51,7 @@ current:
   - ultrabrain-mcp → Structured deep-reasoning MCP server [npm]
   - Reflexos da Alma → Public blog PWA (React + Workers + D1 + Vertex AI) [Live]
   - Oráculo Financeiro → Inflation-indexed fixed-income dashboard (React + Workers + D1) [Live]
+  - Calculadora Android → Native Kotlin/Compose port of the currency calculator [v1.0.0 on Google Play]
   - Maestro        → Desktop writing/orchestration studio (Tauri + Rust) [Shipping]
   - Sponsor Motor  → Donation payments worker (Mercado Pago → Stripe migration planned) [Live]
 motto: "Fail closed, test first, ship through pull requests."
@@ -61,6 +63,8 @@ motto: "Fail closed, test first, ship through pull requests."
 
 - Building **cross-review** — an MCP server that runs adversarial code review across **6 AI models** (GPT, Claude, Gemini, DeepSeek, Grok, Perplexity) with unanimous-convergence gates, evidence custody and cost accounting → Live on npm
 - Building **ultrabrain-mcp** — a structured deep-reasoning MCP server with branching, review and export → Live on npm
+- Shipping **Calculadora Android** — the currency calculator rebuilt as a native Android app in **Kotlin + Jetpack Compose** (Material 3, Hilt, Room, Retrofit/OkHttp), with the calculation engine as pure Kotlin in `:core:calc`; **v1.0.0 published on Google Play**, no tracking, no ads, no account, AGPL-3.0
+- Starting the **Astrólogo** and **Maestro** Android editions — Gradle projects opened, native ports ahead
 - Shipping **Reflexos da Alma** — a public blog PWA on Cloudflare (React 19, Workers, D1, Vertex AI chat/summaries, TipTap content pipeline)
 - Shipping **Oráculo Financeiro** — an inflation-indexed fixed-income dashboard (React, Workers, D1, AI analysis)
 - Building **Maestro** — a desktop writing & orchestration studio in **Tauri/Rust** with deterministic engines (citations, link integrity, web evidence)
@@ -168,6 +172,33 @@ motto: "Fail closed, test first, ship through pull requests."
 </tr>
 </table>
 
+### Mobile (Android)
+<table>
+<tr>
+  <td align="center" width="100">
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/kotlin/kotlin-original.svg" width="50" height="50" alt="Kotlin" />
+    <br><sub><b>Kotlin</b></sub>
+  </td>
+  <td align="center" width="100">
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/android/android-original.svg" width="50" height="50" alt="Android" />
+    <br><sub><b>Android</b></sub>
+  </td>
+  <td align="center" width="100">
+    <img src="https://raw.githubusercontent.com/lcv-leo/lcv-leo/main/site/assets/devicon/icons/jetpackcompose/jetpackcompose-original.svg" width="50" height="50" alt="Jetpack Compose" />
+    <br><sub><b>Jetpack Compose</b></sub>
+  </td>
+</tr>
+</table>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white" />
+  <img src="https://img.shields.io/badge/Material_3-6750A4?style=for-the-badge&logo=materialdesign&logoColor=white" />
+  <img src="https://img.shields.io/badge/Hilt-2196F3?style=for-the-badge&logo=android&logoColor=white" />
+  <img src="https://img.shields.io/badge/Room-FF6F00?style=for-the-badge&logo=sqlite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Retrofit_%2F_OkHttp-3E4348?style=for-the-badge&logo=square&logoColor=white" />
+  <img src="https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=googleplay&logoColor=white" />
+</p>
+
 ### AI & MCP
 <p align="center">
   <img src="https://img.shields.io/badge/Model_Context_Protocol-000000?style=for-the-badge&logo=anthropic&logoColor=white" />
@@ -255,6 +286,14 @@ From idea to deployed edge worker is my favorite journey
 
 <br><br>
 
+**Calculadora Android**
+<br>Kotlin + Jetpack Compose + Material 3
+<br>Native Android port of the currency calculator — pure-Kotlin engine, Room cache, Hilt injection; no tracking, no ads, no account
+<br>
+<img src="https://img.shields.io/badge/Status-Live_on_Google_Play-brightgreen?style=flat-square" />
+
+<br><br>
+
 **Reflexos da Alma**
 <br>React 19 + Cloudflare Workers + D1 + Vertex AI
 <br>Public blog PWA with AI chat, comments moderation, TipTap content pipeline
@@ -300,6 +339,7 @@ From idea to deployed edge worker is my favorite journey
 <img src="https://img.shields.io/badge/Mercado_Pago_3DS-00B1EA?style=flat-square&logo=mercadopago&logoColor=white" />
 <img src="https://img.shields.io/badge/HMAC_signed_webhooks-333333?style=flat-square&logo=letsencrypt&logoColor=white" />
 <img src="https://img.shields.io/badge/Tauri_desktop-24C8DB?style=flat-square&logo=tauri&logoColor=white" />
+<img src="https://img.shields.io/badge/Kotlin_%2B_Compose-7F52FF?style=flat-square&logo=kotlin&logoColor=white" />
 <img src="https://img.shields.io/badge/Vitest_TDD-6E9F18?style=flat-square&logo=vitest&logoColor=white" />
 <img src="https://img.shields.io/badge/Zod_validation-3E67B1?style=flat-square&logo=zod&logoColor=white" />
 <img src="https://img.shields.io/badge/npm_publishing-CB3837?style=flat-square&logo=npm&logoColor=white" />
