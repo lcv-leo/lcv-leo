@@ -4,6 +4,16 @@
 name: Profile Media Liveness
 
 on:
+  # A change to the gate must exercise the gate; without this a pull request
+  # touching only these files would run no workflow at all.
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/check-readme-media-liveness.mjs"
+      - "scripts/check-readme-media-liveness.test.mjs"
+      - "scripts/pages-provenance-contract.mjs"
+      - ".github/workflows/media-liveness.yml"
   schedule:
     - cron: "41 9 * * *" # daily, 06:41 in Brasília; after the Pages deploy of the day
   workflow_dispatch:
@@ -35,5 +45,8 @@ jobs:
       - name: Verify the liveness gate itself
         run: node --test scripts/check-readme-media-liveness.test.mjs
 
+      # Pull requests only prove the gate's own logic: probing live third-party
+      # hosts from untrusted refs would make review depend on their uptime.
       - name: Probe every embedded profile image
+        if: github.event_name != 'pull_request'
         run: node scripts/check-readme-media-liveness.mjs
