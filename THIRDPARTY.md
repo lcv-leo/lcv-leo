@@ -156,14 +156,20 @@ are unchanged.
 
 The profile and Pages site embed responses generated or hosted by GitHub,
 Google Fonts, Shields.io, Best Practices Badge, Komarev Profile Views,
-Readme Typing SVG, GitHub Readme Streak Stats, GitHub Readme Activity Graph,
-GitHub Profile Summary Cards, and Capsule Render. They also link to GitHub,
-Slack, and LCV Ideas & Software services. Those responses are not vendored or
-licensed as repository content; each provider's current terms and each
-underlying data source continue to apply.
+Readme Typing SVG, GitHub Readme Streak Stats, GitHub Profile Summary Cards,
+and Capsule Render. They also link to GitHub, Slack, and LCV Ideas & Software
+services. Those responses are not vendored or licensed as repository content;
+each provider's current terms and each underlying data source continue to apply.
 
 The Pages JavaScript reads public profile and repository data from the GitHub
-REST API, and the contribution-snake generator reads the GitHub GraphQL API.
+REST API, and the contribution-snake and contribution-graph generators read the
+GitHub GraphQL API.
+
+The contribution activity graph is rendered by this repository from that
+official calendar and served from lcv-leo.lcv.dev. It is no longer requested
+from GitHub Readme Activity Graph, whose public deployment was disabled by its
+host; the card stayed dynamic and was not converted to a static snapshot.
+
 The repository-local provenance gate submits the profile Markdown to GitHub's
 official REST Markdown endpoint in `gfm` mode so only images rendered by GitHub
 enter the exact media catalog. Pull-request CI uses the public endpoint without

@@ -327,7 +327,7 @@ From idea to deployed edge worker is my favorite journey
 
 <br/><br/>
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=lcv-leo&theme=tokyo-night&hide_border=true&area=true&custom_title=Leonardo%27s%20Contribution%20Graph" width="98%" alt="Contribution Graph" />
+<img src="https://lcv-leo.lcv.dev/github-contribution-graph.svg" width="98%" alt="Contribution Graph" />
 
 <br/><br/>
 
