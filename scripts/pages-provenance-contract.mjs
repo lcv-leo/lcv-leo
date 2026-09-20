@@ -15,6 +15,9 @@ export const DEVICON_PATHS = [
   "icons/cloudflare/cloudflare-original.svg",
   "icons/nodejs/nodejs-original.svg",
   "icons/tauri/tauri-original.svg",
+  "icons/kotlin/kotlin-original.svg",
+  "icons/android/android-original.svg",
+  "icons/jetpackcompose/jetpackcompose-original.svg",
 ];
 export const DEVICON_URLS = DEVICON_PATHS.map((path) => `${DEVICON_PREFIX}${path}`);
 
@@ -45,6 +48,12 @@ const SHIELDS_PATHS = [
   "badge/DOMPurify-7952B3?style=flat-square",
   "badge/Hono-E36002?style=flat-square&logo=hono&logoColor=white",
   "badge/D1-F38020?style=flat-square&logo=cloudflare&logoColor=white",
+  "badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white",
+  "badge/Material_3-6750A4?style=for-the-badge&logo=materialdesign&logoColor=white",
+  "badge/Hilt-2196F3?style=for-the-badge&logo=android&logoColor=white",
+  "badge/Room-FF6F00?style=for-the-badge&logo=sqlite&logoColor=white",
+  "badge/Retrofit_%2F_OkHttp-3E4348?style=for-the-badge&logo=square&logoColor=white",
+  "badge/Google_Play-414141?style=for-the-badge&logo=googleplay&logoColor=white",
   "badge/Model_Context_Protocol-000000?style=for-the-badge&logo=anthropic&logoColor=white",
   "badge/Vertex_AI_(Gemini)-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white",
   "badge/Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white",
@@ -72,6 +81,7 @@ const SHIELDS_PATHS = [
   "badge/npm_Publishing-CB3837?style=for-the-badge&logo=npm&logoColor=white",
   "badge/Status-Live_on_npm-brightgreen?style=flat-square",
   "badge/Status-Live_on_npm-brightgreen?style=flat-square",
+  "badge/Status-Live_on_Google_Play-brightgreen?style=flat-square",
   "badge/Status-Live-brightgreen?style=flat-square",
   "badge/Status-Live-brightgreen?style=flat-square",
   "badge/Status-Shipping-blue?style=flat-square",
@@ -86,6 +96,7 @@ const SHIELDS_PATHS = [
   "badge/Mercado_Pago_3DS-00B1EA?style=flat-square&logo=mercadopago&logoColor=white",
   "badge/HMAC_signed_webhooks-333333?style=flat-square&logo=letsencrypt&logoColor=white",
   "badge/Tauri_desktop-24C8DB?style=flat-square&logo=tauri&logoColor=white",
+  "badge/Kotlin_%2B_Compose-7F52FF?style=flat-square&logo=kotlin&logoColor=white",
   "badge/Vitest_TDD-6E9F18?style=flat-square&logo=vitest&logoColor=white",
   "badge/Zod_validation-3E67B1?style=flat-square&logo=zod&logoColor=white",
   "badge/npm_publishing-CB3837?style=flat-square&logo=npm&logoColor=white",
@@ -102,7 +113,7 @@ const SHIELDS_PATHS = [
 
 const README_OTHER_IMAGE_URLS = [
   README_BRAND_LOGO_URL,
-  "https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Building+Real+Products+at+LCV+Ideas+%26+Software",
+  "https://readme-typing-svg.herokuapp.com?font=Poppins&weight=600&size=32&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=820&lines=Hi+I'm+Leonardo+Cardozo+Vargas;Full-Stack+%26+Edge+Developer;TypeScript+%E2%80%A2+React+%E2%80%A2+Cloudflare;Rust+%E2%80%A2+Tauri+%E2%80%A2+MCP+Servers;Kotlin+%E2%80%A2+Jetpack+Compose+%E2%80%A2+Android;Building+Real+Products+at+LCV+Ideas+%26+Software",
   "https://komarev.com/ghpvc/?username=lcv-leo&label=Profile%20Views&color=3B82F6&style=flat-square",
   "https://www.bestpractices.dev/projects/14239/badge",
   "https://streak-stats.demolab.com/?user=lcv-leo&theme=tokyonight&hide_border=true",

@@ -11,6 +11,20 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+### Added
+
+- O Android entrou no perfil: o README e a página passam a declarar a camada
+  móvel do portfólio — Kotlin, Android, Jetpack Compose e Gradle com ícones
+  próprios, e Material 3, Hilt, Room e Retrofit/OkHttp como selos. A
+  **Calculadora Android** aparece com a v1.0.0 publicada na Google Play, motor
+  de cálculo em Kotlin puro, sem rastreamento, sem anúncio e sem conta; as
+  edições Android do Astrólogo e do Maestro constam como iniciadas. Os quatro
+  ícones novos foram vendorizados do mesmo commit fixado do Devicon já em uso,
+  com seus SHA-256 registrados no inventário. O Gradle entra como selo, e não
+  como ícone: o `gradle-original.svg` é `#02303a` e fica ilegível sobre o fundo
+  escuro tanto da página quanto do README em tema escuro — medido na
+  renderização, não suposto (LCV-203).
+
 ### Fixed
 
 - O Contribution Graph do README voltou a renderizar: o cartão passou a ser
