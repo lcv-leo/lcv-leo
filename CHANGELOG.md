@@ -13,6 +13,13 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ### Fixed
 
+- O Contribution Graph do README voltou a renderizar: o cartão passou a ser
+  gerado neste repositório a partir do calendário oficial da API GraphQL do
+  GitHub e servido por `lcv-leo.lcv.dev`, no lugar do endpoint público do
+  GitHub Readme Activity Graph, desativado pelo provedor (HTTP 402
+  `DEPLOYMENT_DISABLED`). A página `lcv-leo.lcv.dev` acompanhou a troca, e a
+  CSP derivada deixou de admitir o host desativado (LCV2-27).
+
 - Removida a referência obsoleta a fsevents do inventário de desenvolvimento;
   o lockfile atual do Playwright não contém esse pacote.
 

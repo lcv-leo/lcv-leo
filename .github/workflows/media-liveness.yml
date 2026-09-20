@@ -1,0 +1,52 @@
+# Reaches the remote images the profile embeds and fails when one stops serving
+# an image. The provenance gate blocks every external request by design, so this
+# is the only check that can notice a card's host going dark.
+name: Profile Media Liveness
+
+on:
+  # A change to the gate must exercise the gate; without this a pull request
+  # touching only these files would run no workflow at all.
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "scripts/check-readme-media-liveness.mjs"
+      - "scripts/check-readme-media-liveness.test.mjs"
+      - "scripts/pages-provenance-contract.mjs"
+      - ".github/workflows/media-liveness.yml"
+  schedule:
+    - cron: "41 9 * * *" # daily, 06:41 in Brasília; after the Pages deploy of the day
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: media-liveness
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: Probe embedded profile media
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read # Read the provenance contract that lists the embedded URLs.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+
+      - name: Verify the liveness gate itself
+        run: node --test scripts/check-readme-media-liveness.test.mjs
+
+      # Pull requests only prove the gate's own logic: probing live third-party
+      # hosts from untrusted refs would make review depend on their uptime.
+      - name: Probe every embedded profile image
+        if: github.event_name != 'pull_request'
+        run: node scripts/check-readme-media-liveness.mjs
