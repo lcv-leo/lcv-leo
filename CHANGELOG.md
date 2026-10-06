@@ -39,6 +39,10 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ### Changed
 
+- Update the official Linear Release Action to v0.18.1 at its full commit SHA,
+  select the official CLI v0.18.0 explicitly and retain upstream checksum
+  verification (LCV-316).
+
 - Dependabot verifica GitHub Actions e npm todos os dias, inclusive fins de
   semana, às 05h, e agrupa as correções de segurança separadamente por ecossistema.
 - Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.38.0 e do
