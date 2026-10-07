@@ -11,6 +11,8 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Update the official `actions/upload-artifact` to v7.0.2 at complete commit SHAs (LCV-334).
+
 ### Added
 
 - O Android entrou no perfil: o README e a página passam a declarar a camada
