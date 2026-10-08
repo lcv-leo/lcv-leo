@@ -11,6 +11,8 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Update the official CodeQL SARIF upload Action to v4.38.3 at its complete release commit SHA (LCV-336).
+
 - Update the official `actions/upload-artifact` to v7.0.2 at complete commit SHAs (LCV-334).
 
 ### Added
@@ -47,7 +49,7 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 - Dependabot verifica GitHub Actions e npm todos os dias, inclusive fins de
   semana, às 05h, e agrupa as correções de segurança separadamente por ecossistema.
-- Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.38.0 e do
+- Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.38.3 e do
   zizmor-action para v0.6.4, com os SHAs completos das respectivas releases.
 
 ## 09/09/2026 — Mídia do perfil hospedada no próprio repositório (LCV2-24)
