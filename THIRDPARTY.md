@@ -38,7 +38,7 @@ used by code scanning) is governed by that Action's own release and license.
 | `actions/upload-pages-artifact`    | [MIT](https://github.com/actions/upload-pages-artifact/blob/main/LICENSE)    | https://github.com/actions/upload-pages-artifact    | Package the Pages artifact                                  |
 | `actions/deploy-pages`             | [MIT](https://github.com/actions/deploy-pages/blob/main/LICENSE)             | https://github.com/actions/deploy-pages             | Deploy the Pages artifact                                   |
 | `actions/upload-artifact`          | [MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)          | https://github.com/actions/upload-artifact          | Retain the Scorecard SARIF artifact                         |
-| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/main/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
+| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/24c54180a607b1449ed407dd24f251e4e9147c8d/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
 | `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/main/LICENSE)         | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
 
