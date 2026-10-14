@@ -10,6 +10,9 @@ or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
+- Update the official OpenSSF Scorecard Action to v2.5.0 at its complete release
+  commit SHA, preserving workflow inputs and permissions (LCV-403).
+
 
 - Update the official CodeQL SARIF upload Action to v4.38.3 at its complete release commit SHA (LCV-336).
 
