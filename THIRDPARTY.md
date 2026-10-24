@@ -38,9 +38,9 @@ used by code scanning) is governed by that Action's own release and license.
 | `actions/upload-pages-artifact`    | [MIT](https://github.com/actions/upload-pages-artifact/blob/main/LICENSE)    | https://github.com/actions/upload-pages-artifact    | Package the Pages artifact                                  |
 | `actions/deploy-pages`             | [MIT](https://github.com/actions/deploy-pages/blob/main/LICENSE)             | https://github.com/actions/deploy-pages             | Deploy the Pages artifact                                   |
 | `actions/upload-artifact`          | [MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)          | https://github.com/actions/upload-artifact          | Retain the Scorecard SARIF artifact                         |
-| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
+| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/9b3254085494b55a0f7c4c2b3d2d52cc712ce370/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
-| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/main/LICENSE)         | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
+| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/53290badfa369cb0bf7ad16342cb62c2fa47ac7b/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
 scanning default setup runs is governed by the
