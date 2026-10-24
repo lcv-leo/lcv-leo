@@ -26,11 +26,13 @@ The licenses below apply only to their respective third-party components.
 Every external Action is pinned to an immutable commit SHA in the workflows, as
 the repository's Actions policy requires. Tooling that an Action selects at
 runtime (the Linear CLI, the zizmor tool and Scorecard image, the CodeQL bundle
-used by code scanning) is governed by that Action's own release and license.
+used by code scanning, the `oven-sh/setup-bun` step that the Claude Code Action
+runs) is governed by that Action's own release and license; the Claude Code
+software itself has its own license, noted below the table.
 
 | Component                          | License                                                                      | Source                                              | Purpose                                                     |
 | ---------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
-| `actions/checkout`                 | [MIT](https://github.com/actions/checkout/blob/main/LICENSE)                 | https://github.com/actions/checkout                 | Read repository snapshots without persisting credentials    |
+| `actions/checkout`                 | [MIT](https://github.com/actions/checkout/blob/main/LICENSE)                 | https://github.com/actions/checkout                 | Read snapshots; only the Claude Code job keeps credentials  |
 | `actions/setup-node`               | [MIT](https://github.com/actions/setup-node/blob/main/LICENSE)               | https://github.com/actions/setup-node               | Configure the Node.js runtime for validation and generation |
 | `actions/dependency-review-action` | [MIT](https://github.com/actions/dependency-review-action/blob/main/LICENSE) | https://github.com/actions/dependency-review-action | Review dependency changes on pull requests                  |
 | `linear/linear-release-action`     | [MIT](https://github.com/linear/linear-release-action/blob/main/LICENSE)     | https://github.com/linear/linear-release-action     | Synchronize successful Pages deployments with Linear        |
@@ -41,10 +43,15 @@ used by code scanning) is governed by that Action's own release and license.
 | `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/9b3254085494b55a0f7c4c2b3d2d52cc712ce370/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
 | `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/53290badfa369cb0bf7ad16342cb62c2fa47ac7b/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
+| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/main/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
 scanning default setup runs is governed by the
 [GitHub CodeQL Terms and Conditions](https://github.com/github/codeql-cli-binaries/blob/main/LICENSE.md).
+
+`anthropics/claude-code-action` is MIT-licensed; the Claude Code software that
+it installs at runtime is governed by its own
+[license](https://github.com/anthropics/claude-code/blob/main/LICENSE.md).
 
 The official `ossf/scorecard-action` delegates at runtime to a container image
 addressed by a version tag, which is mutable and therefore not covered by the
@@ -97,7 +104,6 @@ The MIT license applies to the Devicon project assets. Devicon's
 [upstream notice](https://github.com/devicons/devicon/blob/7330accdbc47e2dc0c19789a48533c4a3c50fe58/README.md)
 also states that product names, logos and brands remain subject to their
 respective owners' trademark and brand policies.
-
 
 The vendored icon files come from the exact Devicon commit above:
 

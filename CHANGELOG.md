@@ -10,6 +10,17 @@ or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
+- Add the `Claude Code` workflow (`.github/workflows/claude.yml`), an exact copy
+  of the fleet's canonical file: the official `anthropics/claude-code-action`
+  pinned by full commit SHA, inline review threads, commits signed through the
+  GitHub API, no action on Dependabot pull requests, authenticated by the
+  repository secret `CLAUDE_CODE_OAUTH_TOKEN` and the Claude GitHub App
+  installed on the personal account. Add a reduced English `CLAUDE.md` for the
+  GitHub Actions runtime, list the Action in `THIRDPARTY.md`, where the checkout
+  row now states that only the Claude Code job keeps credentials, and record the
+  second credential exception in `SECURITY.md` and `CONTRIBUTING.md` (LCVLEO-42,
+  LCV-441).
+
 - Ignore the operator-mandated repository-local `temp/` workspace so audit and
   test artifacts cannot be committed (LCV-414).
 
