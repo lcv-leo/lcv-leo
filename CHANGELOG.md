@@ -10,6 +10,14 @@ or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
+- Authenticate the `Claude Code` workflow to the Claude API by workload
+  identity federation under its own Anthropic federation rule, which accepts
+  only this repository: the job's GitHub OIDC token is exchanged for a
+  short-lived Claude API token, and the workflow holds only identifiers. The
+  repository secret `CLAUDE_CODE_OAUTH_TOKEN` was deleted on 25/10/2026, so
+  `SECURITY.md` and `CONTRIBUTING.md` no longer list it as a credential
+  exception (LCVLEO-43, LCV-455).
+
 - Add the `Claude Code` workflow (`.github/workflows/claude.yml`), an exact copy
   of the fleet's canonical file: the official `anthropics/claude-code-action`
   pinned by full commit SHA, inline review threads, commits signed through the
@@ -26,7 +34,6 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 - Update the official OpenSSF Scorecard Action to v2.5.0 at its complete release
   commit SHA, preserving workflow inputs and permissions (LCV-403).
-
 
 - Update the official CodeQL SARIF upload Action to v4.39.1 at its complete release commit SHA (LCV-438).
 
