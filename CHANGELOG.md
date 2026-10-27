@@ -10,6 +10,10 @@ or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
+- Update the official Claude Code Action to v1.0.263 at its complete immutable
+  release commit SHA, preserving the workflow inputs, permissions and behavior
+  (LCV-465).
+
 - Authenticate the `Claude Code` workflow to the Claude API by workload
   identity federation under its own Anthropic federation rule, which accepts
   only this repository: the job's GitHub OIDC token is exchanged for a
