@@ -1,0 +1,145 @@
+# Depot CI Migration
+# Source: .github\workflows\pages.yml
+#
+# Changes made:
+# - Rewrote .github/ path references to .depot/
+# - Changed GitHub runs-on labels to their Depot equivalents
+
+# Generates the contribution grid animation and publishes site/ to GitHub Pages
+# (custom domain lcv-leo.lcv.dev), without an artifact branch.
+name: Deploy Pages
+
+on:
+  pull_request:
+    branches:
+      - main
+    # `edited` covers a pull request retargeted to main; without it the
+    # required check would not run until the next push.
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+      - edited
+  schedule:
+    - cron: "17 6 * * *" # daily, 03:17 in Brasília; avoids the top-of-the-hour peak
+  push:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "README.md"
+      - "THIRDPARTY.md"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.mjs"
+      - "scripts/generate-contribution-snake.mjs"
+      - "scripts/generate-contribution-snake.test.mjs"
+      - "scripts/generate-contribution-graph.mjs"
+      - "scripts/generate-contribution-graph.test.mjs"
+      - "scripts/pages-provenance-contract.mjs"
+      - "scripts/pages-provenance.spec.mjs"
+      - "scripts/provenance-drift.test.mjs"
+      - ".depot/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test Pages
+    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    timeout-minutes: 15
+    permissions:
+      contents: read # Check out untrusted PR content without granting write access or persisting credentials.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+
+      - name: Install locked test dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts
+
+      - name: Install official Playwright Chromium headless shell
+        run: ./node_modules/.bin/playwright install --with-deps --only-shell chromium
+
+      - name: Run repository tests without credentials
+        run: >-
+          node --test
+          scripts/generate-contribution-snake.test.mjs
+          scripts/generate-contribution-graph.test.mjs
+          scripts/provenance-drift.test.mjs
+
+      - name: Run browser provenance tests without credentials
+        if: github.event_name == 'pull_request'
+        run: ./node_modules/.bin/playwright test
+
+      - name: Run browser provenance tests on a trusted ref
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./node_modules/.bin/playwright test
+
+  build:
+    if: github.event_name != 'pull_request'
+    name: Build GitHub Pages artifact
+    needs: test
+    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    timeout-minutes: 10
+    permissions:
+      contents: read # Check out the profile and static site sources.
+      pages: read # Let configure-pages read the existing Pages site metadata.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          check-latest: true
+          package-manager-cache: false
+
+      - name: Generate contribution snake SVGs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USER: lcv-leo
+        run: node scripts/generate-contribution-snake.mjs
+
+      - name: Generate contribution activity graph SVG
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_USER: lcv-leo
+        run: node scripts/generate-contribution-graph.mjs
+
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    name: Deploy GitHub Pages
+    needs: build
+    runs-on: depot-ubuntu-latest # was: ubuntu-latest. Mapped standard GitHub runner to Depot equivalent.
+    timeout-minutes: 10
+    permissions:
+      pages: write # Publish the validated Pages artifact.
+      id-token: write # Request the OIDC token used by Pages deployment.
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
