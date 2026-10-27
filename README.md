@@ -444,3 +444,7 @@ From idea to deployed edge worker is my favorite journey
     <a href="THIRDPARTY.md">third-party notices</a>.
   </small>
 </p>
+
+## Entire
+
+See [Entire setup, merge gates and verification evidence](docs/entire.md).

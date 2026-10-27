@@ -16,3 +16,8 @@ issue, pull request or review in this repository:
   per finding, with a priority badge). A review does not change files.
 - Change request: work on a `claude/...` branch or on the pull request you were given, as the
   action defines.
+
+<!-- entire-agent:begin -->
+Read .entire/agent-guide.md for this repository's workflow, source inspection, and verification guidance.
+@.entire/agent-guide.md
+<!-- entire-agent:end -->
