@@ -53,9 +53,9 @@ GitHub continues enforcing signatures, resolved review conversations, security, 
 
 After a real captured change, inspect its signed commit and use `entire checkpoint explain <checkpoint-id> --repo gh/lcv-leo/lcv-leo --json` to retrieve the actual remote checkpoint. Record the commit, checkpoint and Trail evidence in LCV-477. Never publish credentials, customer data or unredacted images in session history.
 
-## Windows console limitation
+## Windows background-worker correction
 
-Entire subprocesses can create visible terminal windows on this Windows host. A read-only reproduction recorded a Git console even when the parent was started without a window. A PowerShell `-WindowStyle Hidden` wrapper did not eliminate the observed windows. No hook workaround has been applied or validated. Track the diagnosis in LCV-477; preserve hook input/output, exit codes and capture when evaluating an official fix. This is separate from configuration and hosted-memory synchronization.
+The Windows background-worker issue was reproduced and corrected locally on 27 October 2026, with explicit operator authorization. The installed CLI is `0.12.2-lcv.windows-console.1`, based on upstream v0.12.2. Workers now retain a headless console that Git children inherit; no hook-hiding wrapper was added. The regression failed before the patch and passed afterward, the execx package passed, and both the built CLI and installed shim completed the observed status command with zero visible windows. The operator confirmed that the interruptions stopped. [Upstream issue #2926](https://github.com/entireio/cli/issues/2926) contains the full patch, context and limits. This is a local correction, not an official release or proof of the full upstream test suite; a reinstall can replace it. LCV-477 records the installed binary hash and operator confirmation.
 
 ## Official references
 
