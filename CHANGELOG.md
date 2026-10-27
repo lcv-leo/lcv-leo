@@ -10,6 +10,10 @@ or a numbered artifact. Entries are grouped by date rather than semantic
 version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
+
+- Configure official Entire Brain/Graph guidance and the Codex MCP; document
+  repository-specific merge gates, required branch freshness, removal of the
+  retired Depot gate, and the remaining checkpoint/Trail evidence (LCV-477).
 - Update the official Claude Code Action to v1.0.263 at its complete immutable
   release commit SHA, preserving the workflow inputs, permissions and behavior
   (LCV-465).
