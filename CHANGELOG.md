@@ -11,6 +11,10 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Update the official Claude Code Action to v1.0.264 at its complete immutable
+  release commit SHA, preserving existing workflow inputs and permissions
+  (LCV-474/LCV-481).
+
 - Configure official Entire Brain/Graph guidance and the Codex MCP; document
   repository-specific merge gates, required branch freshness, removal of the
   retired Depot gate, and the remaining checkpoint/Trail evidence (LCV-477).
