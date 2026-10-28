@@ -49,6 +49,12 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ### Added
 
+- Set Entire `commit_linking` to `always` and document the enterprise rule for
+  running Entire and GitHub together: agent commits link to their captured
+  session without a prompt, each push is followed by proof that its checkpoint
+  reached GitHub, and one remote dispatch is generated per pull request
+  (LCV-477).
+
 - O Android entrou no perfil: o README e a página passam a declarar a camada
   móvel do portfólio — Kotlin, Android, Jetpack Compose e Gradle com ícones
   próprios, e Material 3, Hilt, Room e Retrofit/OkHttp como selos. A
