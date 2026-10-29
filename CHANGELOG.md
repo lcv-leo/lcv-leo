@@ -11,6 +11,10 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Enable native Google Antigravity CLI (`agy`) hooks in `.agents/hooks.json` and
+  document the Antigravity integration and MCP configuration in `docs/entire.md`
+  (LCV-477).
+
 - Update the official Claude Code Action to v1.0.264 at its complete immutable
   release commit SHA, preserving existing workflow inputs and permissions
   (LCV-474/LCV-481).
