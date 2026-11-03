@@ -11,6 +11,9 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Update the official Zizmor Action to v0.8.1 and its explicitly selected
+  analyzer to 1.32.0 at their immutable release coordinates (LCV-542).
+
 - Update the official Linear Release Action to v0.18.2 and Claude Code Action
   to v1.0.266 at their complete immutable release commit SHAs, preserving the
   existing workflow inputs and official Linear CLI v0.18.0 (LCV-488; LCV-518).

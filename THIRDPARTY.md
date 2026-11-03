@@ -42,7 +42,7 @@ software itself has its own license, noted below the table.
 | `actions/upload-artifact`          | [MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)          | https://github.com/actions/upload-artifact          | Retain the Scorecard SARIF artifact                         |
 | `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/9b3254085494b55a0f7c4c2b3d2d52cc712ce370/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
-| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/53290badfa369cb0bf7ad16342cb62c2fa47ac7b/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
+| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/45d7276c9ca790aabd705e31ca99c6185c3e76dd/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
 | `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/main/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
