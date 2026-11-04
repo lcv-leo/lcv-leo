@@ -1,11 +1,9 @@
 #!/bin/sh
-# Reports one deploy to Cursor Rollouts. Entry points: bootstrap, start, finish.
+# Reports one deploy to Cursor Rollouts. Entry points: start, finish.
 # A failure to report names the cause and returns success so the deploy continues.
 # The bearer token stays in this process. It is not written to disk, so a later
 # step cannot read it. start creates the environment and the service and then
-# the deployment, so one process exchanges the key once. The rejection marker
-# is not a credential: it only stops a second process in the same job from
-# repeating the annotation after a rejected key.
+# the deployment, so one process exchanges the key once.
 
 rollouts_stopped=0
 rollouts_temps=""
@@ -43,32 +41,19 @@ rollouts_new_temp() {
 rollouts_state_dir="${RUNNER_TEMP:-/tmp}"
 rollouts_state_key="$(printf '%s' "${CHANGE_MONITOR_ENV:-}-${CHANGE_MONITOR_SERVICE:-}" | tr -c 'A-Za-z0-9._-' '_')"
 rollouts_state_file="${rollouts_state_dir}/rollouts-${rollouts_state_key}.json"
-rollouts_rejection_file="${rollouts_state_dir}/rollouts-exchange-rejected"
-
-rollouts_clear_rejection() {
-  rm -f "$rollouts_rejection_file"
-}
 
 rollouts_unavailable() {
-  call="${1:-}"
+  call="$1"
   status="${2:-}"
-  if [ -n "$call" ] && [ -n "$status" ]; then
+  if [ -n "$status" ]; then
     rollouts_note "Rollouts API unavailable for ${call} (HTTP ${status}). The deploy was not reported."
-  elif [ -n "$call" ]; then
-    rollouts_note "Rollouts API unavailable for ${call}. The deploy was not reported."
   else
-    rollouts_note "Rollouts API unavailable, deploy not reported"
+    rollouts_note "Rollouts API unavailable for ${call}. The deploy was not reported."
   fi
   rollouts_halt
 }
 
 rollouts_rejected() {
-  if [ -s "$rollouts_rejection_file" ]; then
-    rollouts_halt
-    return 0
-  fi
-  printf '%s\n' "$1 $2" > "$rollouts_rejection_file"
-  chmod 600 "$rollouts_rejection_file" 2>/dev/null || true
   rollouts_error "CURSOR_API_KEY was rejected (HTTP ${1}) by ${2}. Replace the CURSOR_API_KEY secret with a team API key from https://cursor.com/dashboard/api-keys. A personal key or a key with no team access is rejected. The deploy continues."
   rollouts_halt
 }
@@ -87,10 +72,6 @@ rollouts_json() {
 rollouts_exchange() {
   [ "$rollouts_stopped" -eq 1 ] && return 0
   if [ -n "${TOKEN:-}" ]; then
-    return 0
-  fi
-  if [ -s "$rollouts_rejection_file" ]; then
-    rollouts_halt
     return 0
   fi
   rollouts_new_temp exchange_body
@@ -167,13 +148,11 @@ rollouts_ensure_catalog() {
 if [ "${1:-}" = "finish" ]; then
   if [ ! -f "$rollouts_state_file" ]; then
     rollouts_note "no saved report for ${CHANGE_MONITOR_ENV:-}/${CHANGE_MONITOR_SERVICE:-}, so no outcome was sent."
-    rollouts_clear_rejection
     exit 0
   fi
   rollouts_was_stopped="$(jq -r 'if .stopped == true then "true" else "false" end' "$rollouts_state_file" 2>/dev/null || true)"
   rollouts_saved="$(jq -r '.deployment // empty' "$rollouts_state_file" 2>/dev/null || true)"
   if [ "$rollouts_was_stopped" = "true" ] || [ -z "$rollouts_saved" ]; then
-    rollouts_clear_rejection
     exit 0
   fi
 fi
@@ -205,19 +184,16 @@ if [ -n "$rollouts_missing" ]; then
 fi
 
 case "${1:-}" in
-  bootstrap|start|finish)
+  start|finish)
     rollouts_exchange
     ;;
   *)
-    rollouts_note "unknown command '${1:-}'. Expected bootstrap, start, or finish. The deploy was not reported."
+    rollouts_note "unknown command '${1:-}'. Expected start or finish. The deploy was not reported."
     exit 0
     ;;
 esac
 
 case "${1:-}" in
-  bootstrap)
-    rollouts_ensure_catalog
-    ;;
   start)
     rollouts_ensure_catalog
     DEPLOYMENT=""
@@ -243,7 +219,6 @@ case "${1:-}" in
     else
       rollouts_write_state --arg deployment "$DEPLOYMENT" '{deployment:$deployment}'
     fi
-    rollouts_clear_rejection
     ;;
   finish)
     case "${ROLLOUTS_OUTCOME:-}" in
@@ -265,7 +240,6 @@ case "${1:-}" in
       rollouts_post AppendDeploymentEvent https://api.cursor.com/factory.v1.DeploymentsService/AppendDeploymentEvent \
         "$rollouts_value"
     fi
-    rollouts_clear_rejection
     ;;
 esac
 exit 0
