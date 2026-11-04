@@ -128,7 +128,9 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: github-pages
+    environment:
+      name: github-pages
+      deployment: false # Read the environment secret without opening a second deployment.
     permissions:
       contents: read # Read only the Rollouts reporter. This job does not publish.
     env:
@@ -152,7 +154,7 @@ jobs:
           ./.github/scripts/rollouts-reporter.sh bootstrap
           ./.github/scripts/rollouts-reporter.sh start
       - name: Keep the Rollouts state for the finish job
-        if: always()
+        if: ${{ !cancelled() }}
         continue-on-error: true
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -179,10 +181,12 @@ jobs:
   rollouts:
     name: Report the Pages deployment
     needs: [rollouts-start, deploy]
-    if: always() && !cancelled() && needs.deploy.result != 'skipped'
+    if: ${{ !cancelled() && needs.deploy.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: github-pages
+    environment:
+      name: github-pages
+      deployment: false # Read the environment secret without opening a second deployment.
     permissions:
       contents: read # Read only the Rollouts reporter. This job does not publish.
     env:
