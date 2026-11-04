@@ -122,10 +122,48 @@ jobs:
         with:
           path: site
 
-  deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    name: Deploy GitHub Pages
+  rollouts-start:
+    name: Record the Pages deployment start
     needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: github-pages
+    permissions:
+      contents: read # Read only the Rollouts reporter. This job does not publish.
+    env:
+      CHANGE_MONITOR_ENV: "github-pages"
+      CHANGE_MONITOR_SERVICE: "lcv-leo-pages"
+      CHANGE_MONITOR_SOURCE: "https://github.com/${{ github.repository }}"
+      DEPLOY_VERSION: "${{ github.sha }}"
+      CHANGE_MONITOR_ACTOR: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
+    steps:
+      - name: Check out Rollouts reporter
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts/rollouts-reporter.sh
+          sparse-checkout-cone-mode: false
+      - name: Report the Pages deployment start
+        shell: bash
+        env:
+          CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
+        run: |
+          ./.github/scripts/rollouts-reporter.sh bootstrap
+          ./.github/scripts/rollouts-reporter.sh start
+      - name: Keep the Rollouts state for the finish job
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rollouts-github-pages-lcv-leo-pages
+          path: ${{ runner.temp }}/rollouts-github-pages-lcv-leo-pages.json
+          if-no-files-found: ignore
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && !cancelled() && contains(fromJSON('["success","failure"]'), needs.rollouts-start.result)
+    name: Deploy GitHub Pages
+    needs: [build, rollouts-start]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -140,14 +178,14 @@ jobs:
 
   rollouts:
     name: Report the Pages deployment
-    needs: deploy
-    if: always() && needs.deploy.result != 'skipped'
+    needs: [rollouts-start, deploy]
+    if: always() && !cancelled() && needs.deploy.result != 'skipped'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: github-pages
     permissions:
       contents: read # Read only the Rollouts reporter. This job does not publish.
     env:
-      CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
       CHANGE_MONITOR_ENV: "github-pages"
       CHANGE_MONITOR_SERVICE: "lcv-leo-pages"
       CHANGE_MONITOR_SOURCE: "https://github.com/${{ github.repository }}"
@@ -161,9 +199,15 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/scripts/rollouts-reporter.sh
           sparse-checkout-cone-mode: false
+      - name: Restore the Rollouts state
+        continue-on-error: true
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: rollouts-github-pages-lcv-leo-pages
+          path: ${{ runner.temp }}
       - name: Report the Pages deployment
         shell: bash
+        env:
+          CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
         run: |
-          ./.github/scripts/rollouts-reporter.sh bootstrap
-          ./.github/scripts/rollouts-reporter.sh start
           ./.github/scripts/rollouts-reporter.sh finish
