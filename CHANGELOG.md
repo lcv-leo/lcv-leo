@@ -11,6 +11,12 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Report the GitHub Pages deployment to Cursor Rollouts from a job that holds
+  only `contents: read`. The deploy job stays limited to GitHub-owned actions
+  and remains the sole holder of `pages: write` and `id-token: write`. The
+  reporter reads `CURSOR_API_KEY` and calls `api2.cursor.sh` and
+  `api.cursor.com`.
+
 - Update the official CodeQL SARIF upload Action to v4.39.2 and Claude Code
   Action to v1.0.268 at their complete immutable release commit SHAs, preserving
   existing workflow inputs, permissions and separate CLI terms (LCV-554).

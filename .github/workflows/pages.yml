@@ -33,6 +33,7 @@ on:
       - "scripts/pages-provenance-contract.mjs"
       - "scripts/pages-provenance.spec.mjs"
       - "scripts/provenance-drift.test.mjs"
+      - ".github/scripts/rollouts-reporter.sh"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -128,12 +129,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: read # Read the Rollouts reporter script.
       pages: write # Publish the validated Pages artifact.
       id-token: write # Request the OIDC token used by Pages deployment.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  rollouts:
+    name: Report the Pages deployment
+    needs: deploy
+    if: always() && needs.deploy.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read # Read only the Rollouts reporter. This job does not publish.
+    env:
+      CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
+      CHANGE_MONITOR_ENV: "github-pages"
+      CHANGE_MONITOR_SERVICE: "lcv-leo-pages"
+      CHANGE_MONITOR_SOURCE: "https://github.com/${{ github.repository }}"
+      DEPLOY_VERSION: "${{ github.sha }}"
+      CHANGE_MONITOR_ACTOR: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
+      ROLLOUTS_OUTCOME: "${{ needs.deploy.result }}"
     steps:
       - name: Check out Rollouts reporter
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -141,34 +161,9 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/scripts/rollouts-reporter.sh
           sparse-checkout-cone-mode: false
-      - name: Report Rollouts deploy start
+      - name: Report the Pages deployment
         shell: bash
-        env:
-          CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
-          CHANGE_MONITOR_ENV: "github-pages"
-          CHANGE_MONITOR_SOURCE: "https://github.com/${{ github.repository }}"
-          DEPLOY_VERSION: "${{ github.sha }}"
-          CHANGE_MONITOR_ACTOR: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
         run: |
-          for service in lcv-leo-pages; do
-            CHANGE_MONITOR_SERVICE="$service" bash .github/scripts/rollouts-reporter.sh bootstrap
-            CHANGE_MONITOR_SERVICE="$service" bash .github/scripts/rollouts-reporter.sh start
-          done
-          exit 0
-      - id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
-      - name: Report Rollouts deploy result
-        if: always()
-        shell: bash
-        env:
-          CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
-          CHANGE_MONITOR_ENV: "github-pages"
-          CHANGE_MONITOR_SOURCE: "https://github.com/${{ github.repository }}"
-          DEPLOY_VERSION: "${{ github.sha }}"
-          CHANGE_MONITOR_ACTOR: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
-          ROLLOUTS_OUTCOME: "${{ steps.deployment.outcome }}"
-        run: |
-          for service in lcv-leo-pages; do
-            CHANGE_MONITOR_SERVICE="$service" bash .github/scripts/rollouts-reporter.sh finish
-          done
-          exit 0
+          ./.github/scripts/rollouts-reporter.sh bootstrap
+          ./.github/scripts/rollouts-reporter.sh start
+          ./.github/scripts/rollouts-reporter.sh finish
