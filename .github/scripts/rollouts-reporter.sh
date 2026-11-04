@@ -7,6 +7,7 @@
 
 rollouts_stopped=0
 rollouts_temps=""
+rollouts_token=""
 
 rollouts_note() {
   echo "Rollouts reporter: $1" >&2
@@ -71,9 +72,6 @@ rollouts_json() {
 
 rollouts_exchange() {
   [ "$rollouts_stopped" -eq 1 ] && return 0
-  if [ -n "${TOKEN:-}" ]; then
-    return 0
-  fi
   rollouts_new_temp exchange_body
   exchange_status="$(curl -sS --connect-timeout 10 --max-time 20 -o "$exchange_body" -w "%{http_code}" -X POST https://api2.cursor.sh/auth/exchange_user_api_key \
     -H "Authorization: Bearer ${CURSOR_API_KEY}" -H "Content-Type: application/json" -d '{}')" || {
@@ -92,8 +90,8 @@ rollouts_exchange() {
       return 0
       ;;
   esac
-  TOKEN="$(jq -r '.accessToken // empty' "$exchange_body" 2>/dev/null || true)"
-  if [ -z "$TOKEN" ]; then
+  rollouts_token="$(jq -r '.accessToken // empty' "$exchange_body" 2>/dev/null || true)"
+  if [ -z "$rollouts_token" ]; then
     rollouts_note "the token exchange response did not include an access token. The deploy was not reported."
     rollouts_halt
     return 0
@@ -108,7 +106,7 @@ rollouts_post() {
   allow409="${4:-}"
   rollouts_new_temp response
   status="$(curl -sS --connect-timeout 10 --max-time 20 -o "$response" -w "%{http_code}" -X POST "$url" \
-    -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" -H "Connect-Protocol-Version: 1" \
+    -H "Authorization: Bearer ${rollouts_token}" -H "Content-Type: application/json" -H "Connect-Protocol-Version: 1" \
     -d "$body")" || {
     rollouts_unavailable "$call"
     return 0

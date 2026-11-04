@@ -140,13 +140,19 @@ jobs:
       DEPLOY_VERSION: "${{ github.sha }}"
       CHANGE_MONITOR_ACTOR: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}"
     steps:
+      # gh run rerun --failed also reruns dependents. A failed checkout or report
+      # must not fail this job, or the Pages deployment that already published runs again.
       - name: Check out Rollouts reporter
+        id: rollouts_checkout
+        continue-on-error: true
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           sparse-checkout: .github/scripts/rollouts-reporter.sh
           sparse-checkout-cone-mode: false
       - name: Report the Pages deployment start
+        if: steps.rollouts_checkout.outcome == 'success'
+        continue-on-error: true
         shell: bash
         env:
           CURSOR_API_KEY: "${{ secrets.CURSOR_API_KEY }}"
