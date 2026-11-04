@@ -11,28 +11,24 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Update the official CodeQL SARIF upload Action to v4.39.2 and Claude Code
+  Action to v1.0.268 at their complete immutable release commit SHAs, preserving
+  existing workflow inputs, permissions and separate CLI terms (LCV-554).
+
 - Update the official Zizmor Action to v0.8.1 and its explicitly selected
   analyzer to 1.32.0 at their immutable release coordinates (LCV-542).
 
-- Update the official Linear Release Action to v0.18.2 and Claude Code Action
-  to v1.0.266 at their complete immutable release commit SHAs, preserving the
-  existing workflow inputs and official Linear CLI v0.18.0 (LCV-488; LCV-518).
+- Update the official Linear Release Action to v0.18.2 at its complete immutable
+  release commit SHA, preserving the existing workflow inputs and official
+  Linear CLI v0.18.0 (LCV-488; LCV-518).
 
 - Enable native Google Antigravity CLI (`agy`) hooks in `.agents/hooks.json` and
   document the Antigravity integration and MCP configuration in `docs/entire.md`
   (LCV-477).
 
-- Update the official Claude Code Action to v1.0.264 at its complete immutable
-  release commit SHA, preserving existing workflow inputs and permissions
-  (LCV-474/LCV-481).
-
 - Configure official Entire Brain/Graph guidance and the Codex MCP; document
   repository-specific merge gates, required branch freshness, removal of the
   retired Depot gate, and the remaining checkpoint/Trail evidence (LCV-477).
-- Update the official Claude Code Action to v1.0.263 at its complete immutable
-  release commit SHA, preserving the workflow inputs, permissions and behavior
-  (LCV-465).
-
 - Authenticate the `Claude Code` workflow to the Claude API by workload
   identity federation under its own Anthropic federation rule, which accepts
   only this repository: the job's GitHub OIDC token is exchanged for a
@@ -57,8 +53,6 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 - Update the official OpenSSF Scorecard Action to v2.5.0 at its complete release
   commit SHA, preserving workflow inputs and permissions (LCV-403).
-
-- Update the official CodeQL SARIF upload Action to v4.39.1 at its complete release commit SHA (LCV-438).
 
 - Update the official `actions/upload-artifact` to v7.0.2 at complete commit SHAs (LCV-334).
 
@@ -106,9 +100,8 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 - Dependabot verifica GitHub Actions e npm todos os dias, inclusive fins de
   semana, às 05h, e agrupa as correções de segurança separadamente por ecossistema.
-- Atualizados os pins oficiais do upload de SARIF do CodeQL para v4.39.1 e do
-  zizmor-action para v0.8.0, com os SHAs completos das respectivas releases e
-  o inventário de terceiros atual reconciliado (LCV-438).
+- Atualizado o pin oficial do zizmor-action para v0.8.0, com o SHA completo da
+  respectiva release e o inventário de terceiros atual reconciliado (LCV-438).
 
 ## 09/09/2026 — Mídia do perfil hospedada no próprio repositório (LCV2-24)
 
