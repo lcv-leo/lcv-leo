@@ -40,10 +40,10 @@ software itself has its own license, noted below the table.
 | `actions/upload-pages-artifact`    | [MIT](https://github.com/actions/upload-pages-artifact/blob/main/LICENSE)    | https://github.com/actions/upload-pages-artifact    | Package the Pages artifact                                  |
 | `actions/deploy-pages`             | [MIT](https://github.com/actions/deploy-pages/blob/main/LICENSE)             | https://github.com/actions/deploy-pages             | Deploy the Pages artifact                                   |
 | `actions/upload-artifact`          | [MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)          | https://github.com/actions/upload-artifact          | Retain the Scorecard SARIF artifact                         |
-| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/9b3254085494b55a0f7c4c2b3d2d52cc712ce370/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
+| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/1fc58d04a4d4374f921bdac573c3811c240f9c26/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
 | `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/45d7276c9ca790aabd705e31ca99c6185c3e76dd/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
-| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/main/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
+| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/c0949c50a78c1ec8ce2647db36629b870e715d0c/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
 scanning default setup runs is governed by the
