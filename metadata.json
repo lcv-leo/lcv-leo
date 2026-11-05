@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.12.2-lcv.roadmap.1",
+  "checkpoint_id": "01M6P1BMSGP21WBFNBHMBZP2NA",
+  "strategy": "manual-commit",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 90,
+    "cache_creation_tokens": 136092,
+    "cache_read_tokens": 16773148,
+    "output_tokens": 57343,
+    "api_call_count": 45,
+    "subagent_tokens": {
+      "input_tokens": 1109,
+      "cache_creation_tokens": 3067633,
+      "cache_read_tokens": 46439977,
+      "output_tokens": 345974,
+      "api_call_count": 319
+    }
+  },
+  "redaction": {
+    "replacements": 38,
+    "layers": {
+      "betterleaks": 33,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 64,
+      "key_context": 1,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "linked_commits": [
+    {
+      "sha": "9d336e9b2a629a128ee617b91f3bc7c6250d3aef",
+      "repo": "gh/lcv-leo/lcv-leo"
+    }
+  ]
+}
