@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.12.2-lcv.roadmap.1",
+  "checkpoint_id": "01M6PZYK36RK879AWG9AVAEF58",
+  "session_id": "a3f06f8c-34ca-4838-a6ea-5f20a93e0168",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-05T23:15:53.8869165Z",
+  "branch": "claude/lcv-581-master-text-round-7",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-mythos-5-1",
+  "turn_id": "7b7cfb9d3972",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 98,
+    "cache_creation_tokens": 111748,
+    "cache_read_tokens": 462320,
+    "output_tokens": 752,
+    "api_call_count": 4
+  },
+  "redaction": {
+    "replacements": 1,
+    "layers": {
+      "betterleaks": 1,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}
