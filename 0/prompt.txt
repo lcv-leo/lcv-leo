@@ -1,0 +1,6 @@
+You are a sub-session rooted in this Git worktree or repository root. Do exactly these steps and nothing else, then print a short report.
+1. Run `git rev-parse --show-toplevel` and confirm it equals the current directory. Run `entire status --detailed`. Confirm `git branch --show-current` is `claude/lcv-581-master-text-fixes`.
+2. Run `python -X utf8 -I C:/Users/lcvle/lcv-workspace/github-operations/temp/lcv-master-fix/compose.py`. If it exits non-zero, stop and report.
+3. Run `git status --porcelain`; only AGENTS.md and CLAUDE.md may be modified. Otherwise stop and report.
+4. Run `git add AGENTS.md CLAUDE.md` then `git commit -S -F C:/Users/lcvle/lcv-workspace/github-operations/temp/lcv-master-fix/commit-msg-3.txt`. Never pass --no-verify. Do not push.
+5. Report `git log -1 --format="%H %G?%n%(trailers)"`.
