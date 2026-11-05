@@ -11,6 +11,9 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Align the `THIRDPARTY.md` license link for the official CodeQL SARIF upload
+  Action with its pinned v4.39.3 release commit SHA (LCV-574).
+
 - Report the GitHub Pages deployment to Cursor Rollouts from a job that holds
   only `contents: read`. The deploy job stays limited to GitHub-owned actions
   and remains the sole holder of `pages: write` and `id-token: write`. The
