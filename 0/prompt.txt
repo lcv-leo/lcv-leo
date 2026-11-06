@@ -1,0 +1,9 @@
+You are running inside the Git root `C:/Users/lcvle/lcv-workspace/lcv-leo` (repository `lcv-leo`), through the `op run` terminal, on branch `claude/lcv-591-licensing-rule`. Perform this task completely and autonomously. Never pass `--no-verify`. Do NOT push and do NOT amend: this phase ends at a new local signed commit.
+
+1. `git rev-parse --show-toplevel` must print `C:/Users/lcvle/lcv-workspace/lcv-leo`; `git branch --show-current` must print `claude/lcv-591-licensing-rule`; `git status --porcelain` must be empty apart from `temp/`; `git rev-list --count origin/claude/lcv-591-licensing-rule..HEAD` must print `4`.
+2. `python -X utf8 -I temp/edit11.py` (replaces the master-text part of AGENTS.md and CLAUDE.md, keeps this repository's own sections, asserts both files identical). `git diff --stat` must list exactly AGENTS.md and CLAUDE.md.
+3. `git add AGENTS.md CLAUDE.md`; `git commit -S -F temp/commit-msg11.txt` (message already written; do not change it).
+4. Verify: `git log -1 --show-signature --format=fuller` (SSH signature good), `git log -1 --format=%B` contains an `Entire-Checkpoint:` trailer. If no trailer, do not amend or force anything: report it.
+5. Delete `temp/edit11.py` and `temp/commit-msg11.txt`. Leave the other files in `temp/`.
+
+Final output: exactly one JSON object on the last line with keys `repo`, `head_sha`, `signature_ok`, `entire_checkpoint`, `files_changed`, `notes`.
