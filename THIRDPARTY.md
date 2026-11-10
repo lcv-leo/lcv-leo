@@ -43,7 +43,7 @@ software itself has its own license, noted below the table.
 | `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/33d7b85da1a04171e211befe2c739303b9a4c066/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
 | `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/45d7276c9ca790aabd705e31ca99c6185c3e76dd/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
-| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/c0949c50a78c1ec8ce2647db36629b870e715d0c/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
+| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/4fa93a88de49bbef68b10eb15aabedf28ca0e1ed/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
 scanning default setup runs is governed by the
