@@ -9,8 +9,7 @@ updates:
     cooldown:
       default-days: 7
       exclude:
-        - "actions/*"
-        - "github/*"
+        - "*"
     rebase-strategy: auto
     labels:
       - "dependencies"
@@ -39,6 +38,8 @@ updates:
       timezone: "Etc/GMT+3"
     cooldown:
       default-days: 7
+      exclude:
+        - "*"
     rebase-strategy: auto
     labels:
       - "dependencies"
