@@ -11,10 +11,8 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
-- Update the official Claude Code Action to v1.0.271 at its complete immutable
-  release commit SHA, aligning the last repository behind the fleet standard,
-  with the `THIRDPARTY.md` license link following the new pin and the workflow
-  inputs, permissions and separate CLI terms unchanged (LCV-619).
+- Align the `THIRDPARTY.md` license link for the official Claude Code Action
+  with its pinned v1.0.271 release commit SHA (LCV-619).
 
 - Align `.github/dependabot.yml` with the fleet standard: each `package-ecosystem`
   block keeps its `cooldown` configured (`default-days: 7`) but now excludes every
