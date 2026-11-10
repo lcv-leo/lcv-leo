@@ -11,6 +11,16 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Correct the master text's Section 7.C intake-routing rule in `AGENTS.md` and
+  `CLAUDE.md`: the exactly-one-Team-or-template invariant applies to addresses
+  of type `team`, `template`, and `asks`; Linear's official documentation
+  proves that `asksWeb` web-form addresses carry no Team/Template field by
+  platform design (the form routes through its page and template, and the API
+  refuses updates on them), so an `asksWeb` address with null team and null
+  template is valid — never a finding or a pendency. This closes the external
+  pendency that held the daily audits at PARTIAL since LCV-604, proven
+  10/11/2026 under LCV-619.
+
 - Align the `THIRDPARTY.md` license link for the official CodeQL SARIF upload
   Action with its pinned v4.39.3 release commit SHA (LCV-574).
 
