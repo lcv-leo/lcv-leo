@@ -11,6 +11,16 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
+- Align `.github/dependabot.yml` with the fleet standard: each `package-ecosystem`
+  block keeps its `cooldown` configured (`default-days: 7`) but now excludes every
+  dependency (`exclude: "*"`), so version updates are proposed immediately instead
+  of observing the seven-day delay. The previous partial exclusion
+  (`actions/*`, `github/*`) is replaced by the whole-ecosystem `*`, matching every
+  organization repository and the master text's External Actions rule. The
+  `CONTRIBUTING.md` and `SECURITY.md` cooldown prose is corrected to the same
+  wording, and `AGENTS.md`/`CLAUDE.md` Section 7.A carries the corrected External
+  Actions rule (LCV-619).
+
 - Align the `THIRDPARTY.md` license link for the official CodeQL SARIF upload
   Action with its pinned v4.39.3 release commit SHA (LCV-574).
 
