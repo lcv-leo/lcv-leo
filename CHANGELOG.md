@@ -14,6 +14,16 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 - Align the `THIRDPARTY.md` license link for the official Claude Code Action
   with its pinned v1.0.271 release commit SHA (LCV-619).
 
+- Correct the master text's Section 7.C intake-routing rule in `AGENTS.md` and
+  `CLAUDE.md`: the exactly-one-Team-or-template invariant applies to addresses
+  of type `team`, `template`, and `asks`; Linear's official documentation
+  proves that `asksWeb` web-form addresses carry no Team/Template field by
+  platform design (the form routes through its page and template, and the API
+  refuses updates on them), so an `asksWeb` address with null team and null
+  template is valid — never a finding or a pendency. This closes the external
+  pendency that held the daily audits at PARTIAL since LCV-604, proven
+  10/11/2026 under LCV-619.
+
 - Align `.github/dependabot.yml` with the fleet standard: each `package-ecosystem`
   block keeps its `cooldown` configured (`default-days: 7`) but now excludes every
   dependency (`exclude: "*"`), so version updates are proposed immediately instead
