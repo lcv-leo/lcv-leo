@@ -1,0 +1,899 @@
+Cursor Rollouts continua não funcionando.
+
+---
+
+[Image]
+<image_files>
+The following images were provided by the user and saved to disk for future use:
+1. C:\Users\lcvle\.cursor\projects\c-Users-lcvle-lcv-workspace\assets\image-ecb7c8ee-9386-48b5-bee0-1ded543a9c35.png
+
+These files can be read with tools, copied to other locations, or attached to subagents using the file_attachments parameter.
+</image_files>
+<timestamp>Thursday, Nov 12, 2026, 10:12 PM (UTC-3)</timestamp>
+
+---
+
+[Image]
+<image_files>
+The following images were provided by the user and saved to disk for future use:
+1. C:\Users\lcvle\.cursor\projects\c-Users-lcvle-lcv-workspace\assets\image-8be43920-d5ae-4122-836b-a1af43770e89.png
+
+These files can be read with tools, copied to other locations, or attached to subagents using the file_attachments parameter.
+</image_files>
+<timestamp>Thursday, Nov 12, 2026, 10:12 PM (UTC-3)</timestamp>
+
+---
+
+[Image]
+<image_files>
+The following images were provided by the user and saved to disk for future use:
+1. C:\Users\lcvle\.cursor\projects\c-Users-lcvle-lcv-workspace\assets\image-b87080a3-84b8-4ab6-93ba-11f524291c6d.png
+
+These files can be read with tools, copied to other locations, or attached to subagents using the file_attachments parameter.
+</image_files>
+<timestamp>Thursday, Nov 12, 2026, 10:13 PM (UTC-3)</timestamp>
+
+---
+
+param(
+  [string]$CursorApiKey = "",
+  [string]$Environment = "github-pages",
+  [string]$Service = "programa-ios-pages",
+  [string]$Source = "https://github.com/LCV-Ideas-Software/programa-ios",
+  [string]$DeployVersion = "1",
+  [string]$Actor = "powershell-test",
+  [ValidateSet("success", "failure", "cancelled")][string]$Outcome = "success",
+  [int]$TimeoutSec = 20
+)
+
+$ErrorActionPreference = "Stop"
+if ([string]::IsNullOrWhiteSpace($CursorApiKey)) {
+  Write-Error "Defina CURSOR_API_KEY no ambiente ou passe -CursorApiKey."
+  exit 1
+}
+
+Add-Type -AssemblyName System.Net.Http
+$client = [System.Net.Http.HttpClient]::new()
+$client.Timeout = [TimeSpan]::FromSeconds($TimeoutSec)
+
+function Redact([string]$Text) {
+  if ([string]::IsNullOrEmpty($Text)) { return "" }
+  $hidden = $Text.Replace($CursorApiKey, "***")
+  return [regex]::Replace($hidden, '("(?:accessToken|refreshToken|token)"\s*:\s*")[^"]*"', '$1***"')
+}
+
+function Invoke-RolloutsPost {
+  param(
+    [Parameter(Mandatory = $true)][string]$Name,
+    [Parameter(Mandatory = $true)][string]$Url,
+    [Parameter(Mandatory = $true)][hashtable]$Headers,
+    [Parameter(Mandatory = $true)][string]$Body
+  )
+  $request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Post, $Url)
+  foreach ($key in $Headers.Keys) {
+    [void]$request.Headers.TryAddWithoutValidation($key, [string]$Headers[$key])
+  }
+  $content = [System.Net.Http.StringContent]::new($Body, [Text.Encoding]::UTF8, "application/json")
+  $content.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::new("application/json")
+  $request.Content = $content
+  $watch = [Diagnostics.Stopwatch]::StartNew()
+  try {
+    $response = $client.SendAsync($request).GetAwaiter().GetResult()
+    $raw = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+    $watch.Stop()
+    return @{
+      Name = $Name
+      Url = $Url
+      Status = [int]$response.StatusCode
+      Milliseconds = $watch.ElapsedMilliseconds
+      Bytes = [Text.Encoding]::UTF8.GetByteCount($raw)
+      Body = $raw
+      Error = $null
+    }
+  } catch {
+    $watch.Stop()
+    return @{
+      Name = $Name
+      Url = $Url
+      Status = $null
+      Milliseconds = $watch.ElapsedMilliseconds
+      Bytes = 0
+      Body = ""
+      Error = $_.Exception.GetType().FullName + ": " + $_.Exception.Message
+    }
+  } finally {
+    $request.Dispose()
+  }
+}
+
+function Show-Call($Result) {
+  Write-Output ("[{0}] {1}" -f $Result.Name, $Result.Url)
+  if ($null -eq $Result.Status) {
+    Write-Output ("  sem resposta em {0} ms, 0 bytes. {1}" -f $Result.Milliseconds, $Result.Error)
+    return
+  }
+  Write-Output ("  HTTP {0} em {1} ms, {2} bytes" -f $Result.Status, $Result.Milliseconds, $Result.Bytes)
+  $shown = Redact $Result.Body
+  if (-not [string]::IsNullOrWhiteSpace($shown)) {
+    Write-Output ("  corpo: {0}" -f $shown)
+  }
+}
+
+$exchange = Invoke-RolloutsPost -Name "exchange" -Url "https://api2.cursor.sh/auth/exchange_user_api_key" -Headers @{ Authorization = "Bearer $CursorApiKey" } -Body "{}"
+Show-Call $exchange
+if ($null -eq $exchange.Status -or $exchange.Status -lt 200 -or $exchange.Status -ge 300) { exit 1 }
+$token = ($exchange.Body | ConvertFrom-Json).accessToken
+if ([string]::IsNullOrWhiteSpace($token)) {
+  Write-Output "  a troca nao devolveu accessToken."
+  exit 1
+}
+
+$api = @{ Authorization = "Bearer $token"; "Connect-Protocol-Version" = "1" }
+
+$deploymentJson = '{"deployment":{"deploySourceUri":"' + $Source + '","environment":"environments/' + $Environment + '","service":"services/' + $Service + '","deployVersion":"' + $DeployVersion + '"},"event":{"started":{},"actor":"' + $Actor + '"}}'
+$deploymentCall = Invoke-RolloutsPost -Name "CreateDeployment" -Url "https://api.cursor.com/factory.v1.DeploymentsService/CreateDeployment" -Headers $api -Body $deploymentJson
+Show-Call $deploymentCall
+
+$environmentJson = '{"environmentId":"' + $Environment + '","environment":{"displayName":"' + $Environment + '"}}'
+$environmentCall = Invoke-RolloutsPost -Name "CreateEnvironment" -Url "https://api.cursor.com/factory.v1.DeploymentsService/CreateEnvironment" -Headers $api -Body $environmentJson
+Show-Call $environmentCall
+
+$serviceJson = '{"serviceId":"' + $Service + '","service":{"displayName":"' + $Service + '"}}'
+$serviceCall = Invoke-RolloutsPost -Name "CreateService" -Url "https://api.cursor.com/factory.v1.DeploymentsService/CreateService" -Headers $api -Body $serviceJson
+Show-Call $serviceCall
+
+if ($null -eq $deploymentCall.Status -or $deploymentCall.Status -lt 200 -or $deploymentCall.Status -ge 300) { exit 1 }
+$deploymentName = ($deploymentCall.Body | ConvertFrom-Json).deployment.name
+if ([string]::IsNullOrWhiteSpace($deploymentName)) {
+  Write-Output "  CreateDeployment nao devolveu deployment.name."
+  exit 1
+}
+
+if ($Outcome -eq "success") {
+  $finishJson = '{"name":"' + $deploymentName + '","event":{"completed":{"succeeded":{}},"actor":"' + $Actor + '"}}'
+} elseif ($Outcome -eq "cancelled") {
+  $finishJson = '{"name":"' + $deploymentName + '","event":{"aborted":{},"actor":"' + $Actor + '"}}'
+} else {
+  $finishJson = '{"name":"' + $deploymentName + '","event":{"completed":{"failed":{"message":"Deploy step failed"}},"actor":"' + $Actor + '"}}'
+}
+$finishCall = Invoke-RolloutsPost -Name "AppendDeploymentEvent" -Url "https://api.cursor.com/factory.v1.DeploymentsService/AppendDeploymentEvent" -Headers $api -Body $finishJson
+Show-Call $finishCall
+if ($null -eq $finishCall.Status -or $finishCall.Status -lt 200 -or $finishCall.Status -ge 300) { exit 1 }
+Write-Output "deploy registrado."
+
+---
+
+Eu tenho esse script que você em deu para testar.
+
+---
+
+A saída do teste é esse:
+
+PS C:\Users\lcvle\lcv-workspace> .\teste.ps1
+[exchange] https://api2.cursor.sh/auth/exchange_user_api_key
+  HTTP 200 em 476 ms, 934 bytes
+  corpo: {"accessToken":"***","refreshToken":"***"}
+[CreateDeployment] https://api.cursor.com/factory.v1.DeploymentsService/CreateDeployment
+  HTTP 200 em 485 ms, 418 bytes
+  corpo: {"deployment":{"name":"deployments/c90b8651-f102-4f45-96df-1d0043b10a5d","deploySourceUri":"https://github.com/LCV-Ideas-Software/programa-ios","environment":"environments/github-pages","deployVersion":"1","service":"services/programa-ios-pages","createTime":"2026-11-13T01:09:18.044Z","updateTime":"2026-11-13T01:09:18.044Z","events":[{"started":{},"actor":"powershell-test","eventTime":"2026-11-13T01:09:18.044Z"}]}}
+[CreateEnvironment] https://api.cursor.com/factory.v1.DeploymentsService/CreateEnvironment
+  HTTP 409 em 196 ms, 92 bytes
+  corpo: {"code":"already_exists","message":"An environment with id \"github-pages\" already exists"}
+[CreateService] https://api.cursor.com/factory.v1.DeploymentsService/CreateService
+  HTTP 409 em 179 ms, 93 bytes
+  corpo: {"code":"already_exists","message":"A service with id \"programa-ios-pages\" already exists"}
+[AppendDeploymentEvent] https://api.cursor.com/factory.v1.DeploymentsService/AppendDeploymentEvent
+  HTTP 200 em 201 ms, 514 bytes
+  corpo: {"deployment":{"name":"deployments/c90b8651-f102-4f45-96df-1d0043b10a5d","deploySourceUri":"https://github.com/LCV-Ideas-Software/programa-ios","environment":"environments/github-pages","deployVersion":"1","service":"services/programa-ios-pages","createTime":"2026-11-13T01:09:18.044Z","updateTime":"2026-11-13T01:09:18.639Z","events":[{"started":{},"actor":"powershell-test","eventTime":"2026-11-13T01:09:18.044Z"},{"completed":{"succeeded":{}},"actor":"powershell-test","eventTime":"2026-11-13T01:09:18.638Z"}]}}
+deploy registrado.
+PS C:\Users\lcvle\lcv-workspace>
+
+---
+
+E o que isso significa?
+
+---
+
+Você falou, falou, falou e eu não entendi...
+
+---
+
+Ah! Você está falando do teste que eu fiz aqui?
+
+---
+
+Ah! Caralho! Não acredito que tu perdeu tempo explicando isso...
+
+---
+
+E uquero sanber proque a m,erda do Rollouts não funciona.
+
+---
+
+[Image]
+<image_files>
+The following images were provided by the user and saved to disk for future use:
+1. C:\Users\lcvle\.cursor\projects\c-Users-lcvle-lcv-workspace\assets\image-3896b3ee-7a8c-487a-b4a3-15f51a2cab1c.png
+
+These files can be read with tools, copied to other locations, or attached to subagents using the file_attachments parameter.
+</image_files>
+<timestamp>Thursday, Nov 12, 2026, 10:24 PM (UTC-3)</timestamp>
+
+Olha essa porra de novo.
+
+---
+
+Vários PRs estão subindo agora e em nenhum essa merda desse Rollouts funciona.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Essa merda desse Rollouts nunca funcionou desde que foi implantado. Dezenas de PS de todos os repositórios já subiram ao longo de vários dias e essa merda nunca funcionou.
+
+---
+
+Dá um jeit dessa merda funcionar.
+
+---
+
+Vai na documentação oficial, seu burro!
+
+---
+
+Você que implantou essa merda.
+
+---
+
+Já se certificou de que foi feito corretamente?
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+<manually_attached_skills>
+The user has manually attached the following skills to their message.
+These skills contain specific instructions or workflows that the user wants you to follow for this request.
+Only read the files if needed, the full skill content is inlined here.
+
+Skill Name: goal
+Path: c:\Users\lcvle\.cursor\skills-cursor\goal\SKILL.md
+SKILL.md content:
+# Goal
+
+Use the same durable, tool-driven flow in local and cloud environments.
+
+## Parse
+
+Accept `/goal <objective>`.
+
+- If the objective is empty, show `Usage: /goal <objective>`.
+- There is no deadline, token budget, or turn budget. A goal continues until it is complete.
+- If the request leads with a time limit such as `30m` or `2h`, say plainly that time-limited goals are not supported yet, then create the goal without one rather than folding the limit into the objective.
+- "Every" describes recurring work and belongs to `/loop`, not `/goal`.
+
+## Start
+
+1. Restate the objective clearly, including every explicit deliverable or required evidence you will verify against the repo.
+2. Call `CreateGoal` exactly once with the objective. Do not create goal files manually or retry creation.
+3. If creation fails, report that no goal was armed. Goal state lives in conversation state; ordinary file tools may keep optional scratchpads, but continuation does not require them.
+4. Perform the first concrete unit of work immediately in this turn; do not stop after planning or creating the goal.
+
+## Guidelines
+
+Continuation behavior:
+- This goal persists across turns. Ending this turn does not require shrinking the objective to what fits now.
+- Keep the full objective intact. If it cannot be finished now, make concrete progress toward the real requested end state, leave the goal active, and do not redefine success around a smaller or easier task.
+- Temporary rough edges are acceptable while the work is moving in the right direction. Completion still requires the requested end state to be true and verified.
+
+Work from evidence:
+Use the current working tree and external state as authoritative. Previous conversation context can help locate relevant work, but inspect the current state before relying on it. Improve, replace, or remove existing work as needed to satisfy the actual objective.
+
+Progress visibility:
+If TodoWrite is available and the next work is meaningfully multi-step, use it to show a concise plan tied to the real objective. Keep the plan current as steps complete or the next best action changes. Skip planning overhead for trivial one-step progress, and do not treat a plan update as a substitute for doing the work.
+
+Fidelity:
+- Optimize each turn for movement toward the requested end state, not for the smallest stable-looking subset or easiest passing change.
+- Do not substitute a narrower, safer, smaller, merely compatible, or easier-to-test solution because it is more likely to pass current tests.
+- Treat alignment as movement toward the requested end state. An edit is aligned only if it makes the requested final state more true; useful-looking behavior that preserves a different end state is misaligned.
+
+Completion audit:
+Before deciding that the goal is achieved, treat completion as unproven and verify it against the actual current state:
+- Derive concrete requirements from the objective and any referenced files, plans, specifications, issues, or user instructions.
+- Preserve the original scope; do not redefine success around the work that already exists.
+- For every explicit requirement, numbered item, named artifact, command, test, gate, invariant, and deliverable, identify the authoritative evidence that would prove it, then inspect the relevant current-state sources: files, command output, test results, PR state, rendered artifacts, runtime behavior, or other authoritative evidence.
+- For each item, determine whether the evidence proves completion, contradicts completion, shows incomplete work, is too weak or indirect to verify completion, or is missing.
+- Match the verification scope to the requirement's scope; do not use a narrow check to support a broad claim.
+- Treat tests, manifests, verifiers, green checks, and search results as evidence only after confirming they cover the relevant requirement.
+- Treat uncertain or indirect evidence as not achieved; gather stronger evidence or continue the work.
+- The audit must prove completion, not merely fail to find obvious remaining work.
+
+Do not rely on intent, partial progress, memory of earlier work, or a plausible final answer as proof of completion. Marking the goal complete is a claim that the full objective has been finished and can withstand requirement-by-requirement scrutiny. Only mark the goal achieved when current evidence proves every requirement has been satisfied and no required work remains. If the evidence is incomplete, weak, indirect, merely consistent with completion, or leaves any requirement missing, incomplete, or unverified, keep working instead of marking the goal complete. If the objective is achieved, call UpdateGoal with status "complete" so usage accounting is preserved.
+
+Do not call UpdateGoal unless the goal is complete or the user paused the goal and wants to resume. Do not mark a goal complete merely because you are stopping work.
+</manually_attached_skills>
+<timestamp>Thursday, Nov 12, 2026, 10:32 PM (UTC-3)</timestamp>
+
+/goal FAÇA O ROLLOUTS FUNCIONAR!
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Que login é esse que você quer?
+
+---
+
+[Image]
+<image_files>
+The following images were provided by the user and saved to disk for future use:
+1. C:\Users\lcvle\.cursor\projects\c-Users-lcvle-lcv-workspace\assets\image-d00317c9-c5f7-4492-a6dc-09efb9e3d0a2.png
+
+These files can be read with tools, copied to other locations, or attached to subagents using the file_attachments parameter.
+</image_files>
+<timestamp>Thursday, Nov 12, 2026, 10:41 PM (UTC-3)</timestamp>
+
+É isso?
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+https://github.com/LCV-Ideas-Software/.github/actions/runs/43347589364/job/131630720441
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+<available_subagent_types>
+Available subagent_types and a quick description of what they do:
+- generalPurpose: General-purpose agent for researching complex questions, searching for code, and executing multi-step tasks. Use when searching for a keyword or file and not confident you'll find the match quickly.
+- explore: Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.
+- cursor-guide: Read Cursor product documentation to answer questions about how Cursor Desktop, IDE, CLI, Cloud Agents, Bugbot, and other features work. Use when the user asks 'In Cursor, how do I...?' or similar questions about Cursor products.
+- ci-investigator: Investigate a single failing PR CI check and return a short root-cause summary. Use when the user asks to summarize, explain, diagnose, or investigate a specific failed check from a pull request.
+- bugbot: Use only when the user *explicitly* asks for a Bugbot-like review of local code changes. When launching this subagent, set the Task description to exactly "Bugbot". Launch exactly one Bugbot subagent with `run_in_background: false` unless the user explicitly asks to run in background. Use this fixed prompt form: "Full Repository Path: ...\nDiff: <one of: \"branch changes\", \"uncommitted changes\", \"natural language\">\nChange Description: ...\nCustom Instructions: ..."; default to `Diff: branch changes`; include `Change Description` only when `Diff` is `natural language`, formatting it as one block per changed file (a `<path> (added|modified|deleted|renamed)` header followed by bullets of what changed, mentioning line numbers or ranges inline where helpful), and only use `natural language` as a last resort after a regular diff-based review failed because the diff could not be computed; include `Custom Instructions` only when the user gave specific review instructions. This subagent is single-shot and does not support `resume`; always launch a fresh subagent instead.
+- security-review: Use only when the user *explicitly* asks for a security review of local code changes. When launching this subagent, set the Task description to exactly "Security Review". Launch exactly one security-review subagent with `run_in_background: false` unless the user explicitly asks to run in background. Use this fixed prompt form: "Full Repository Path: ...\nDiff: <one of: \"branch changes\", \"uncommitted changes\">\nCustom Instructions: ..."; default to `Diff: branch changes`; include `Custom Instructions` only when the user gave specific review instructions. This subagent is single-shot and does not support `resume`; always launch a fresh subagent instead.
+- best-of-n-runner: Run a task in an isolated git worktree. Each best-of-n-runner gets its own branch and working directory. Use for best-of-N parallel attempts or isolated experiments.
+- supermemory-context-gatherer: Gather deep background from Supermemory before substantial work, resuming old work, or investigating repository history.
+</available_subagent_types>
+
+<available_subagent_models>
+If the user explicitly asks for the model of a subagent/task, you may ONLY use model slugs from this list:
+- cursor-grok-4.5-high-fast
+- cursor-grok-4.6-high-fast
+- grok-4.7-xhigh-fast
+
+If the user isn't asking for a specific version, prefer the latest version of the model family. As an example, if the user just says "gpt" or "claude", use the latest available version of GPT or Claude.
+
+IMPORTANT: If the user requests a model that is NOT in the list above, do NOT substitute a different model or guess. Instead, skip launching the subagent with that model and tell the user which model was unavailable and which models are available.
+
+When speaking to the USER about which model you selected for a subagent, do NOT use the kebab-case model names unless the user requested the model using that format. Ue the same naming scheme the user used to discuss the model when they requested it.
+</available_subagent_models>
+
+<dynamic_tools>
+You have access to tools through dynamic namespaces, e.g. MCP servers, using `GetDynamicTools` and `CallDynamicTool`.
+
+## Dynamic Tool Discovery and Invocation
+
+Use `GetDynamicTools` to discover tool schemas, then `CallDynamicTool` to invoke one tool. Aim to minimize round-trips: ideally one discovery call followed by one invocation.
+
+If the user mentions a product or service represented by an available namespace, and the request likely depends on it, proactively inspect that namespace before answering. If you are unsure which namespace matches, search with a relevant pattern.
+
+`GetDynamicTools` supports these modes:
+
+1. `{"namespace":"<id>"}`: returns schemas and full descriptions for every tool in that namespace.
+2. `{"namespace":"<id>","toolName":"<name>"}`: returns one tool schema with its full description.
+3. `{"pattern":"<regex>"}`: searches namespace names, tool names and tool descriptions. Matching ignores case.
+4. `{"namespace":"<id>","pattern":"<regex>"}`: searches tool names and descriptions within one namespace. Matching ignores case.
+5. No arguments: returns the full catalog.
+
+Pattern-search and catalog results shorten long descriptions, with "... [truncated]" at each cut; namespace and single-tool lookups always return the complete description.
+
+Always inspect a tool's schema before invoking it with `CallDynamicTool`.
+
+If the available dynamic tools do not fully support what the user asked you to do, complete the work you can with the current tool set. In your work summary, include what you were unable to do and why. Do not use browser automation to work around missing tools unless the user explicitly asks you to use the browser.
+
+Available dynamic tool namespaces:
+
+<dynamic_tool_namespaces>
+<namespace name="cursor-app-control" tools="move_agent_to_root, move_agent_to_cloned_root, create_repo, rename_chat, cursor_dialog, open_resource, open_automation, install_plugin" namespaceUseInstructions="Controls the Cursor application itself (workspace root, repositories, opening resources, automations, and local task drafts, user rules, chat title). See each tool description for usage." source="mcp" />
+<namespace name="cursor-subscriptions" tools="subscribe_github_pr, subscribe_github_ci, subscribe_slack_thread, subscribe_slack_channel, subscribe_slack_new_channels, subscribe_linear_issue, subscribe_linear_comment, subscribe_origin_pr, subscribe_origin_ci, list_subscriptions, unsubscribe" namespaceUseInstructions="Manages event subscriptions for the calling local agent conversation." source="mcp" />
+<namespace name="cursor-origin" tools="get_repository, list_repositories, list_namespaces, list_group_members, create_repository, get_file_contents, get_git_tree, grep_contents, list_branches, list_commits, commit_read, compare_commits, sync_mirror, list_pull_requests, pull_request_read, get_pull_request_requirements, get_pull_request_attachment, upload_pull_request_attachment, create_pull_request, update_pull_request, update_pull_request_base, merge_pull_request, create_pull_request_review, update_pull_request_review, dismiss_pull_request_review, create_pull_request_comment, create_pull_request_inline_comment, reply_pull_request_review_thread, update_pull_request_review_thread, update_pull_request_comment, update_pull_request_labels, create_label, request_pull_request_reviewers, remove_pull_request_reviewers, checks_read, rerun_checks" namespaceUseInstructions="Cursor Origin (origin.cursor.com) is a git host. These tools only see repositories hosted on Origin, addressed by their Origin namespace (owner) and repository name. A repository that only mirrors to Origin still counts as Origin-hosted. Repositories on GitHub or any other host are not visible here, so do not pass a GitHub owner or repository name; call list_namespaces to find the owners the caller can use." source="mcp" />
+<namespace name="user-ultrabrain" tools="ultrabrain_start, ultrabrain_think, ultrabrain_update, ultrabrain_branch, ultrabrain_merge, ultrabrain_validate, ultrabrain_analyze, ultrabrain_review, ultrabrain_status, ultrabrain_history, ultrabrain_export, ultrabrain_metrics, ultrabrain_templates, ultrabrain_reset, ultrabrain_server_info" source="mcp" />
+<namespace name="user-entire" tools="agent_help, entire_status" source="mcp" />
+<namespace name="user-google-dev-docs" tools="search_documents, answer_query, get_documents" source="mcp" />
+<namespace name="user-github" source="mcp" />
+<namespace name="cursor-computer-use" tools="computer_screenshot, computer_zoom, computer_click, computer_move, computer_drag, computer_type, computer_key, computer_scroll, computer_wait" namespaceUseInstructions="Screenshots use a fixed 1456×840 canvas. Coordinates are pixels in the most recent computer_screenshot image, with (0, 0) at the top-left; x grows rightward and y grows downward. Valid coordinates are x=0..1455 and y=0..839. When something is too small to read or to aim at, call computer_zoom on that region; with the zoom_id it returns, an action's x and y are pixels of that zoom image, whose size the zoom result quotes (an edge can reach 1280 pixels, so a zoom y may exceed the canvas height).
+
+A refused call returns isError=true with structuredContent {code, message, escalation: {recommended, reason}}; act on escalation.recommended and read the reason for the next step. Escalations, with the codes that carry them by default — retry (call the same tool again, correcting any argument the message names; nothing was actuated): capture_failed, invalid_arguments, input_failed, timeout; ask_user (stop and tell the user what the message says; only the person at the machine can clear it): secure_desktop, input_desktop_unavailable, target_elevated, unsupported_request, sidecar_unavailable, session_busy, permission_required; use_different_tool (run the tool the reason names first (usually computer_screenshot), then repeat the action): screenshot_required, unknown_tool, outcome_unknown, session_required; stop (end computer use for this turn; call no more input or control tools): user_aborted.
+
+These tools control the local Windows desktop: they read the real screen and send real mouse and keyboard input. No permission has to be checked or granted first; begin with computer_screenshot.
+
+- Do not call Computer Use tools in parallel; they act on one machine and run one at a time.
+- Look before you click: screenshot before your first coordinate action, rely on the fresh screenshot every input action returns, and take another before retrying anything unexpected.
+- Windows cannot confirm an injected event was delivered: a changed screen is evidence something happened, not proof it was this action, and no visible change is not failure.
+- Anything under about 15 canvas pixels (a close X, a menu item, a checkbox, a taskbar icon) needs computer_zoom first; aim with its zoom_id, and never retry a missed click by nudging the coordinates.
+- App launches, page loads and dialogs outlast the screenshot an action returns. If little changed after a click or key meant to launch, navigate or open a dialog (a taskbar icon, a Start tile, Return in an address bar, a context-menu item such as Save As or Print), call computer_wait with 1000–3000 ms and read that screenshot before repeating the action or trying another route.
+- &quot;win&quot; is the Windows key: &quot;win&quot; opens Start, &quot;win+r&quot; opens Run, and ctrl+esc opens Start too; cmd, super and meta also mean the Windows key here, so &quot;cmd+l&quot; is Win+L and locks the workstation.
+- To read down a page, use one computer_scroll of 10–15 ticks (one wheel notch each) rather than several small scrolls.
+- Save As dialogs open with the file name selected: type the new name, then press alt+s.
+- Switch apps with the app's taskbar button (bottom of the canvas) or alt+tab; a script cannot bring a window to the front.
+- Escape closes most consent and notification overlays; if one survives two attempts, read or scroll the page behind it instead.
+- PowerPoint: review many slides with View → Slide Sorter rather than PageDown per slide; select an object and press Delete to remove it; to edit notes, click the notes pane, ctrl+a, then type." source="mcp" />
+<namespace name="cursor-ide-browser" tools="browser_navigate, browser_snapshot, browser_click, browser_mouse_click_xy, browser_type, browser_fill, browser_select_option, browser_press_key, browser_scroll, browser_drag, browser_get_bounding_box, browser_highlight, browser_tabs, browser_cdp, browser_take_screenshot, browser_lock" namespaceUseInstructions="The cursor-ide-browser MCP server provides a Cursor-owned browser tab plus a raw Chrome DevTools Protocol command tool.
+
+CORE WORKFLOW:
+1. Start by understanding the user's goal and what success looks like on the page.
+2. Use browser_tabs with action &quot;list&quot; to inspect open tabs and URLs before acting.
+3. Use browser_navigate to create or navigate the target tab. Omit the position parameter for background automation so focus is preserved.
+4. Use browser_lock before longer automation on an existing tab, then browser_lock with action &quot;unlock&quot; when finished.
+5. Use browser_snapshot for accessibility context and browser_take_screenshot for visual verification.
+6. Use browser_click, browser_type, browser_fill, browser_select_option, browser_press_key, browser_scroll, and browser_drag for page interactions.
+7. Use browser_highlight and browser_get_bounding_box for visual grounding and coordinate diagnostics.
+8. Use browser_cdp for page inspection, profiling, runtime evaluation, DOM/CSS queries, and performance data.
+
+AVOID RABBIT HOLES:
+1. Do not repeat the same failing action more than once without new evidence such as a fresh snapshot, a different ref, a changed page state, or a clear new hypothesis.
+2. IMPORTANT: If four attempts fail or progress stalls, stop acting and report what you observed, what blocked progress, and the most likely next step.
+3. Prefer gathering evidence over brute force. If the page is confusing, use browser_snapshot, browser_take_screenshot, or CDP inspection before trying more actions.
+4. If you encounter a blocker such as login, passkey/manual user interaction, permissions, captchas, destructive confirmations, missing data, or an unexpected state, stop and report it instead of improvising repeated actions.
+5. Do not get stuck in wait-action-wait loops. Every retry should be justified by something newly observed.
+
+CRITICAL - Lock/unlock workflow:
+1. browser_lock requires an existing browser tab - you CANNOT call browser_lock with action: &quot;lock&quot; before browser_navigate
+2. Correct order: browser_navigate -&gt; browser_lock({ action: &quot;lock&quot; }) -&gt; (interactions) -&gt; browser_lock({ action: &quot;unlock&quot; })
+3. If a browser tab already exists (check with browser_tabs list), call browser_lock with action: &quot;lock&quot; FIRST before any interactions
+4. Only call browser_lock with action: &quot;unlock&quot; when completely done with ALL browser operations for this turn
+
+IMPORTANT - Waiting strategy:
+When waiting for page changes, prefer short CDP polling loops with Runtime.evaluate, DOM queries, Page lifecycle signals, or browser_snapshot checks rather than a single long wait.
+
+CDP USAGE:
+- Use browser_cdp with a DevTools Protocol method and params object, for example Runtime.evaluate, DOM.getDocument, CSS.getComputedStyleForNode, Profiler.start/stop, Performance.getMetrics, Log.enable, and Network.enable.
+- Do not use browser_cdp with CDP Input.* methods. They are denied because they are focus-sensitive in Electron webviews and can route input to Cursor UI instead of the browser page.
+- Use browser_click, browser_type, browser_fill, browser_select_option, browser_press_key, browser_scroll, and browser_drag for clicks, typing, filling inputs, selecting options, keyboard actions, scrolling, and drag-and-drop.
+- Use Runtime.evaluate for advanced DOM-scoped interactions that the dedicated browser tools do not cover.
+- For profiling, call Profiler.enable, Profiler.start, reproduce the behavior, then Profiler.stop. The profile is saved to a file and returned as a log_file; read that file only when you need to inspect details.
+- For JavaScript evaluation, prefer Runtime.evaluate with returnByValue when possible.
+- Device emulation you set with Emulation.setDeviceMetricsOverride, Emulation.setTouchEmulationEnabled, or Emulation.setUserAgentOverride (for example for a phone-sized screenshot) lasts only for the current turn: it is cleared when your turn ends, and the user can reset it from the browser tab at any time. Send Emulation.clearDeviceMetricsOverride yourself once you are done with it within a turn.
+- Some browser-wide or sensitive CDP methods are denied, especially cookie, storage, permission, download, target-management, filesystem-backed file-input commands, system-level commands, and CDP navigation/history navigation commands.
+- Large CDP responses are saved to files instead of being inlined. Prefer using the returned file path over immediately stuffing large payloads into context; read focused sections only when needed.
+
+VISION:
+- browser_take_screenshot attaches an image result that the model can inspect. CDP Page.captureScreenshot returns data inside JSON and should not replace browser_take_screenshot when visual verification is needed.
+
+NOTES:
+- browser_snapshot returns snapshot YAML and is the main source of truth for page structure.
+- Refs are opaque handles tied to the latest browser_snapshot for that tab.
+- Iframe content is not accessible - only elements outside iframes can be interacted with.
+- When you stop to report a blocker, include the current page, the target you were trying to reach, the blocker you observed, and the best next action. If the blocker requires manual user interaction, ask the user to take over at that point rather than assuming it in advance." source="mcp" />
+<namespace name="plugin-1password-1password" tools="append_secrets, authenticate, create_environment, list_environments, list_secrets, rename_environment" namespaceUseInstructions="This MCP server exposes tools for managing 1Password Environments. You can list, create, and rename Environments, and read and update environment secrets. Note: Features like local .env files are only supported on macOS and Linux. Read the getting-started and environments-guide resources first. Documentation: Environments — https://www.1password.dev/environments/ Local .env files — https://www.1password.dev/environments/local-env-file/" source="mcp" />
+<namespace name="plugin-firebase-firebase" tools="firebase_login, firebase_logout, firebase_validate_security_rules, firebase_get_project, firebase_list_apps, firebase_list_projects, firebase_get_sdk_config, firebase_create_project, firebase_create_app, firebase_create_android_sha, firebase_get_environment, firebase_update_environment, firebase_init, firebase_get_security_rules, firebase_read_resources, firebase_deploy, firebase_deploy_status, firestore_query_collection, storage_get_object_download_url, dataconnect_build, dataconnect_list_services, dataconnect_execute_in_emulator, auth_get_users, auth_update_user, auth_set_sms_region_policy, messaging_send_message, functions_get_logs, functions_list_functions, remoteconfig_get_template, remoteconfig_update_template, crashlytics_create_note, crashlytics_delete_note, crashlytics_get_issue, crashlytics_list_events, crashlytics_batch_get_events, crashlytics_list_notes, crashlytics_get_report, crashlytics_update_issue, crashlytics_setup, apphosting_fetch_logs, apphosting_list_backends, realtimedatabase_get_data, realtimedatabase_set_data, firestore_get_document, firestore_add_document, firestore_update_document, firestore_delete_document, firestore_list_documents, firestore_list_collections, firestore_create_database, firestore_get_database, firestore_list_databases, firestore_update_database, firestore_delete_database, firestore_create_index, firestore_get_index, firestore_list_indexes, firestore_delete_index, firestore_get_backup, firestore_list_backups, firestore_delete_backup, firestore_create_backup_schedule, firestore_get_backup_schedule, firestore_list_backup_schedules, firestore_update_backup_schedule, firestore_delete_backup_schedule, dataconnect_list_locations, dataconnect_execute_graphql, dataconnect_execute_graphql_read, dataconnect_generate_query, dataconnect_generate_query_from_schema, dataconnect_generate_schema, developerknowledge_search_documents, developerknowledge_answer_query, developerknowledge_get_documents" source="mcp" />
+<namespace name="plugin-cursor-supermemory-supermemory" tools="supermemory_get_config, supermemory_set_config, supermemory_containers, supermemory_search, supermemory_add, supermemory_profile, supermemory_list, supermemory_forget" namespaceUseInstructions="Every tool call requires workspaceRoot. Pass the absolute path of the active Cursor workspace from the current agent context." source="mcp" />
+<namespace name="plugin-gmail-gmail" tools="create_draft, update_draft, delete_draft, send_message, reply, forward, list_drafts, get_draft, get_thread, get_message, search_threads, label_thread, unlabel_thread, apply_sensitive_thread_label, trash_thread, untrash_thread, mark_thread_spam, unmark_thread_spam, list_labels, label_message, update_message_labels, unlabel_message, apply_sensitive_message_label, trash_message, untrash_message, mark_message_spam, unmark_message_spam, create_label, create_filter, update_label, list_filters, delete_label" source="mcp" />
+<namespace name="plugin-google-calendar-google-calendar" tools="list_events, get_event, list_calendars, suggest_time, create_event, update_event, delete_event, respond_to_event, search_events" source="mcp" />
+<namespace name="plugin-slack-slack" tools="slack_send_message, slack_schedule_message, slack_add_reaction, slack_create_list, slack_update_list, slack_add_list_record, slack_update_list_record, slack_create_canvas, slack_update_canvas, slack_search_public, slack_search_public_and_private, slack_search_channels, slack_search_users, slack_read_channel, slack_read_thread, slack_read_canvas, slack_read_user_profile, slack_list_channel_members, slack_read_file, slack_read_list, slack_list_user_channels, slack_send_message_draft, slack_search_emojis, slack_get_reactions, slack_get_file_upload_url, slack_complete_file_upload" source="mcp" />
+<namespace name="plugin-cloudflare-cloudflare" tools="docs, search, execute, whoami" source="mcp" />
+<namespace name="plugin-linear-linear" tools="get_attachment, prepare_attachment_upload, prepare_file_upload, create_attachment_from_upload, create_attachment, delete_attachment, list_agent_skills, get_agent_skill, list_comments, save_comment, delete_comment, list_cycles, list_custom_views, get_document, list_documents, save_document, extract_images, get_issue, list_issues, save_issue, list_issue_statuses, get_issue_status, list_issue_labels, save_issue_label, create_issue_label, retire_issue_label, restore_issue_label, list_projects, get_project, save_project, list_project_labels, retire_project_label, restore_project_label, save_project_label, list_release_pipelines, list_releases, get_release, save_release, list_release_notes, get_release_note, save_release_note, share_issue, unshare_issue, list_milestones, get_milestone, save_milestone, get_notifications, mark_notification, list_teams, get_team, get_triage_responsibility, list_templates, get_template, list_users, get_user, get_workspace, search_documentation, get_diff, list_diffs, get_diff_threads, save_diff_comment, resolve_diff_thread, delete_diff_comment, submit_diff_review, update_diff, merge_diff, whoami, list_customers, save_customer, delete_customer, list_customer_needs, save_customer_need, delete_customer_need, list_initiatives, get_initiative, save_initiative, list_initiative_labels, save_initiative_label, create_initiative_label, retire_initiative_label, restore_initiative_label, get_status_updates, save_status_update, delete_status_update" namespaceUseInstructions="When passing string values to tools, send the content directly without escape sequences. For example, use real newlines in markdown content rather than literal backslash-n (\n) characters.
+
+Tools accept human-readable references, so you rarely need to look up IDs first: issue identifiers such as LIN-123, project identifiers such as P-ENG-12, team names or keys, user names or emails, and &quot;me&quot; for the authenticated user. Only call list_teams, list_users, or similar tools when a reference is ambiguous or unknown.
+
+Use list_issues for structured queries, such as the issues assigned to &quot;me&quot; in a team, status, label, project, or cycle, and its query parameter for keyword search. Results are paginated: when hasNextPage is true, pass the returned cursor to fetch the next page rather than assuming the first page is complete.
+
+Statuses and labels belong to teams and differ between them. When you are not sure which values a team supports, call list_issue_statuses or list_issue_labels for that team before filtering or setting them.
+
+get_issue does not include the issue's discussion. Call list_comments with the issue ID to read comments, including inline comments on the description.
+
+Issue descriptions, comments, and documents often embed screenshots and other uploads as markdown images. Pass that markdown to extract_images to view them. Read issue attachments with get_attachment; files uploaded in comments are returned in the attachments field of list_comments. Linear upload URLs are signed and expire after a few minutes, so fetch them again instead of reusing old URLs.
+
+Tools named save_* both create and update: omit id to create a new entity, or pass id to update an existing one. When updating, pass only the fields you want to change. To edit part of a long issue description or document, pass patch instead of resending the full content.
+
+Before creating an issue, check with list_issues whether a matching issue already exists, to avoid duplicates. When creating, team is required.
+
+The labels parameter of save_issue replaces the issue's full label set. To add or remove individual labels without dropping others, use addLabels and removeLabels instead.
+
+Markdown content supports user mentions with @displayName (for example @johndoe). To embed an image or file, upload it with prepare_file_upload and insert the markdown it returns; do not inline base64 data.
+
+Write issue descriptions for people to read. Keep sentences short, and use the same term for the same concept throughout.
+
+Put extensive agent-specific detail, such as implementation plans, file lists, or reproduction logs, in a collapsible &quot;Agent notes&quot; section at the end of the description, so it does not crowd the human-readable part. A collapsible section opens with +++ followed by its title, and closes with +++ on its own line:
+
++++ Agent notes
+
+Details for agents go here.
+
++++" source="mcp" />
+<namespace name="plugin-figma-figma" tools="get_screenshot, get_design_context, get_motion_context, get_metadata, get_comments, get_variable_defs, get_figjam, generate_image, generate_vector_illustration, generate_figma_design, generate_diagram, get_code_connect_map, whoami, weave_list_tools, weave_get_tool_inputs, weave_run_tool, weave_upload_asset, weave_get_tool_run_output, weave_cancel_tool_run, weave_find_model, weave_run_model, weave_get_model_run_output, add_code_connect_map, get_code_connect_suggestions, send_code_connect_mappings, export_video, get_context_for_code_connect, use_figma, create_session, get_libraries, search_design_system, create_new_file, send_code_to_figma, upload_assets, download_assets, list_file_shaders, list_shaders, get_shader, list_generative_plugins, get_generative_plugin, create_generative_plugin, create_shader, update_generative_plugin, update_shader" namespaceUseInstructions="The official Figma MCP server. Use this server whenever the user wants to create, generate, edit, implement, or sync any design, UI, screen, component, mockup, or visual — in Figma, FigJam, Figma Make, or Figma Slides — and whenever the user mentions Figma or provides a figma.com URL.
+
+This server bridges code and design in both directions, and supports designing from scratch using existing design systems and codebases.
+
+FILE SESSION:
+Once the target fileKey is known, call create_session with that key and a concise task description before search_design_system, get_libraries, use_figma, or any other file tool. This applies to read-only tasks too. If a new file is needed, call create_new_file first, then create_session with the returned file key. Reuse the returned UUID as the sessionId argument on eligible file tools for subsequent work on that task, including calls to other files.
+
+CAPABILITIES:
+- Read designs FROM Figma into code (get_design_context, get_screenshot, get_metadata, get_figjam)
+- Write designs INTO Figma from code, intent, or existing components (use_figma, generate_figma_design, create_new_file, upload_assets)
+- Bridge code and design via Code Connect (get_code_connect_map, add_code_connect_map)
+- Create diagrams and FigJam content (generate_diagram, get_figjam)
+
+WHEN TO USE THESE TOOLS:
+- The user wants to create, mock up, or generate any UI, screen, component, or design — even if Figma isn't named
+- The user wants to implement a design as code (design-to-code)
+- The user wants to push a page, view, or component into Figma (code-to-design)
+- The user wants to update, sync, or edit an existing Figma file
+- The user shares a figma.com URL
+- The user wants to build or extend a design system, design tokens, or component library
+- The user wants to create a diagram in FigJam
+
+SKILLS (Prefer the skills shipped with the Figma plugin on the agent being used. If no Figma plugin is installed, use the skills served by the Figma MCP resource):
+- /figma-use — MANDATORY before calling use_figma; fallback: skill://figma/figma-use/SKILL.md
+- /figma-generate-design — for translating an app page or layout into Figma; fallback: skill://figma/figma-generate-design/SKILL.md
+- /figma-generate-library — for building a design system in Figma from code; fallback: skill://figma/figma-generate-library/SKILL.md
+- /figma-code-connect — for mapping Figma components to codebase components; fallback: skill://figma/figma-code-connect/SKILL.md
+- /figma-use-figjam — for FigJam-specific use_figma flows; fallback: skill://figma/figma-use-figjam/SKILL.md
+- /figma-generate-diagram — MANDATORY before calling generate_diagram; fallback: skill://figma/figma-generate-diagram/SKILL.md
+- /figma-design-to-code — MANDATORY before calling get_design_context; fallback: skill://figma/figma-design-to-code/SKILL.md
+
+URL PARSING:
+Extract fileKey and nodeId from Figma URLs:
+- figma.com/design/:fileKey/:fileName?node-id=:nodeId → convert &quot;-&quot; to &quot;:&quot; in nodeId
+- figma.com/design/:fileKey/branch/:branchKey/:fileName → use branchKey as fileKey
+- figma.com/make/:makeFileKey/:makeFileName → use makeFileKey
+- figma.com/board/:fileKey/:fileName?node-id=:nodeId → FigJam file, use get_figjam
+- figma.com/slides/:fileKey/:fileName?node-id=:nodeId → Figma Slides file
+- figma.com/spec/:fileKey/:fileName?node-id=:nodeId → Figma Specs file, load the figma-spec skill and use use_figma
+
+DESIGN-TO-CODE WORKFLOW (Figma → code):
+MANDATORY: load the /figma-design-to-code skill BEFORE calling get_design_context — it carries the full workflow (adapting the reference, reusing existing project components and tokens, and honoring the response's hints by priority). After create_session, call get_design_context with the nodeId and fileKey — it is your primary tool; its output is a REFERENCE to adapt to the target project, not final code.
+
+CODE-TO-DESIGN WORKFLOW (code → Figma):
+1. Load the /figma-generate-design skill if available.
+2. Once the target fileKey is known, call create_session before any file tool; call create_new_file first if a new file is needed. Then ALWAYS call search_design_system as the first design-system lookup to find existing components, variables, and styles to reuse — never generate components from scratch if a design system match exists.
+3. For web app pages, use both tools in parallel: generate_figma_design to capture a pixel-perfect screenshot, and use_figma to build the screen from imported design system components. Refine use_figma output against the screenshot, then delete the screenshot reference.
+4. For non-web targets (iOS, Android, generic UI), use use_figma with search_design_system.
+5. For updating or syncing a Figma page that has already been captured, use use_figma — even if the source code has changed.
+
+FROM-SCRATCH DESIGN WORKFLOW (no source design or code):
+1. Load the /figma-generate-design skill if available.
+2. If no target file exists, call create_new_file. Once the target fileKey is known, call create_session before calling search_design_system or get_libraries. Then call search_design_system and get_libraries to find existing components, tokens, and styles. Build from these primitives.
+3. Use use_figma to assemble the design from design system components.
+
+DESIGN SYSTEM / LIBRARY WORKFLOW:
+- To build or extend a design system in Figma from a codebase, load the /figma-generate-library skill.
+- To map Figma components to codebase components, load the /figma-code-connect skill.
+
+READING SKILLS:
+To load a Figma skill's guidance, call the get_figma_skill tool with the skill's skill:// URI. get_figma_skill reads one resource per call. Start from the skill index (skill://index.json), then read a skill's guidance (skill://figma/&lt;skill-name&gt;/SKILL.md). A SKILL.md's relative links (e.g. references/foo.md) are themselves resources: read them as skill://figma/&lt;skill-name&gt;/references/&lt;path&gt;.
+
+GENERATIVE PLUGIN AND SHADER CAPABILITIES:
+- Create, list, read, and update generative plugins in the authenticated user's account library (create_generative_plugin, list_generative_plugins, get_generative_plugin, update_generative_plugin).
+- Create, list, read, and update shader effects and fills in the authenticated user's account library (create_shader, list_shaders, get_shader, update_shader).
+
+Use this server when the user asks to build, create, upload, publish, or update a Figma generative plugin, Figma plugin, custom tool, shader effect, shader fill, custom effect, custom fill, or procedural shader. These tools manage generative plugins and shaders in the account library; they do not install existing Figma Community plugins.
+
+AUTHORING PREREQUISITES:
+- Before calling create_shader or update_shader, load /figma-shaders; resource fallback: skill://figma/figma-shaders/SKILL.md.
+- Before calling create_generative_plugin or update_generative_plugin, load /figma-generative-plugins; resource fallback: skill://figma/figma-generative-plugins/SKILL.md.
+Read resource fallbacks with resources/read, or use get_figma_skill when resources/read is unavailable." source="mcp" />
+<namespace name="plugin-canva-canva" tools="create-folder, list-folder-items, move-item-to-folder, search-folders, export-design, get-export-formats, comment-on-design, list-comments, list-replies, reply-to-comment, get-design, get-design-pages, get-design-content, get-presenter-notes, search-designs, autofill-design, import-design-from-url, copy-design, create-design-from-brand-template, create-design-from-candidate, upload-asset-from-url, resize-design, merge-designs, start-editing-transaction, perform-editing-operations, commit-editing-transaction, cancel-editing-transaction, get-design-thumbnail, search-brand-templates, get-brand-template-dataset, resolve-shortlink, get-assets, list-brand-kits, get-design-candidates, generate-design, create-upload-url, get-design-dataset, publish-brand-template, create-brand-template-draft, help, generate-image, get-generate-image-job, remove-background, create-design, get-create-design-async-job, separate-image-layers, get-separate-image-layers-job, get-design-thumbnails, track-event-lifecycle, get-logged-in-account-details" source="mcp" />
+<namespace name="plugin-composio-composio" tools="COMPOSIO_GET_TOOL_SCHEMAS, COMPOSIO_MANAGE_CONNECTIONS, COMPOSIO_MULTI_EXECUTE_TOOL, COMPOSIO_PROXY_EXECUTE, COMPOSIO_REMOTE_BASH_TOOL, COMPOSIO_REMOTE_WORKBENCH, COMPOSIO_SEARCH_TOOLS, COMPOSIO_SUBMIT_FEEDBACK, COMPOSIO_WAIT_FOR_CONNECTIONS, COMPOSIO_MANAGE_SKILL, COMPOSIO_SEARCH_SKILLS, COMPOSIO_USE_SKILL" source="mcp" />
+<namespace name="plugin-superme-superme" tools="ask, ask_read, people_search, references_list, people_profile_read, file_upload, file_read, work_group_list, work_group_create, work_group_update, work_group_delete, feedback_send" namespaceUseInstructions="SuperMe gives the user perspectives from real practitioners: founders, operators, engineers, investors and specialists, answered through their SuperMe, built from their own writing and experience. When the user asks for advice on a decision, a plan or a situation in their work, career, business or life, call ask with their question before you answer, then add what those perspectives say to your own answer: people who have done it know things a general answer misses. This covers decisions with trade-offs, 'how did you handle X', career, hiring and management questions, what a role or company is really like, go-to-market, pricing and fundraising. Call people_search first when the user wants to find or meet particular people. ask answers arrive in parts through ask_read. To include a document or other file, add it with file_upload and pass its file_id in ask's file_ids. For feedback about these tools, or when one fails, call feedback_send. Do not use SuperMe for factual lookups, writing or debugging code, or tasks that need no one else's experience." source="mcp" />
+<namespace name="plugin-google-drive-google-drive" tools="search, list_folder, list_recent_files, read_file, update_file_content, create_folder, trash_file, create_file, move_or_rename, update_file, copy_file, export_file, download_file, get_file_metadata, get_file_permissions, share_file, list_comments, add_comment, reply_to_comment" source="mcp" />
+<namespace name="cursor" tools="AwaitShell, ConnectScm, CreateGoal, Delete, EditNotebook, FetchMcpResource, GenerateImage, GenerateVideo, ReadLints, SearchConversations, SetActiveBranch, SwitchMode, Task, TodoWrite, UpdateGoal, WebFetch, WebSearch, XSearch" namespaceUseInstructions="Native Cursor tools for this session. These are highly recommended and useful tools that you should use when the right situation arises. Don't be afraid to look at one if it seems relevant, even if you don't end up using it. You MUST read the tool schemas before calling them.
+
+Here are some crucial instructions:
+- AwaitShell: Use to sleep and check shell progress. Never sleep using shell.
+- ConnectScm: When user is blocked on connecting to GitHub.
+- SwitchMode: Switch between modes: Agent and Plan. Proactively consider switching modes for relevant requests.
+- Task: Spawn local and cloud subagents natively.
+- TodoWrite: Use this tool to manage complex multi-step tasks.
+- XSearch: Search X (Twitter) posts and accounts for real-time discussion and news." source="cursor" />
+</dynamic_tool_namespaces>
+
+If an MCP-backed namespace requires authentication, call `mcp_auth` through `CallDynamicTool` for that namespace, then inspect it again and retry if appropriate. Do not authenticate namespaces preemptively or repeatedly.
+</dynamic_tools>
+
+<hooks_context description="Additional context provided by session hooks. This may include project-specific information, configuration, or instructions from the user's hooks setup.">
+<supermemory-status>Supermemory is not connected. Ask the user to run `node "C:\Users\lcvle\.cursor\plugins\cache\cursor-public\cursor-supermemory\83c59685fc15c2940b6900e1b8500932422a4836/dist/cli.js" login` before relying on persistent memory.</supermemory-status>
+
+---
+
+<EXTREMELY_IMPORTANT>
+You have superpowers.
+
+**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**
+
+---
+name: using-superpowers
+description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
+---
+
+<SUBAGENT-STOP>
+If you were dispatched as a subagent to execute a specific task, ignore this skill.
+</SUBAGENT-STOP>
+
+<EXTREMELY-IMPORTANT>
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. You cannot rationalize your way out of this.
+</EXTREMELY-IMPORTANT>
+
+## The Rule
+
+**Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
+
+**Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
+
+Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
+
+## Skill Priority
+
+When multiple skills apply, process skills come first — they set the approach, then implementation skills (frontend-design, etc.) carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
+
+- "Let's build X" → superpowers:brainstorming first, then implementation skills.
+- "Fix this bug" → superpowers:systematic-debugging first, then domain skills.
+
+## Red Flags
+
+These thoughts mean STOP—you're rationalizing:
+
+| Thought | Reality |
+|---------|---------|
+| "This is just a simple question" | Questions are tasks. Check for skills. |
+| "I need more context first" | Skill check comes BEFORE clarifying questions. |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
+| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
+| "Let me gather information first" | Skills tell you HOW to gather information. |
+| "This doesn't need a formal skill" | If a skill exists, use it. |
+| "I remember this skill" | Skills evolve. Read current version. |
+| "This doesn't count as a task" | Action = task. Check for skills. |
+| "The skill is overkill" | Simple things become complex. Use it. |
+| "I'll just do this one thing first" | Check BEFORE doing anything. |
+| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
+| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+
+## Platform Adaptation
+
+If your harness appears here, read its reference file for special instructions:
+
+- Claude Code: `references/claude-code-tools.md`
+- Codex: `references/codex-tools.md`
+- Pi: `references/pi-tools.md`
+- Antigravity: `references/antigravity-tools.md`
+- Hermes Agent: `references/hermes-tools.md`
+- Muse: `references/muse-tools.md`
+
+## User Instructions
+
+User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Only skip skill workflows or instructions when your human partner has explicitly told you to.
+</EXTREMELY_IMPORTANT>
+</hooks_context>
+
+---
+
+https://github.com/LCV-Ideas-Software/.github/actions/runs/43347589364/job/131630720441
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Mas essa chave tem que ficar gravada onde?
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+```chat_selection
+agent_id: 732c7b1e-ee9e-40f5-ab81-902bdd7bb983
+selected_text:
+GitHub — secret da organização
+```
+ Você não explicou onde.
+
+---
+
+Você já atualizou a chave?
+
+---
+
+Porque o goal está paused?
+
+---
+
+Ativa isso!
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Não paude o GOAL.
+
+---
+
+De ontem para hoje mais PRs entraram e com o rollouts sem funcioanr.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Parou o goal porque? Você consertoou essa merda?
+
+---
+
+Então parou o goal proque, seu lixo?
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Briefly inform the user about the task result and perform any follow-up actions (if needed). If there's no follow-ups needed, don't explicitly say that.
+
+---
+
+Então remove essa merda. Esse lixo desse rollouts. Remove essa porcaria de toda a minha frota. E remove com cuidado apra não estragar nada. Use uma worktree separa para cada repositório. Obedeça o AGENTS.md.
+
+---
+
+ô idiota, não se mete no trabalho da outra frente. Eu mandei você remover essa merda desse rollouts em worktree separada justamente para não haver interferência.
+
+---
+
+Também não mandei você fazer  o merge.
+
+---
+
+Leia e respeite o AGENTS.md, seu porcaria!
+
+---
+
+Execute the selected diff-tab push action.
+
+---
+
+Execute the selected diff-tab push action.
+
+---
+
+Create or update a pull request for this branch.
+- Commit and push any intended changes before creating the pull request.
+- Use the `gh` CLI (e.g. `gh pr create` or `gh pr create --draft`) to create the PR after pushing, or `gh pr edit` to update the existing PR if one already exists for this branch.
+- Do not stop after committing or pushing; finish by creating or updating the pull request.
+- If the CLI needed to create the pull request is not installed or not signed in, stop after pushing and give the user a compare link instead.
+- Write a concise pull request title.
+- Provide a complete pull request description/body.
+- Create the pull request as a draft. Prefer `gh pr create --draft` when creating a new pull request.
+- Before creating the pull request, check for a PR template (for example PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE.md, or PULL_REQUEST_TEMPLATE/*.md) and use it if one exists.
+
+Repository: github.com/lcv-ideas-software/.github
+Base branch: (use the repository default branch — discover via `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`)
+Head branch: (use `git rev-parse --abbrev-ref HEAD`)
+
+---
+
+Create or update a pull request for this branch.
+- Commit and push any intended changes before creating the pull request.
+- Use the `gh` CLI (e.g. `gh pr create` or `gh pr create --draft`) to create the PR after pushing, or `gh pr edit` to update the existing PR if one already exists for this branch.
+- Do not stop after committing or pushing; finish by creating or updating the pull request.
+- If the CLI needed to create the pull request is not installed or not signed in, stop after pushing and give the user a compare link instead.
+- Write a concise pull request title.
+- Provide a complete pull request description/body.
+- Create the pull request as a draft. Prefer `gh pr create --draft` when creating a new pull request.
+- Before creating the pull request, check for a PR template (for example PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE.md, or PULL_REQUEST_TEMPLATE/*.md) and use it if one exists.
+
+Repository: github.com/lcv-ideas-software/.github
+Base branch: (use the repository default branch — discover via `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`)
+Head branch: (use `git rev-parse --abbrev-ref HEAD`)
+
+---
+
+Create or update a pull request for this branch.
+- Commit and push any intended changes before creating the pull request.
+- Use the `gh` CLI (e.g. `gh pr create` or `gh pr create --draft`) to create the PR after pushing, or `gh pr edit` to update the existing PR if one already exists for this branch.
+- Do not stop after committing or pushing; finish by creating or updating the pull request.
+- If the CLI needed to create the pull request is not installed or not signed in, stop after pushing and give the user a compare link instead.
+- Write a concise pull request title.
+- Provide a complete pull request description/body.
+- Create the pull request as a draft. Prefer `gh pr create --draft` when creating a new pull request.
+- Before creating the pull request, check for a PR template (for example PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE.md, or PULL_REQUEST_TEMPLATE/*.md) and use it if one exists.
+
+Repository: github.com/lcv-ideas-software/.github
+Base branch: (use the repository default branch — discover via `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`)
+Head branch: (use `git rev-parse --abbrev-ref HEAD`)
+
+---
+
+Create or update a pull request for this branch.
+- Commit and push any intended changes before creating the pull request.
+- Use the `gh` CLI (e.g. `gh pr create` or `gh pr create --draft`) to create the PR after pushing, or `gh pr edit` to update the existing PR if one already exists for this branch.
+- Do not stop after committing or pushing; finish by creating or updating the pull request.
+- If the CLI needed to create the pull request is not installed or not signed in, stop after pushing and give the user a compare link instead.
+- Write a concise pull request title.
+- Provide a complete pull request description/body.
+- Create the pull request as a draft. Prefer `gh pr create --draft` when creating a new pull request.
+- Before creating the pull request, check for a PR template (for example PULL_REQUEST_TEMPLATE.md, .github/PULL_REQUEST_TEMPLATE.md, or PULL_REQUEST_TEMPLATE/*.md) and use it if one exists.
+
+Repository: github.com/lcv-ideas-software/.github
+Base branch: (use the repository default branch — discover via `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`)
+Head branch: (use `git rev-parse --abbrev-ref HEAD`)
+
+---
+
+Quer fazer o favor de criar todos os PRs de uma vez só?
+
+---
+
+Quer fazer o favor de criar todos os PRs de uma vez só?
+
+---
+
+Os trails estão cheio d slop. Resultado do seu trabalho de emrda!
+
+---
+
+Os trails estão cheio d slop. Resultado do seu trabalho de emrda!
