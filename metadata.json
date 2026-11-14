@@ -24,13 +24,6 @@
       "prompt": ""
     }
   ],
-  "token_usage": {
-    "input_tokens": 12,
-    "cache_creation_tokens": 6183,
-    "cache_read_tokens": 881470,
-    "output_tokens": 3648,
-    "api_call_count": 5
-  },
   "redaction": {
     "replacements": 3,
     "layers": {
