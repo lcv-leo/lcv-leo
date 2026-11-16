@@ -51,7 +51,7 @@ current:
   - ultrabrain-mcp → Structured deep-reasoning MCP server [npm]
   - Reflexos da Alma → Public blog PWA (React + Workers + D1 + Vertex AI) [Live]
   - Oráculo Financeiro → Inflation-indexed fixed-income dashboard (React + Workers + D1) [Live]
-  - Calculadora Android → Native Kotlin/Compose port of the currency calculator [v1.0.0 on Google Play]
+  - Calculadora Android → Native Kotlin/Compose port of the currency calculator [Published on Google Play]
   - Maestro        → Desktop writing/orchestration studio (Tauri + Rust) [Shipping]
   - Sponsor Motor  → Donation payments worker (Mercado Pago → Stripe migration planned) [Live]
 motto: "Fail closed, test first, ship through pull requests."
@@ -63,8 +63,8 @@ motto: "Fail closed, test first, ship through pull requests."
 
 - Building **cross-review** — an MCP server that runs adversarial code review across **6 AI models** (GPT, Claude, Gemini, DeepSeek, Grok, Perplexity) with unanimous-convergence gates, evidence custody and cost accounting → Live on npm
 - Building **ultrabrain-mcp** — a structured deep-reasoning MCP server with branching, review and export → Live on npm
-- Shipping **Calculadora Android** — the currency calculator rebuilt as a native Android app in **Kotlin + Jetpack Compose** (Material 3, Hilt, Room, Retrofit/OkHttp), with the calculation engine as pure Kotlin in `:core:calc`; **v1.0.0 published on Google Play**, no tracking, no ads, no account, AGPL-3.0
-- Starting the **Astrólogo** and **Maestro** Android editions — Gradle projects opened, native ports ahead
+- Shipping **Calculadora Android** — the currency calculator rebuilt as a native Android app in **Kotlin + Jetpack Compose** (Material 3, Hilt, Room, Retrofit/OkHttp), with the calculation engine as pure Kotlin in `:core:calc`; **published on Google Play**, no tracking, no ads, no account. Current original application code is proprietary; earlier AGPL grants and third-party licenses remain in effect.
+- Developing the **Astrólogo** and **Maestro** Android editions — native **Kotlin + Jetpack Compose** applications with published Android releases
 - Shipping **Reflexos da Alma** — a public blog PWA on Cloudflare (React 19, Workers, D1, Vertex AI chat/summaries, TipTap content pipeline)
 - Shipping **Oráculo Financeiro** — an inflation-indexed fixed-income dashboard (React, Workers, D1, AI analysis)
 - Building **Maestro** — a desktop writing & orchestration studio in **Tauri/Rust** with deterministic engines (citations, link integrity, web evidence)
