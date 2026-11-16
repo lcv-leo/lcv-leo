@@ -1,0 +1,61 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M7HTYNQGY9NSPT18ZJ6CVVDV",
+  "session_id": "01a1e3ac-b953-79a1-91dd-19a52b63cfa2",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-16T09:28:03.0341478Z",
+  "branch": "codex/lcv661-lcv-leo-docs",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "site/index.html"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "0a03a3798d11",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 134341,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1625728,
+    "output_tokens": 8426,
+    "api_call_count": 19,
+    "subagent_tokens": {
+      "input_tokens": 23304,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 514304,
+      "output_tokens": 1366,
+      "api_call_count": 6
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 134341,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1625728,
+    "output_tokens": 8426,
+    "api_call_count": 19,
+    "subagent_tokens": {
+      "input_tokens": 23304,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 514304,
+      "output_tokens": 1366,
+      "api_call_count": 6
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 20,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 0,
+      "entropy": 18,
+      "key_context": 1,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
