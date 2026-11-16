@@ -3,7 +3,7 @@
   "checkpoint_id": "01M7HTYNQGY9NSPT18ZJ6CVVDV",
   "session_id": "01a1e3ac-b953-79a1-91dd-19a52b63cfa2",
   "strategy": "manual-commit",
-  "created_at": "2026-11-16T09:28:03.0341478Z",
+  "created_at": "2026-11-16T09:32:59.3941804Z",
   "branch": "codex/lcv661-lcv-leo-docs",
   "checkpoints_count": 1,
   "files_touched": [
@@ -13,28 +13,22 @@
   "agent": "Codex",
   "model": "gpt-6.1-sol",
   "turn_id": "0a03a3798d11",
-  "compact_transcript_start": 0,
+  "checkpoint_transcript_start": 153,
+  "transcript_lines_at_start": 153,
+  "compact_transcript_start": 25,
   "token_usage": {
-    "input_tokens": 134341,
+    "input_tokens": 33348,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 1625728,
-    "output_tokens": 8426,
-    "api_call_count": 19,
-    "subagent_tokens": {
-      "input_tokens": 23304,
-      "cache_creation_tokens": 0,
-      "cache_read_tokens": 514304,
-      "output_tokens": 1366,
-      "api_call_count": 6
-    },
-    "subagent_tokens_complete": true
+    "cache_read_tokens": 4654464,
+    "output_tokens": 11214,
+    "api_call_count": 31
   },
   "session_token_usage": {
-    "input_tokens": 134341,
+    "input_tokens": 167689,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 1625728,
-    "output_tokens": 8426,
-    "api_call_count": 19,
+    "cache_read_tokens": 6280192,
+    "output_tokens": 19640,
+    "api_call_count": 50,
     "subagent_tokens": {
       "input_tokens": 23304,
       "cache_creation_tokens": 0,
@@ -45,14 +39,14 @@
     "subagent_tokens_complete": true
   },
   "redaction": {
-    "replacements": 20,
+    "replacements": 22,
     "layers": {
-      "betterleaks": 0,
+      "betterleaks": 2,
       "connection_string": 0,
       "credential_key": 0,
       "credential_value": 2,
       "credentialed_uri": 0,
-      "entropy": 18,
+      "entropy": 20,
       "key_context": 1,
       "provider_token": 0,
       "shell_stdin": 0
