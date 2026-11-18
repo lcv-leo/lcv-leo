@@ -11,8 +11,10 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
 
 ## Unreleased
 
-- Align the `THIRDPARTY.md` license link for the official Claude Code Action
-  with its pinned v1.0.271 release commit SHA (LCV-619).
+- Update Claude Code Action to v1.0.280 and Dependency Review Action to v5.0.1
+  at their complete immutable release commit SHAs, preserving workflow inputs
+  and permissions. Align the Claude Code Action MIT license link with its new
+  pin; the bundled minimatch license change to ISC is approved under LCV-666.
 
 - Correct the master text's Section 7.C intake-routing rule in `AGENTS.md` and
   `CLAUDE.md`: the exactly-one-Team-or-template invariant applies to addresses
