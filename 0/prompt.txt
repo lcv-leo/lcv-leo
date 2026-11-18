@@ -1,0 +1,50 @@
+Implement only this repository's authorized dependency updates for the already-running LCV-666 daily audit. Do not start another audit or acquire its shared lock. Parent RUN_KEY: REDACTED Worktree: C:\Users\lcvle\lcv-workspace\.worktrees\lcv-leo-lcv-666-dependencies, branch codex/lcv-666-dependencies, initial base a5aa1594c61feb3e77bcbc91c43a615e942d42ae.
+
+Follow the current governing AGENTS/CLAUDE and skills. This actual native session starts inside the prepared worktree; verify root, actual session identity, Entire capture, current remote main, and hook availability before editing. Preserve other sessions and root work. Parent selected this isolated worktree because concurrent root/other worktrees must remain untouched. If current remote main changed, inspect it and update your own clean branch safely before edits; do not reset another checkout.
+
+Use direct PowerShell with task-owned temp, runtime environment credentials, official service APIs only. Never op run/opx/op-terminal or service MCP. Do not remove API credentials from the agent process; give code subprocesses only credentials they need. Do not print secrets, prompts, file contents, or command lines. Consult installed help for flags rather than guessing. A worktree_path_not_discovered diagnostic by itself does not prove stale hooks: inspect actual native doctor and captured caller session before claiming a failure. Never change hooks or inject a fake session identity.
+
+Verified intended updates (recheck exact current source and official release contracts):
+{
+  "repository": "lcv-leo/lcv-leo",
+  "actions": [
+    {
+      "repository": "lcv-leo/lcv-leo",
+      "commit": "a5aa1594c61feb3e77bcbc91c43a615e942d42ae",
+      "file": ".github/workflows/claude.yml",
+      "line": 44,
+      "action": "anthropics/claude-code-action",
+      "oldSha": "cc98b3ae241b0fcfb6a42a2690751afffecb4452",
+      "oldComment": "v1.0.278",
+      "newSha": "469588f42e6b1e94cd14ad09dccfeaec772ce0fd",
+      "newComment": "v1.0.280",
+      "releaseUrl": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.280"
+    },
+    {
+      "repository": "lcv-leo/lcv-leo",
+      "commit": "a5aa1594c61feb3e77bcbc91c43a615e942d42ae",
+      "file": ".github/workflows/dependency-review.yml",
+      "line": 36,
+      "action": "actions/dependency-review-action",
+      "oldSha": "a1d282b36b6f3519aa1f3fc636f609c47dddb294",
+      "oldComment": "v5.0.0",
+      "newSha": "bbc44d14a204704ccc493733616cd1e93a0321ec",
+      "newComment": "v5.0.1",
+      "releaseUrl": "https://github.com/actions/dependency-review-action/releases/tag/v5.0.1"
+    }
+  ],
+  "wranglerManifests": [],
+  "workerConfigurationFiles": []
+}
+
+The operator explicitly approved actions/dependency-review-action v5.0.1 across all 22 repositories, including the bundled minimatch license change BlueOak-1.0.0 -> ISC. Consent is preserved on LCV-666 in comment b54acf4e-d708-4751-a50e-95f15e9fec9e. Do not ask again. anthopics/claude-code-action stable target is v1.0.280; direct Wrangler target is 4.164.0. Do not change unrelated transitive Wrangler versions. Ignore selfRepositoryReferences in an older inventory: GitHub's $/ self-repository syntax is official and valid; preserve it. No source path fix is authorized.
+
+Inspect all eight dependency contract surfaces, including full-SHA pins/comments/inputs, package declarations and official lockfile regeneration, per-repository Actions allowlist, THIRDPARTY, README, contract tests/scripts, CHANGELOG Unreleased, and upstream license/terms/defaults. Do not modify AGENTS/CLAUDE. For governance repositories preserve their strict source boundaries and site byte parity; dependency updates do not authorize site or boundary changes. Preserve historical changelog releases.
+
+Dependency validation is CI-only. For npm locks run npm install --package-lock-only --ignore-scripts with task cache under temp. Do not run local test/build/lint suites on bumped checkouts. Only if direct Wrangler updates apply, the explicit exception permits npm ci --ignore-scripts followed by npx --no wrangler types exactly once per tracked worker-configuration.d.ts using its real config. Commit regenerated files. Do not restore package-lock or generated types from main afterward.
+
+Use the full AGENTS Section4 sequence: minimal implementation, SSH-signed Conventional Commit with verified Entire checkpoint and transcript; planned PR body with Refs LCV-666; a separate repository-rooted reviewer CLI session applies all three Section8 lens prompts verbatim to exact base/head read-only. Resolve or disprove every actual finding before pushing. Review dependencies read-only; do not execute code or suites. Then git push, gh pr create ready (never API, never draft), mandatory SSH-signed amend and force-with-lease handshake. Verify final signature/checkpoint and remote head. Wait for posted Codex review of the current head before another content push; fixes go in one batch.
+
+No merge and no auto-merge enablement: operator has not ordered either. If a merge happens externally, verify actual main signature and checkpoint trailers, applicable deployment and cleanup, and identify it as external. Parent owns all shared audit reporting/Slack; send no Slack messages, and create no duplicate tracker issues.
+
+After publication, capture an initial exact-head inventory of checks, all GitHub review bodies/comments/threads and Entire findings, then hand off active long-running watch to the parent instead of retaining a session solely for polling. Return the PR URL, full base/head/tree SHAs, actual checkpoint, changed paths, CI/review/finding state, remaining action, and task evidence locations. Keep task files under this worktree/temp. Do not destroy evidence or other sessions; parent preserves durable audit evidence remotely.
