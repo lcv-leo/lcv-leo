@@ -1,0 +1,8 @@
+You are executing inside an isolated Git worktree for lcv-leo/lcv-leo.
+Do the following steps strictly and concisely:
+1. Verify git rev-parse --show-toplevel and entire status --json.
+2. Run: entire agent add antigravity --force
+3. Run: entire doctor
+4. Inspect git status --porcelain and git diff. Only .agents/hooks.json (or .entire/settings.json if Entire modified it) may be changed; NEVER modify AGENTS.md, CLAUDE.md, or temp/.
+5. Stage the changed hook file(s) explicitly (never temp/) and commit using the exact prepared message file: git commit -S -F temp/commit-msg.txt (NEVER pass --no-verify).
+6. Output git log -1 --show-signature --format=fuller and stop.
