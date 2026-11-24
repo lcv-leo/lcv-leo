@@ -1,0 +1,63 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M87VRH11BGTM8BME78EKR4CE",
+  "session_id": "01a20fb0-b7aa-73e1-abce-b287a23a1d6c",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-24T22:45:26.5901765Z",
+  "branch": "codex/codeql-managed-diagnostics",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "agent": "Codex",
+  "model": "gpt-6.2-sol",
+  "turn_id": "32bd38ce552f",
+  "checkpoint_transcript_start": 473,
+  "transcript_lines_at_start": 473,
+  "compact_transcript_start": 95,
+  "token_usage": {
+    "input_tokens": 29634,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3490560,
+    "output_tokens": 10392,
+    "api_call_count": 26,
+    "subagent_tokens": {
+      "input_tokens": 25596,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 1412480,
+      "output_tokens": 3360,
+      "api_call_count": 11
+    },
+    "subagent_tokens_complete": true
+  },
+  "session_token_usage": {
+    "input_tokens": 140906,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 7353088,
+    "output_tokens": 26295,
+    "api_call_count": 64,
+    "subagent_tokens": {
+      "input_tokens": 75691,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 3367552,
+      "output_tokens": 7695,
+      "api_call_count": 31
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 34,
+    "layers": {
+      "betterleaks": 13,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 2,
+      "entropy": 27,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 1
+  }
+}

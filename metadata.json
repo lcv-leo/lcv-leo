@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M87VRH11BGTM8BME78EKR4CE",
+  "strategy": "manual-commit",
+  "branch": "codex/codeql-managed-diagnostics",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": ""
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 29634,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 3490560,
+    "output_tokens": 10392,
+    "api_call_count": 26,
+    "subagent_tokens": {
+      "input_tokens": 25596,
+      "cache_creation_tokens": 0,
+      "cache_read_tokens": 1412480,
+      "output_tokens": 3360,
+      "api_call_count": 11
+    },
+    "subagent_tokens_complete": true
+  },
+  "redaction": {
+    "replacements": 34,
+    "layers": {
+      "betterleaks": 13,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 2,
+      "credentialed_uri": 2,
+      "entropy": 27,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
