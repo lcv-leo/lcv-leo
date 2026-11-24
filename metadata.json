@@ -3,7 +3,7 @@
   "checkpoint_id": "01M87VGDR3ERJ9W4D09DF5WMCB",
   "strategy": "manual-commit",
   "branch": "codex/codeql-managed-diagnostics",
-  "checkpoints_count": 1,
+  "checkpoints_count": 2,
   "files_touched": [
     ".github/codeql-diagnostic-run.md"
   ],
@@ -14,30 +14,36 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 111272,
+    "input_tokens": 157048,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 3862528,
-    "output_tokens": 15903,
-    "api_call_count": 38,
+    "cache_read_tokens": 4050944,
+    "output_tokens": 19063,
+    "api_call_count": 42,
     "subagent_tokens": {
       "input_tokens": 50095,
       "cache_creation_tokens": 0,
       "cache_read_tokens": 1955072,
       "output_tokens": 4335,
       "api_call_count": 20
-    },
-    "subagent_tokens_complete": true
+    }
   },
   "redaction": {
-    "replacements": 26,
+    "replacements": 28,
     "layers": {
       "betterleaks": 13,
       "connection_string": 0,
       "credential_key": 0,
-      "credential_value": 2,
+      "credential_value": 4,
       "credentialed_uri": 2,
       "entropy": 15,
       "key_context": 0,
