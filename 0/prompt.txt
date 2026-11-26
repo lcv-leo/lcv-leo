@@ -1,0 +1,181 @@
+You are a repository-rooted sub-session, opened per the BLOCKING GATE in Section 4.A.2 of this repository's AGENTS.md. Your working root is the checkout you were launched in (for an iOS repository, its worktree; never touch the repository root checkout or a sibling worktree). Follow AGENTS.md there, except where this task gives an explicit OPERATOR directive: an operator directive outranks any bot, reviewer or agent opinion.
+
+PURPOSE: the branch checked out here (`copilot/changelog-2026-11-final` or `copilot/changelog-2026-11-lockfile`) holds this repository's FINAL pull request for the Actions-lockfile task (LCV-719 and LCV-738), not yet pushed. It must contain every pending task. Three items may still be missing in this repository. Apply the ones that are missing, commit, and STOP before the push.
+
+OPERATOR DIRECTIVES:
+- The master text is the operator's property and its wording is final. Apply it ONLY with the script below. Never hand-edit the master portion of AGENTS.md or CLAUDE.md; never rewrite a sentence because a bot, reviewer or agent disagrees with it. Report disagreement instead.
+- No drive-by edits. Do NOT switch branches, rebase, amend or rewrite existing commits. Never add an "Exception #4".
+- The verification job below is a CHECK THAT REPORTS AND DOES NOT BLOCK: do not add it to any ruleset, branch protection or required-check list, and do not describe it as required.
+- (iOS repositories) never modify `.github/workflows/dependabot-lineage.yml` and nothing under `quality/`.
+
+STEP 0 - Scope. Run: git rev-parse --show-toplevel (must be your root); git fetch origin; `git rev-parse --abbrev-ref HEAD` (one of the two branches above); `git status --porcelain`. Uncommitted changes to AGENTS.md, CLAUDE.md, CHANGELOG.md, THIRDPARTY.md (and its tracked copies), README.md, CONTRIBUTING.md, SECURITY.md or files under .github/workflows are earlier work of this same task: keep them and include them in your commit; list them in the report. Any other uncommitted tracked file: STOP and report.
+
+STEP 1 - Full master sync. Run exactly:
+  python "C:\Users\lcvle\lcv-workspace\temp\sync-master-text.py" "C:\Users\lcvle\lcv-workspace\lcv-leo"
+Both files must print `synced=True` or `already in sync`. Then `git hash-object AGENTS.md` equals `git hash-object CLAUDE.md`.
+
+STEP 2 - Lockfile policy statement. The operator created an enterprise Actions policy named "Actions Lockfile" (rule: Require lockfile; every organization, repository and workflow; enforcement: Evaluate). Evaluate records, under Policy insights, the runs that Active mode would block, and blocks none. In the CHANGELOG Unreleased section, find the clause stating that the `Require lockfile` policy stays off (English: "stays off", "remains off", "continues disabled"; Portuguese: "permanece desligada", "continua desativada", "segue desligada") and replace ONLY that clause, grammatical in its own language:
+  - English: "The `Require lockfile` policy runs in **Evaluate** mode at the enterprise."
+  - Portuguese: "A política `Require lockfile` roda em modo **Evaluate** no enterprise."
+Do the same in any README, CONTRIBUTING, SECURITY or THIRDPARTY sentence carrying that statement. If nothing carries it, change nothing and say so. Dated historical CHANGELOG entries stay.
+
+STEP 3 - Verification job. Create `.github/workflows/verify-lockfile.yml` with exactly this content:
+
+name: verify-lockfile
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/gh-actions-lock@5fa07d19c267d19e29f4341f10fdf7f516375038 # verify/v0.5.1
+
+This is the official example of the `github/gh-actions-lock` repository (README and verify/README.md). Exactly two adaptations are allowed, and only when the repository already uses a different convention in its other workflows:
+  (a) `runs-on`: the runner label this repository's other Linux jobs use; otherwise keep `ubuntu-latest`.
+  (b) permissions: `permissions: {}` at the top level and `permissions: contents: read` on the job; the effective grant must stay `contents: read`.
+Nothing else changes: no path filter, no `paths-ignore`, no push trigger, no extra inputs, no `continue-on-error`. Write `verify/v0.5.1` as the version (the tag `verify/v*` is the one the documentation says to pin). Match the file's indentation style of the repository's other workflows only if it differs (spaces); the content above is already the YAML the documentation shows.
+If `.github/workflows/verify-lockfile.yml` already exists on this branch, verify it equals this content and skip the creation.
+
+STEP 4 - Onboard the new workflow. Run `gh actions-lock --no-narrow` (never a plain run: a plain run rewrites every full-SHA pin into a mutable tag). It must add the new workflow and its two dependencies to `.github/workflows/actions.lock`. Then prove: `git diff --name-only origin/main -- .github/workflows/` lists only `actions.lock`, `verify-lockfile.yml` and, on a branch that introduces the lockfile itself, nothing else; no existing `.yml` changed; `gh actions-lock --verify` reports all workflows valid; zizmor over `.github/workflows` in offline mode exits 0. (iOS) `dependabot-lineage.yml` and `quality/` are untouched.
+
+STEP 5 - Documentation surfaces of the new job.
+  a. Inventory. Where THIRDPARTY.md (and each tracked copy of it) lists the GitHub Actions this repository runs, add `github/gh-actions-lock` (the action named "Verify actions.lock"), version `verify/v0.5.1`, commit `5fa07d19c267d19e29f4341f10fdf7f516375038`, MIT, license link https://github.com/github/gh-actions-lock/blob/5fa07d19c267d19e29f4341f10fdf7f516375038/LICENSE , used by `.github/workflows/verify-lockfile.yml` on every pull request. Follow the file's row or prose convention; keep tracked copies byte-identical.
+  b. Workflow lists. Where a README, CONTRIBUTING, SECURITY or docs section enumerates this repository's workflows or its pull-request checks, add the new workflow as a check that runs on every pull request and reports without blocking. Where nothing enumerates workflows, add nothing.
+  c. CHANGELOG. Add ONE Unreleased entry, in this repository's language, stating: the repository now runs the official `verify-lockfile` workflow on every pull request through `github/gh-actions-lock`, which fails when `actions.lock` is out of sync with the workflows or a locked pin no longer verifies upstream; it reports and does not block, because it is not a required check (LCV-738).
+
+STEP 6 - Mechanical checks. Set TMP, TEMP and TMPDIR to a temp/ folder inside this checkout first. Run each and paste its output:
+  & "C:\Users\lcvle\lcv-workspace\temp\sweep-versions.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"     -> VERSION-SWEEP CLEAN
+  & "C:\Users\lcvle\lcv-workspace\temp\check-inventory.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"    -> no MISSING-FROM-INVENTORY line
+  & "C:\Users\lcvle\lcv-workspace\temp\verify-claims.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"       -> CLEAN
+  gh actions-lock --verify                                                             -> all workflows valid
+Then every local gate this repository defines that reads the files this branch changed: the exact commands CI runs (from .github/workflows/ci.yml, package.json or the build files), including any test that reads the workflows or the documentation. iOS: never run Xcode or simulators; declare them as validation gaps. When a gate exits non-zero, classify it: caused by this branch (fix it), pre-existing at the base (prove by stash and re-run; out of scope), or environmental (prove which; validation gap). Never report a gate as passed when it did not run or did not pass.
+
+STEP 7 - Commit. `git merge-base origin/main HEAD` must equal `git rev-parse origin/main`. Write the message to temp/commit-msg.txt (Conventional Commits, US English, the trailer `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` as the last line). Suggested title: `ci(lockfile): verify actions.lock on every pull request and sync the workspace instructions`. The body states what you did in steps 1 to 5. `git add` each changed file by name (never temp/). Commit with `git commit -S -F temp/commit-msg.txt`. Verify with `git log -1 --format=%B` that the `Entire-Checkpoint:` trailer exists and with `git for-each-ref "refs/entire/checkpoints/**"` that its ref exists locally. Never pass --no-verify. Never run `entire session attach`.
+
+STEP 8 - STOP. Do not push, do not open a pull request, do not create temp/pr-body.md.
+
+REPORT (short): branch; `git log --oneline origin/main..HEAD`; `git diff --name-only origin/main...HEAD`; which of the three items were missing and what you did for each; the new workflow file content if you adapted it; the lockfile entries added; the mechanical check outputs; every gate with its exit code; anything out of scope you noticed and did NOT touch.
+
+
+======================================================================
+RESUME ADDENDUM. This session RESUMES an earlier one that was killed from outside while working in this checkout, before it could commit. Where this addendum and the task above differ, the addendum prevails.
+
+R1. Working tree. The uncommitted changes you find are that earlier session's work on this same task and this same branch. Keep them: read `git status --porcelain` and `git diff`, finish what is incomplete, correct what is wrong, and include all of it in your commit. Never discard them: no `git checkout -- <file>`, no `git restore`, no `git reset`, no branch switch, no rebase, no `git clean`. The sentence in STEP 0 that says to STOP on an uncommitted tracked file outside its list does not apply to the files named in R5.
+
+R2. Finish the earlier work FIRST (skip each item that is already complete, and prove it with a command), then run STEPS 1 to 8 above.
+  a. Lockfile. `gh actions-lock --verify` must report every workflow valid. Every `uses:` line keeps its full 40-character commit SHA and its version comment. If any was rewritten to a tag, restore that workflow file with `git checkout origin/main -- <file>` and run `gh actions-lock --no-narrow` again. Never a plain `gh actions-lock`.
+  b. Inventory. Every file that lists the GitHub Actions this repository runs (THIRDPARTY.md and each tracked copy, `git ls-files "*THIRDPARTY*"`; any README, CONTRIBUTING or SECURITY section that names Action versions) agrees with the live `uses:` pins and with the `dependencies:` section of actions.lock:
+     - each directly used Action: the live version, its commit, and a license link that resolves at that commit (check with `gh api repos/<owner>/<repo>/contents/LICENSE?ref=<sha>`);
+     - each transitive-only Action, and each second revision of an Action that a workflow also pins directly: named with the Action that pulls it in, its commit, and a license link at that commit; when a workflow pins the same Action directly at another revision, name both paths;
+     - tracked copies byte-identical to their source (`git hash-object`).
+     Leave version drift that already exists at the base and that you do not touch, and report it.
+  c. Prose. No undated passage of tracked Markdown still declares actions.lock nonexistent, retired or forbidden, and none still says the `Require lockfile` policy is off (STEP 2 above gives the wording). Dated historical CHANGELOG entries stay.
+  d. CHANGELOG, Unreleased section. It carries one entry, in this repository's language and style, recording the adoption of the lockfile and the inventory reconciliation and referencing LCV-719. Complete it if it is missing or unfinished. The entry STEP 5c asks for is a separate, additional entry.
+  e. Every instruction you write or edit about generating or refreshing the lockfile names `gh actions-lock --no-narrow`.
+
+R3. To prove that a failing gate also fails at the base, STEP 6 allows `git stash`. If you use it: push and pop in the same command, then prove with `git status --porcelain` that the working tree is exactly as before; leave no stash of yours behind (`git stash list`).
+
+R4. Report, before the task's own report: what the earlier session had left unfinished, what you corrected, and every stash entry that existed before you started (do not touch those).
+
+R5. Files outside the task's list that belong in this commit:
+None. This repository is a public user-account repository, `lcv-leo/lcv-leo`: pass `--repo lcv-leo/lcv-leo` to every gh command that needs a repository and accepts it; `gh actions-lock` reads the repository from this checkout's remote.
+
+---
+
+You are a repository-rooted sub-session, opened per the BLOCKING GATE in Section 4.A.2 of this repository's AGENTS.md. Your working root is the checkout you were launched in (for an iOS repository, its worktree; never touch the repository root checkout or a sibling worktree). Follow AGENTS.md there, except where this task gives an explicit OPERATOR directive: an operator directive outranks any bot, reviewer or agent opinion.
+
+PURPOSE: the branch checked out here (`copilot/changelog-2026-11-final` or `copilot/changelog-2026-11-lockfile`) holds this repository's FINAL pull request for the Actions-lockfile task (LCV-719 and LCV-738), not yet pushed. It must contain every pending task. Three items may still be missing in this repository. Apply the ones that are missing, commit, and STOP before the push.
+
+OPERATOR DIRECTIVES:
+- The master text is the operator's property and its wording is final. Apply it ONLY with the script below. Never hand-edit the master portion of AGENTS.md or CLAUDE.md; never rewrite a sentence because a bot, reviewer or agent disagrees with it. Report disagreement instead.
+- No drive-by edits. Do NOT switch branches, rebase, amend or rewrite existing commits. Never add an "Exception #4".
+- The verification job below is a CHECK THAT REPORTS AND DOES NOT BLOCK: do not add it to any ruleset, branch protection or required-check list, and do not describe it as required.
+- (iOS repositories) never modify `.github/workflows/dependabot-lineage.yml` and nothing under `quality/`.
+
+STEP 0 - Scope. Run: git rev-parse --show-toplevel (must be your root); git fetch origin; `git rev-parse --abbrev-ref HEAD` (one of the two branches above); `git status --porcelain`. Uncommitted changes to AGENTS.md, CLAUDE.md, CHANGELOG.md, THIRDPARTY.md (and its tracked copies), README.md, CONTRIBUTING.md, SECURITY.md or files under .github/workflows are earlier work of this same task: keep them and include them in your commit; list them in the report. Any other uncommitted tracked file: STOP and report.
+
+STEP 1 - Full master sync. Run exactly:
+  python "C:\Users\lcvle\lcv-workspace\temp\sync-master-text.py" "C:\Users\lcvle\lcv-workspace\lcv-leo"
+Both files must print `synced=True` or `already in sync`. Then `git hash-object AGENTS.md` equals `git hash-object CLAUDE.md`.
+
+STEP 2 - Lockfile policy statement. The operator created an enterprise Actions policy named "Actions Lockfile" (rule: Require lockfile; every organization, repository and workflow; enforcement: Evaluate). Evaluate records, under Policy insights, the runs that Active mode would block, and blocks none. In the CHANGELOG Unreleased section, find the clause stating that the `Require lockfile` policy stays off (English: "stays off", "remains off", "continues disabled"; Portuguese: "permanece desligada", "continua desativada", "segue desligada") and replace ONLY that clause, grammatical in its own language:
+  - English: "The `Require lockfile` policy runs in **Evaluate** mode at the enterprise."
+  - Portuguese: "A política `Require lockfile` roda em modo **Evaluate** no enterprise."
+Do the same in any README, CONTRIBUTING, SECURITY or THIRDPARTY sentence carrying that statement. If nothing carries it, change nothing and say so. Dated historical CHANGELOG entries stay.
+
+STEP 3 - Verification job. Create `.github/workflows/verify-lockfile.yml` with exactly this content:
+
+name: verify-lockfile
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/gh-actions-lock@5fa07d19c267d19e29f4341f10fdf7f516375038 # verify/v0.5.1
+
+This is the official example of the `github/gh-actions-lock` repository (README and verify/README.md). Exactly two adaptations are allowed, and only when the repository already uses a different convention in its other workflows:
+  (a) `runs-on`: the runner label this repository's other Linux jobs use; otherwise keep `ubuntu-latest`.
+  (b) permissions: `permissions: {}` at the top level and `permissions: contents: read` on the job; the effective grant must stay `contents: read`.
+Nothing else changes: no path filter, no `paths-ignore`, no push trigger, no extra inputs, no `continue-on-error`. Write `verify/v0.5.1` as the version (the tag `verify/v*` is the one the documentation says to pin). Match the file's indentation style of the repository's other workflows only if it differs (spaces); the content above is already the YAML the documentation shows.
+If `.github/workflows/verify-lockfile.yml` already exists on this branch, verify it equals this content and skip the creation.
+
+STEP 4 - Onboard the new workflow. Run `gh actions-lock --no-narrow` (never a plain run: a plain run rewrites every full-SHA pin into a mutable tag). It must add the new workflow and its two dependencies to `.github/workflows/actions.lock`. Then prove: `git diff --name-only origin/main -- .github/workflows/` lists only `actions.lock`, `verify-lockfile.yml` and, on a branch that introduces the lockfile itself, nothing else; no existing `.yml` changed; `gh actions-lock --verify` reports all workflows valid; zizmor over `.github/workflows` in offline mode exits 0. (iOS) `dependabot-lineage.yml` and `quality/` are untouched.
+
+STEP 5 - Documentation surfaces of the new job.
+  a. Inventory. Where THIRDPARTY.md (and each tracked copy of it) lists the GitHub Actions this repository runs, add `github/gh-actions-lock` (the action named "Verify actions.lock"), version `verify/v0.5.1`, commit `5fa07d19c267d19e29f4341f10fdf7f516375038`, MIT, license link https://github.com/github/gh-actions-lock/blob/5fa07d19c267d19e29f4341f10fdf7f516375038/LICENSE , used by `.github/workflows/verify-lockfile.yml` on every pull request. Follow the file's row or prose convention; keep tracked copies byte-identical.
+  b. Workflow lists. Where a README, CONTRIBUTING, SECURITY or docs section enumerates this repository's workflows or its pull-request checks, add the new workflow as a check that runs on every pull request and reports without blocking. Where nothing enumerates workflows, add nothing.
+  c. CHANGELOG. Add ONE Unreleased entry, in this repository's language, stating: the repository now runs the official `verify-lockfile` workflow on every pull request through `github/gh-actions-lock`, which fails when `actions.lock` is out of sync with the workflows or a locked pin no longer verifies upstream; it reports and does not block, because it is not a required check (LCV-738).
+
+STEP 6 - Mechanical checks. Set TMP, TEMP and TMPDIR to a temp/ folder inside this checkout first. Run each and paste its output:
+  & "C:\Users\lcvle\lcv-workspace\temp\sweep-versions.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"     -> VERSION-SWEEP CLEAN
+  & "C:\Users\lcvle\lcv-workspace\temp\check-inventory.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"    -> no MISSING-FROM-INVENTORY line
+  & "C:\Users\lcvle\lcv-workspace\temp\verify-claims.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"       -> CLEAN
+  gh actions-lock --verify                                                             -> all workflows valid
+Then every local gate this repository defines that reads the files this branch changed: the exact commands CI runs (from .github/workflows/ci.yml, package.json or the build files), including any test that reads the workflows or the documentation. iOS: never run Xcode or simulators; declare them as validation gaps. When a gate exits non-zero, classify it: caused by this branch (fix it), pre-existing at the base (prove by stash and re-run; out of scope), or environmental (prove which; validation gap). Never report a gate as passed when it did not run or did not pass.
+
+STEP 7 - Commit. `git merge-base origin/main HEAD` must equal `git rev-parse origin/main`. Write the message to temp/commit-msg.txt (Conventional Commits, US English, the trailer `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` as the last line). Suggested title: `ci(lockfile): verify actions.lock on every pull request and sync the workspace instructions`. The body states what you did in steps 1 to 5. `git add` each changed file by name (never temp/). Commit with `git commit -S -F temp/commit-msg.txt`. Verify with `git log -1 --format=%B` that the `Entire-Checkpoint:` trailer exists and with `git for-each-ref "refs/entire/checkpoints/**"` that its ref exists locally. Never pass --no-verify. Never run `entire session attach`.
+
+STEP 8 - STOP. Do not push, do not open a pull request, do not create temp/pr-body.md.
+
+REPORT (short): branch; `git log --oneline origin/main..HEAD`; `git diff --name-only origin/main...HEAD`; which of the three items were missing and what you did for each; the new workflow file content if you adapted it; the lockfile entries added; the mechanical check outputs; every gate with its exit code; anything out of scope you noticed and did NOT touch.
+
+
+======================================================================
+RESUME ADDENDUM. This session RESUMES an earlier one that was killed from outside while working in this checkout, before it could commit. Where this addendum and the task above differ, the addendum prevails.
+
+R1. Working tree. The uncommitted changes you find are that earlier session's work on this same task and this same branch. Keep them: read `git status --porcelain` and `git diff`, finish what is incomplete, correct what is wrong, and include all of it in your commit. Never discard them: no `git checkout -- <file>`, no `git restore`, no `git reset`, no branch switch, no rebase, no `git clean`. The sentence in STEP 0 that says to STOP on an uncommitted tracked file outside its list does not apply to the files named in R5.
+
+R2. Finish the earlier work FIRST (skip each item that is already complete, and prove it with a command), then run STEPS 1 to 8 above.
+  a. Lockfile. `gh actions-lock --verify` must report every workflow valid. Every `uses:` line keeps its full 40-character commit SHA and its version comment. If any was rewritten to a tag, restore that workflow file with `git checkout origin/main -- <file>` and run `gh actions-lock --no-narrow` again. Never a plain `gh actions-lock`.
+  b. Inventory. Every file that lists the GitHub Actions this repository runs (THIRDPARTY.md and each tracked copy, `git ls-files "*THIRDPARTY*"`; any README, CONTRIBUTING or SECURITY section that names Action versions) agrees with the live `uses:` pins and with the `dependencies:` section of actions.lock:
+     - each directly used Action: the live version, its commit, and a license link that resolves at that commit (check with `gh api repos/<owner>/<repo>/contents/LICENSE?ref=<sha>`);
+     - each transitive-only Action, and each second revision of an Action that a workflow also pins directly: named with the Action that pulls it in, its commit, and a license link at that commit; when a workflow pins the same Action directly at another revision, name both paths;
+     - tracked copies byte-identical to their source (`git hash-object`).
+     Leave version drift that already exists at the base and that you do not touch, and report it.
+  c. Prose. No undated passage of tracked Markdown still declares actions.lock nonexistent, retired or forbidden, and none still says the `Require lockfile` policy is off (STEP 2 above gives the wording). Dated historical CHANGELOG entries stay.
+  d. CHANGELOG, Unreleased section. It carries one entry, in this repository's language and style, recording the adoption of the lockfile and the inventory reconciliation and referencing LCV-719. Complete it if it is missing or unfinished. The entry STEP 5c asks for is a separate, additional entry.
+  e. Every instruction you write or edit about generating or refreshing the lockfile names `gh actions-lock --no-narrow`.
+
+R3. To prove that a failing gate also fails at the base, STEP 6 allows `git stash`. If you use it: push and pop in the same command, then prove with `git status --porcelain` that the working tree is exactly as before; leave no stash of yours behind (`git stash list`).
+
+R4. Report, before the task's own report: what the earlier session had left unfinished, what you corrected, and every stash entry that existed before you started (do not touch those).
+
+R5. Files outside the task's list that belong in this commit:
+None. This repository is a public user-account repository, `lcv-leo/lcv-leo`: pass `--repo lcv-leo/lcv-leo` to every gh command that needs a repository and accepts it; `gh actions-lock` reads the repository from this checkout's remote.
