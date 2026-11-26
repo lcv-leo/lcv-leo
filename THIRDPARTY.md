@@ -11,14 +11,23 @@ JavaScript uses browser built-ins and GitHub APIs.
 The versioned inventory is the repository's **dependency graph** (Insights →
 Dependency graph), which GitHub maintains from the committed manifest, lockfile
 and workflow files and exports as an SBOM on request. Versions, version ranges
-and immutable commit pins for everything a workflow references directly live
-only in `package.json`, `package-lock.json`, the workflow files and
-`.github/workflows/actions.lock`, where Dependabot updates them; this document
-does not restate those direct pins, so it can never drift from those sources.
-The single exception is the transitive Action revisions that no
-workflow `uses:` line points at: their exact commits are named in the
-subsection under **GitHub
-Actions** below, because no workflow reference records them. The
+and immutable commit pins for everything a workflow references directly are
+authoritative only in `package.json`, `package-lock.json`, the workflow files
+and `.github/workflows/actions.lock`, where Dependabot updates them; every
+version, commit and link this document names for a GitHub Action is a derived
+record of those sources, not an independent pin. That covers the license links
+in the inventory table and the subsection under **GitHub Actions** below: a
+commit SHA embedded in a license link points at the license as it exists at the
+pinned commit recorded for that Action in those sources — the workflow `uses:`
+pin for a direct revision, the lockfile entry for a transitive one. The
+subsection names the exact commit of each transitive Action revision, because
+no workflow reference records them, and restates a direct release and commit
+only where the lockfile records both revisions of an Action and they must be
+told apart. So whenever a pin changes, each version label, recorded commit and
+link commit that names that Action in this document must be updated to track
+it. This rule governs the Actions inventory only; a hosted-media license link,
+such as the Devicon one, records the source revision of the media copied into
+the repository in the media section below. The
 GitHub Actions dependency lockfile (`.github/workflows/actions.lock`, generated
 by `gh actions-lock --no-narrow` and never edited by hand) pins those transitive
 Actions and records each source repository's identity

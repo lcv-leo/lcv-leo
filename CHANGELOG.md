@@ -26,9 +26,11 @@ version. Dates are written `DD/MM/AAAA` in Brasília time (UTC−03:00).
   mode at the enterprise. This
   repository has no same-repository `uses: ./` action, so neither
   `--migrate-local-actions` nor `--ignore-local-actions` applies. `AGENTS.md`
-  and `CLAUDE.md` Sections 6.E item 2 and 7.A now copy the workspace master
-  text that adopts the lockfile, replacing the passages that declared it
-  nonexistent or retired, and `SECURITY.md`, `CONTRIBUTING.md` and the
+  and `CLAUDE.md` were fully synced with the workspace master text, which
+  adopts the lockfile in Sections 6.E item 2 and 7.A, replacing the passages
+  that declared it nonexistent or retired, and the same sync also carries the
+  master's Section 5.F governance-repository rewrite and the Section 7.B
+  license-compliance update; `SECURITY.md`, `CONTRIBUTING.md` and the
   third-party inventory carry the same rule; the inventory's license links for
   `github/codeql-action`, `zizmorcore/zizmor-action` and
   `anthropics/claude-code-action` were aligned to the pins the workflow files
