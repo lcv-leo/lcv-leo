@@ -11,9 +11,19 @@ JavaScript uses browser built-ins and GitHub APIs.
 The versioned inventory is the repository's **dependency graph** (Insights →
 Dependency graph), which GitHub maintains from the committed manifest, lockfile
 and workflow files and exports as an SBOM on request. Versions, version ranges
-and immutable commit pins live only in `package.json`, `package-lock.json` and
-the workflow files, where Dependabot updates them; this document deliberately
-does not repeat them, so it can never drift from those sources. The official GitHub
+and immutable commit pins for everything a workflow references directly live
+only in `package.json`, `package-lock.json`, the workflow files and
+`.github/workflows/actions.lock`, where Dependabot updates them; this document
+does not restate those direct pins, so it can never drift from those sources.
+The single exception is the transitive Action revisions that no
+workflow `uses:` line points at: their exact commits are named in the
+subsection under **GitHub
+Actions** below, because no workflow reference records them. The
+GitHub Actions dependency lockfile (`.github/workflows/actions.lock`, generated
+by `gh actions-lock --no-narrow` and never edited by hand) pins those transitive
+Actions and records each source repository's identity
+([Workflow dependency lockfiles](https://docs.github.com/en/actions/concepts/security/workflow-dependency-lockfiles)).
+The official GitHub
 Dependency Review action evaluates manifest and lockfile changes on every pull
 request to `main`, and the Pages workflow installs the committed lockfile with lifecycle
 scripts disabled.
@@ -23,12 +33,19 @@ The licenses below apply only to their respective third-party components.
 
 ## GitHub Actions
 
-Every external Action is pinned to an immutable commit SHA in the workflows, as
-the repository's Actions policy requires. Tooling that an Action selects at
-runtime (the Linear CLI, the zizmor tool and Scorecard image, the CodeQL bundle
-used by code scanning, the `oven-sh/setup-bun` step that the Claude Code Action
-runs) is governed by that Action's own release and license; the Claude Code
-software itself has its own license, noted below the table.
+Every external Action is pinned to a full-length immutable commit SHA: the
+workflow files carry their direct `uses:` references with a version comment,
+as the repository's Actions policy requires, and the lockfile described above
+records each resolved commit.
+The table lists every external Action repository that a
+workflow `uses:` line references, plus `oven-sh/setup-bun`, marked
+"Transitive only" because no `uses:` line references it. The subsection below
+names the exact commit of each transitive dependency the lockfile records.
+Tooling that an
+Action selects at runtime (the Linear CLI, the zizmor tool and Scorecard image,
+and the CodeQL bundle used by code scanning) is governed by that Action's own
+release and license; the Claude Code software itself has its own license, noted
+below the table.
 
 | Component                          | License                                                                      | Source                                              | Purpose                                                     |
 | ---------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
@@ -40,10 +57,12 @@ software itself has its own license, noted below the table.
 | `actions/upload-pages-artifact`    | [MIT](https://github.com/actions/upload-pages-artifact/blob/main/LICENSE)    | https://github.com/actions/upload-pages-artifact    | Package the Pages artifact                                  |
 | `actions/deploy-pages`             | [MIT](https://github.com/actions/deploy-pages/blob/main/LICENSE)             | https://github.com/actions/deploy-pages             | Deploy the Pages artifact                                   |
 | `actions/upload-artifact`          | [MIT](https://github.com/actions/upload-artifact/blob/main/LICENSE)          | https://github.com/actions/upload-artifact          | Retain the Scorecard SARIF artifact                         |
-| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/33d7b85da1a04171e211befe2c739303b9a4c066/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
+| `github/codeql-action`             | [MIT](https://github.com/github/codeql-action/blob/915412ff23e8b7659517e607487dbeae018f2934/LICENSE)             | https://github.com/github/codeql-action             | Upload the Scorecard SARIF to code scanning                 |
 | `ossf/scorecard-action`            | [Apache-2.0](https://github.com/ossf/scorecard-action/blob/main/LICENSE)     | https://github.com/ossf/scorecard-action            | Assess supply-chain posture                                 |
-| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/45d7276c9ca790aabd705e31ca99c6185c3e76dd/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
-| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/469588f42e6b1e94cd14ad09dccfeaec772ce0fd/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
+| `zizmorcore/zizmor-action`         | [MIT](https://github.com/zizmorcore/zizmor-action/blob/1b4550e929643b8b26a62303c6bd64814271a4f1/LICENSE) | https://github.com/zizmorcore/zizmor-action         | Audit GitHub Actions workflows                              |
+| `anthropics/claude-code-action`    | [MIT](https://github.com/anthropics/claude-code-action/blob/4411a9e9b0283becf4b924f7bce360fd7756c78c/LICENSE)    | https://github.com/anthropics/claude-code-action    | Respond to Claude mentions in issues and pull requests      |
+| `oven-sh/setup-bun`                | [MIT](https://github.com/oven-sh/setup-bun/blob/0c5077e51419868618aeaa5fe8019c62421857d6/LICENSE)                | https://github.com/oven-sh/setup-bun                | Transitive only: locked inside `anthropics/claude-code-action` |
+| `github/gh-actions-lock`           | [MIT](https://github.com/github/gh-actions-lock/blob/5fa07d19c267d19e29f4341f10fdf7f516375038/LICENSE)           | https://github.com/github/gh-actions-lock           | "Verify actions.lock" (`verify/v0.5.1`) in `verify-lockfile.yml` on every pull request |
 
 `github/codeql-action` is MIT-licensed; the CodeQL CLI that GitHub's code
 scanning default setup runs is governed by the
@@ -59,6 +78,30 @@ commit pin of the consumer workflow. The repository keeps the official Action
 because Scorecard is mandatory and the upstream project exposes no consumer-side
 image digest override. Track
 [ossf/scorecard-action#1676](https://github.com/ossf/scorecard-action/issues/1676).
+
+### Transitive Actions recorded in the lockfile
+
+The lockfile's `dependencies:` section resolves three Action revisions that no
+workflow `uses:` line points at. Each is pinned in the lockfile to the exact
+commit below, MIT-licensed, and reached only through the parent Action named
+for it:
+
+- `oven-sh/setup-bun` v2.2.0 (`0c5077e51419868618aeaa5fe8019c62421857d6`,
+  [license](https://github.com/oven-sh/setup-bun/blob/0c5077e51419868618aeaa5fe8019c62421857d6/LICENSE)),
+  pulled in by `anthropics/claude-code-action` v1.0.290. No workflow references
+  it directly.
+- `actions/upload-artifact` v7.0.0 (`bbbca2ddaa5d8feaa63e36b76fdaad77386f024f`,
+  [license](https://github.com/actions/upload-artifact/blob/bbbca2ddaa5d8feaa63e36b76fdaad77386f024f/LICENSE)),
+  pulled in by `actions/upload-pages-artifact` v5.0.0. The workflow
+  `.github/workflows/scorecard.yml` pins `actions/upload-artifact` itself at a
+  different revision, v7.0.2
+  (`cf430e030ddbb5b0abf93d22962f4752f3646cd9`); the lockfile records both.
+- `github/codeql-action` v4.39.3 (`33d7b85da1a04171e211befe2c739303b9a4c066`,
+  [license](https://github.com/github/codeql-action/blob/33d7b85da1a04171e211befe2c739303b9a4c066/LICENSE)),
+  pulled in by `zizmorcore/zizmor-action` v0.9.2. The workflow
+  `.github/workflows/scorecard.yml` pins the same Action at v4.39.5
+  (`915412ff23e8b7659517e607487dbeae018f2934`) for the SARIF upload; the
+  lockfile records both.
 
 ## CI-only browser validation tooling
 
