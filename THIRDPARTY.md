@@ -17,12 +17,15 @@ and `.github/workflows/actions.lock`, where Dependabot updates them; this
 document states no version or `uses:` pin of its own. The links to each
 component's license text are derived from those sources, not independent
 records: a license link that embeds a commit SHA points at the license as it
-exists at the commit the workflow pins today, so whenever a pin changes the
-embedded commit in the corresponding license link must be updated to track it.
-The transitive Action revisions that no workflow `uses:` line points at are
-the one case where this document names commits itself: their exact commits
-are named in the subsection under **GitHub
-Actions** below, because no workflow reference records them. The
+exists at the pinned commit recorded for that component in those sources —
+the workflow `uses:` pin for a direct revision, the lockfile entry for a
+transitive one — so whenever a pin changes, the embedded commit in the
+corresponding license link must be updated to track it. The subsection under
+**GitHub
+Actions** below is where this document names commits: the exact commit of
+each transitive Action revision, because no workflow reference records them,
+citing a direct commit only where the lockfile records both revisions and they
+must be told apart. The
 GitHub Actions dependency lockfile (`.github/workflows/actions.lock`, generated
 by `gh actions-lock --no-narrow` and never edited by hand) pins those transitive
 Actions and records each source repository's identity
