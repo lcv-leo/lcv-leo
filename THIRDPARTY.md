@@ -11,13 +11,17 @@ JavaScript uses browser built-ins and GitHub APIs.
 The versioned inventory is the repository's **dependency graph** (Insights →
 Dependency graph), which GitHub maintains from the committed manifest, lockfile
 and workflow files and exports as an SBOM on request. Versions, version ranges
-and immutable commit pins for everything a workflow references directly live
-only in `package.json`, `package-lock.json`, the workflow files and
-`.github/workflows/actions.lock`, where Dependabot updates them; this document
-does not restate those direct pins, so it can never drift from those sources.
-The single exception is the transitive Action revisions that no
-workflow `uses:` line points at: their exact commits are named in the
-subsection under **GitHub
+and immutable commit pins for everything a workflow references directly are
+authoritative only in `package.json`, `package-lock.json`, the workflow files
+and `.github/workflows/actions.lock`, where Dependabot updates them; this
+document states no version or `uses:` pin of its own. The links to each
+component's license text are derived from those sources, not independent
+records: a license link that embeds a commit SHA points at the license as it
+exists at the commit the workflow pins today, so whenever a pin changes the
+embedded commit in the corresponding license link must be updated to track it.
+The transitive Action revisions that no workflow `uses:` line points at are
+the one case where this document names commits itself: their exact commits
+are named in the subsection under **GitHub
 Actions** below, because no workflow reference records them. The
 GitHub Actions dependency lockfile (`.github/workflows/actions.lock`, generated
 by `gh actions-lock --no-narrow` and never edited by hand) pins those transitive
