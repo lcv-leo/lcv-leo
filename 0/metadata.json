@@ -1,0 +1,45 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M8B80KR9Y1MW7Q9BRFJK6ETY",
+  "session_id": "0c0c9f7a-8702-4f3f-8272-9395a3d94de8",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-26T06:17:19.0188081Z",
+  "branch": "copilot/docs-thirdparty-changelog-fix",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CHANGELOG.md",
+    "THIRDPARTY.md"
+  ],
+  "agent": "Copilot CLI",
+  "model": "",
+  "turn_id": "dac1a9f87399",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 83502,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1428992,
+    "output_tokens": 31083,
+    "api_call_count": 24
+  },
+  "session_token_usage": {
+    "input_tokens": 83502,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1428992,
+    "output_tokens": 31083,
+    "api_call_count": 24
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
