@@ -1,0 +1,89 @@
+You are a repository-rooted sub-session, opened per the BLOCKING GATE in Section 4.A.2 of this repository's AGENTS.md. Your working root is the checkout you were launched in. Follow AGENTS.md there. This task is narrow: apply exactly the corrections listed under ITEMS, commit, and stop.
+
+CONTEXT. The branch checked out here holds this repository's final pull request for the Actions-lockfile task (LCV-719 and LCV-738), not yet pushed. An adversarial review and a mechanical sweep found the defects listed below. Most are the same kind: a version written in prose must equal the version the workflow actually pins. The live Linear Release pin, in every repository below, is:
+
+  uses: linear/linear-release-action@cfd42077dccdc0c26a38589934e2aa11046f57b7 # v0.18.3
+
+RULES. Change only what ITEMS names, line by line. Never switch branches, rebase, amend, reset, stash or rewrite existing commits. Never pass --no-verify. Never run `entire session attach`. Never push. Keep each file's line endings and encoding exactly as they are: edit bytes, not re-serialized text (PowerShell's Set-Content or Out-File can add a BOM or change CRLF to LF; prefer a small python script that reads the file as bytes, replaces the exact byte sequence, and writes bytes back). After editing, `git diff --stat` must show only the files of ITEMS, a few lines each: a whole-file change means the line endings changed, so undo that file (`git checkout -- <file>`) and redo the edit on bytes.
+
+ITEMS
+- LF. `.github/workflows/verify-lockfile.yml` was committed with CRLF line endings; this repository stores LF. Rewrite it from the committed bytes, replacing every `\r\n` with `\n` and changing nothing else:
+    python -c "import subprocess;p='.github/workflows/verify-lockfile.yml';b=subprocess.run(['git','cat-file','blob','HEAD:'+p],capture_output=True).stdout;open(p,'wb').write(b.replace(b'\r\n',b'\n'))"
+  Proof: the committed blob of the new HEAD has 0 carriage returns and the same number of line feeds as before; `git diff --ignore-cr-at-eol HEAD~1 HEAD -- .github/workflows/verify-lockfile.yml` is empty.
+
+FINAL PROOF. Set TMP, TEMP and TMPDIR to a temp/ folder inside this checkout first. Paste each output:
+  git status --porcelain                       -> only the files of ITEMS
+  git diff --stat                              -> only those files, a few lines each
+  git diff --check                             -> empty
+  python "C:\Users\lcvle\lcv-workspace\temp\sync-master-text.py" --check "C:\Users\lcvle\lcv-workspace\lcv-leo"   -> both files already in sync. AGENTS.md and CLAUDE.md are never items: if either appears changed, STOP and report.
+  & "C:\Users\lcvle\lcv-workspace\temp\sweep-versions.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"         -> VERSION-SWEEP CLEAN
+  & "C:\Users\lcvle\lcv-workspace\temp\check-inventory.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"        -> no MISSING-FROM-INVENTORY line
+  & "C:\Users\lcvle\lcv-workspace\temp\verify-claims.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"          -> CLEAN, except for the single informational line `WORKFLOW-CHANGED .github/workflows/linear-release.yml` when ITEMS edits the comment of that file; any other line is a defect: fix it.
+  & "C:\Users\lcvle\lcv-workspace\temp\check-urls.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"             -> every URL answers 200
+  gh actions-lock --verify                                                                    -> all workflows valid
+  For each existing workflow file ITEMS edited: its blob keeps its line endings (the carriage-return count of `git cat-file blob HEAD:<file>` equals the one of `HEAD~1:<file>`; count bytes with python `subprocess`, not with a PowerShell text pipe), and after the commit `git diff HEAD~1 HEAD -- <file>` shows only comment lines, each starting with whitespace and `#`.
+
+COMMITS. Message in temp/commit-msg.txt (US English, Conventional Commits, the trailer `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` as the last line). `git add` each file by name (never temp/). `git commit -S -F temp/commit-msg.txt`. Never --no-verify.
+  1. If ITEMS contains the item `LF`, commit that file alone first, with exactly this message:
+
+ci(lockfile): store the verify-lockfile workflow with LF line endings
+
+The file was committed with CRLF line endings while every other file in this
+repository is stored with LF. Its content does not change.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+  2. If other items remain, commit them together with this message (title given under ITEMS; the body has one line per correction, then `Refs: LCV-719`, then the trailer):
+
+(none)
+
+  For every commit, verify the `Entire-Checkpoint:` trailer in `git log -1 --format=%B` and its ref under refs/entire/checkpoints/.
+
+STOP. No push, no pull request.
+REPORT (short): each item with the text before and after; the FINAL PROOF outputs; each new commit sha with its checkpoint id.
+
+---
+
+You are a repository-rooted sub-session, opened per the BLOCKING GATE in Section 4.A.2 of this repository's AGENTS.md. Your working root is the checkout you were launched in. Follow AGENTS.md there. This task is narrow: apply exactly the corrections listed under ITEMS, commit, and stop.
+
+CONTEXT. The branch checked out here holds this repository's final pull request for the Actions-lockfile task (LCV-719 and LCV-738), not yet pushed. An adversarial review and a mechanical sweep found the defects listed below. Most are the same kind: a version written in prose must equal the version the workflow actually pins. The live Linear Release pin, in every repository below, is:
+
+  uses: linear/linear-release-action@cfd42077dccdc0c26a38589934e2aa11046f57b7 # v0.18.3
+
+RULES. Change only what ITEMS names, line by line. Never switch branches, rebase, amend, reset, stash or rewrite existing commits. Never pass --no-verify. Never run `entire session attach`. Never push. Keep each file's line endings and encoding exactly as they are: edit bytes, not re-serialized text (PowerShell's Set-Content or Out-File can add a BOM or change CRLF to LF; prefer a small python script that reads the file as bytes, replaces the exact byte sequence, and writes bytes back). After editing, `git diff --stat` must show only the files of ITEMS, a few lines each: a whole-file change means the line endings changed, so undo that file (`git checkout -- <file>`) and redo the edit on bytes.
+
+ITEMS
+- LF. `.github/workflows/verify-lockfile.yml` was committed with CRLF line endings; this repository stores LF. Rewrite it from the committed bytes, replacing every `\r\n` with `\n` and changing nothing else:
+    python -c "import subprocess;p='.github/workflows/verify-lockfile.yml';b=subprocess.run(['git','cat-file','blob','HEAD:'+p],capture_output=True).stdout;open(p,'wb').write(b.replace(b'\r\n',b'\n'))"
+  Proof: the committed blob of the new HEAD has 0 carriage returns and the same number of line feeds as before; `git diff --ignore-cr-at-eol HEAD~1 HEAD -- .github/workflows/verify-lockfile.yml` is empty.
+
+FINAL PROOF. Set TMP, TEMP and TMPDIR to a temp/ folder inside this checkout first. Paste each output:
+  git status --porcelain                       -> only the files of ITEMS
+  git diff --stat                              -> only those files, a few lines each
+  git diff --check                             -> empty
+  python "C:\Users\lcvle\lcv-workspace\temp\sync-master-text.py" --check "C:\Users\lcvle\lcv-workspace\lcv-leo"   -> both files already in sync. AGENTS.md and CLAUDE.md are never items: if either appears changed, STOP and report.
+  & "C:\Users\lcvle\lcv-workspace\temp\sweep-versions.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"         -> VERSION-SWEEP CLEAN
+  & "C:\Users\lcvle\lcv-workspace\temp\check-inventory.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"        -> no MISSING-FROM-INVENTORY line
+  & "C:\Users\lcvle\lcv-workspace\temp\verify-claims.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"          -> CLEAN, except for the single informational line `WORKFLOW-CHANGED .github/workflows/linear-release.yml` when ITEMS edits the comment of that file; any other line is a defect: fix it.
+  & "C:\Users\lcvle\lcv-workspace\temp\check-urls.ps1" -Root "C:\Users\lcvle\lcv-workspace\lcv-leo"             -> every URL answers 200
+  gh actions-lock --verify                                                                    -> all workflows valid
+  For each existing workflow file ITEMS edited: its blob keeps its line endings (the carriage-return count of `git cat-file blob HEAD:<file>` equals the one of `HEAD~1:<file>`; count bytes with python `subprocess`, not with a PowerShell text pipe), and after the commit `git diff HEAD~1 HEAD -- <file>` shows only comment lines, each starting with whitespace and `#`.
+
+COMMITS. Message in temp/commit-msg.txt (US English, Conventional Commits, the trailer `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` as the last line). `git add` each file by name (never temp/). `git commit -S -F temp/commit-msg.txt`. Never --no-verify.
+  1. If ITEMS contains the item `LF`, commit that file alone first, with exactly this message:
+
+ci(lockfile): store the verify-lockfile workflow with LF line endings
+
+The file was committed with CRLF line endings while every other file in this
+repository is stored with LF. Its content does not change.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+
+  2. If other items remain, commit them together with this message (title given under ITEMS; the body has one line per correction, then `Refs: LCV-719`, then the trailer):
+
+(none)
+
+  For every commit, verify the `Entire-Checkpoint:` trailer in `git log -1 --format=%B` and its ref under refs/entire/checkpoints/.
+
+STOP. No push, no pull request.
+REPORT (short): each item with the text before and after; the FINAL PROOF outputs; each new commit sha with its checkpoint id.

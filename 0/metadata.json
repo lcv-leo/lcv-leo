@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M8B15B65XRTCQD51SE10C509",
+  "session_id": "29c866ce-386d-4fb1-9fec-4b7722987052",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-26T04:17:33.5494824Z",
+  "branch": "copilot/changelog-2026-11-lockfile",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".github/workflows/verify-lockfile.yml"
+  ],
+  "agent": "Copilot CLI",
+  "model": "",
+  "turn_id": "0080929f25a6",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 44622,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 216064,
+    "output_tokens": 2959,
+    "api_call_count": 5
+  },
+  "session_token_usage": {
+    "input_tokens": 44622,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 216064,
+    "output_tokens": 2959,
+    "api_call_count": 5
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
