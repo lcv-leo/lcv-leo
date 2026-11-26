@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.13.4",
+  "checkpoint_id": "01M8B0GMKA8SK67PFV4TADE4NY",
+  "session_id": "34635df2-6c84-4528-8a15-bbfc2dc9bfd8",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-26T04:06:18.4679051Z",
+  "branch": "copilot/changelog-2026-11-lockfile",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "THIRDPARTY.md"
+  ],
+  "agent": "Copilot CLI",
+  "model": "",
+  "turn_id": "5a04f624f751",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 257211,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10311936,
+    "output_tokens": 221913,
+    "api_call_count": 101
+  },
+  "session_token_usage": {
+    "input_tokens": 257211,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10311936,
+    "output_tokens": 221913,
+    "api_call_count": 101
+  },
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
