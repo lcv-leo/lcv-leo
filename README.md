@@ -249,7 +249,8 @@ motto: "Fail closed, test first, ship through pull requests."
 ```
 Fail closed: a gate that cannot verify must refuse, never guess
 RED before GREEN — the failing test is half the proof
-Every external action pinned to a full commit SHA, every dependency in a lockfile
+External actions use full commit SHAs with version comments
+The GitHub Actions lockfile records direct and transitive action pins
 Nothing reaches production outside a pull request merged into main
 Six AI models argue over my code before it ships — unanimity or it doesn't merge
 Evidence over narrative: logs, SHAs and run IDs, or it didn't happen
@@ -448,3 +449,6 @@ From idea to deployed edge worker is my favorite journey
 ## Entire
 
 See [Entire setup, merge gates and verification evidence](docs/entire.md).
+
+Repository instructions are in [AGENTS.md](AGENTS.md) and
+[CLAUDE.md](CLAUDE.md).
